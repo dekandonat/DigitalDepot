@@ -6,13 +6,21 @@ export default function Navbar(){
         <img 
         src = {logo} 
         alt = "Digital Depot logo" 
-        style = {{height: '50px', width: 'auto'}} 
+        id = "navbarLogo"
         ></img> 
-        
-        <input 
-        type="button" 
-        value="Bejelentkezés" 
-        style={{padding: '8px 16px', cursor: 'pointer'}} 
-        ></input> 
+    
+        <div id="navbarActions">
+            <input
+            type = "button"
+            value = "CartPlaceholder"
+            id = "navbarCartBtn"
+            ></input>
+
+            <input 
+            type = "button" 
+            value  ="Bejelentkezés" 
+            id = "navbarLoginBtn"
+            ></input> 
+        </div>
     </nav> ); 
 }
