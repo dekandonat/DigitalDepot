@@ -1,0 +1,16 @@
+{
+    "slides": [
+        {
+            "src": "./src/assets/sliderImg/slide1.png",
+            "alt": "Első kép"
+        },
+        {
+            "src": "./src/assets/sliderImg/slide2.png",
+            "alt": "Második kép"
+        },
+        {
+            "src": "./src/assets/sliderImg/slide3.png",
+            "alt": "Harmadik kép"
+        }
+    ]
+}
