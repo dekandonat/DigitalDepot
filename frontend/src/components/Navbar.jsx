@@ -1,4 +1,5 @@
 import logo from '../assets/logo.png'; 
+import NavSearchBar from './NavSearchBar';
 
 export default function Navbar(){ 
     return ( 
@@ -10,6 +11,8 @@ export default function Navbar(){
         ></img> 
     
         <div id="navbarActions">
+            <NavSearchBar />
+
             <input
             type = "button"
             value = "CartPlaceholder"
