@@ -24,4 +24,15 @@ module.exports = class Products{
             throw err;
         }
     }
+
+    static async fetch(id){
+        try{
+            const [rows] = await db.execute(`SELECT * FROM products WHERE prodId = ${id}`);
+            console.log(rows);
+            return rows;
+        }
+        catch(err){
+            throw err;
+        }
+    }
 }

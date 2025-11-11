@@ -16,28 +16,38 @@ app.use(cors());
 app.post('/products', (req, res) => {
     const product = new Products(req.body.prodName, req.body.prodId , req.body.prodDescription, req.body.prodPrice, req.body.prodImg);
     product.save();
-    res.status(201).json({message: "product saved!"});
+    res.status(201).json({result: "success"});
 });
 
-app.get('/products/:prodId', (req, res) => {
+app.get('/products/:prodId', async(req, res) => {
     const id = req.params.prodId;
-    const product = Products.fetchAll().find(prod => prod.prodId == id);
-
-    if(!product){
-        return res.status(404).json({message: "Nincs ilyen termék!"});
+    try{
+        const data = await Products.fetch(id);
+        if(data.length > 0){
+            res.status(200).json({result: "success", data: data});
+        }
+        else{
+            res.status(404).json({result: "fail", message: "no product with this id"});
+        }
     }
-
-    res.json(product);
+    catch(err){
+        res.status(500).json({result: "fail", message: err.message});
+    }
 });
 
 app.get('/products', async(req, res) => {
     try{
         const data = await Products.fetchAll();
-        res.status(200).json(data);
+        if(data.length > 0){
+            res.status(200).json({result: "success", data: data});
+        }
+        else{
+            res.status(404).json({result: "fail", message: "no products"});
+        }
     }
     catch(err){
         console.log(err);
-        res.status(500).json({result: "fail"});
+        res.status(500).json({result: "fail", message: err.message});
     }
 });
 
