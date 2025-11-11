@@ -1,17 +1,21 @@
 const db = require('../util/database');
 
 module.exports = class Products{
-    constructor(prodName, prodId, prodDescription, prodPrice, prodImg){
+    constructor(prodName, prodDescription, prodPrice, prodImg){
         this.prodName = prodName;
-        this.prodId = prodId;
         this.prodDescription = prodDescription;
         this.prodPrice = prodPrice;
         this.prodImg = prodImg;
     }
 
-    save(){ 
-        products.push(this);
-        console.log(products);
+    async save(){ 
+        try{
+            await db.execute(`INSERT INTO products (productName, productDescription, productPrice, productImg) VALUES ("${this.prodName}", "${this.prodDescription}", ${this.prodPrice}, "${this.prodImg}")`);
+            return {result: "success"};
+        }
+        catch(err){
+            return {result: "fail", message: err.message};
+        }
     }
 
     static async fetchAll(){

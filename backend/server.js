@@ -13,10 +13,15 @@ const Products = require('./models/products');
 app.use(express.json());
 app.use(cors());
 
-app.post('/products', (req, res) => {
-    const product = new Products(req.body.prodName, req.body.prodId , req.body.prodDescription, req.body.prodPrice, req.body.prodImg);
-    product.save();
-    res.status(201).json({result: "success"});
+app.post('/products', async(req, res) => {
+    const product = new Products(req.body.prodName, req.body.prodDescription, req.body.prodPrice, req.body.prodImg);
+    const result = await product.save();
+    if(result.message === "success"){
+        res.status(201).json(result);
+    }
+    else{
+        res.status(500).json(result);
+    }
 });
 
 app.get('/products/:prodId', async(req, res) => {
