@@ -1,19 +1,4 @@
-let products = [
-    {
-    "prodName": "Wired Mouse",
-    "prodId": 1,
-    "prodDescription": "Ergonomic wired mouse with adjustable DPI.",
-    "prodPrice": 25.99,
-    "prodImg": "https://example.com/images/wireless-mouse.jpg"
-  },
-  {
-    "prodName": "Mechanical Keyboard",
-    "prodId": 2,
-    "prodDescription": "RGB mechanical keyboard with tactile switches and customizable lighting.",
-    "prodPrice": 79.99,
-    "prodImg": "https://example.com/images/mechanical-keyboard.jpg"
-  }
-];
+const db = require('../util/database');
 
 module.exports = class Products{
     constructor(prodName, prodId, prodDescription, prodPrice, prodImg){
@@ -29,7 +14,14 @@ module.exports = class Products{
         console.log(products);
     }
 
-    static fetchAll(){
-        return products;
+    static async fetchAll(){
+        try{
+            const [rows] = await db.execute('SELECT * FROM products');
+            console.log(rows);
+            return rows;
+        }
+        catch(err){
+            throw err;
+        }
     }
 }

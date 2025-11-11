@@ -30,8 +30,15 @@ app.get('/products/:prodId', (req, res) => {
     res.json(product);
 });
 
-app.get('/products', (req, res) => {
-    res.json(Products.fetchAll());
+app.get('/products', async(req, res) => {
+    try{
+        const data = await Products.fetchAll();
+        res.status(200).json(data);
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({result: "fail"});
+    }
 });
 
 app.listen(PORT, IP, ()=>{
