@@ -1,5 +1,6 @@
-import logo from '../assets/logo.png'; 
+import logo from '../assets/NavImages/logo.png'; 
 import NavSearchBar from './NavSearchBar';
+import "./Navbar.css";
 
 export default function Navbar(){ 
     return ( 
@@ -13,17 +14,13 @@ export default function Navbar(){
         <div id="navbarActions">
             <NavSearchBar />
 
-            <input
-            type = "button"
-            value = "CartPlaceholder"
+            <button 
             id = "navbarCartBtn"
-            ></input>
+            ></button>
 
-            <input 
-            type = "button" 
-            value  ="Bejelentkezés" 
+            <button
             id = "navbarLoginBtn"
-            ></input> 
+            ></button>
         </div>
     </nav> ); 
 }

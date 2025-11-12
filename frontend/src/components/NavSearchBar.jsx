@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import "./NavSearchBar.css";
+import SearchIcon from "../assets/NavImages/search-icon.png";
 
 export default function NavSearchBar({onSearch}) {
     const [searched, setSearched] = useState("");
@@ -19,11 +20,9 @@ export default function NavSearchBar({onSearch}) {
                 placeholder="Keressen rá valamire"
                 id="navSearchText"
             ></input>
-            <input 
-                type="button"
-                value="Keresés"
-                id="navSearchButton"
-            ></input>
+            <button
+            id="navSearchButton"
+            ><img src={SearchIcon} alt="Search Icon" id="searchIconId"></img></button>
         </form>
     );
 }

@@ -1,0 +1,48 @@
+#mainCategoriesNav{
+  left: 0;
+  width: 90vw;
+  justify-self: center;
+  border-bottom: 1px solid darkgray;
+  background-color: white;
+  transition: all 0.3s ease;
+  overflow: visible;
+}
+
+#mainCategoriesList{
+  display: flex;
+  justify-content: space-around;
+  list-style: none;
+  margin: 0;
+  padding: 10px 0;
+}
+
+#mainCategoriesList > li {
+  position: relative;
+  cursor: pointer;
+  padding: 8px 20px;
+  text-align: center;
+}
+
+.subCategories{
+  list-style: none;
+  margin-top: 8px;
+  padding: 0;
+  text-align: center;
+  animation: expandDown 0.5s ease forwards;
+}
+
+.subCategories li {
+  padding: 6px 0;
+  border-top: 1px solid darkgray;
+}
+
+@keyframes expandDown {
+  from{
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to{
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

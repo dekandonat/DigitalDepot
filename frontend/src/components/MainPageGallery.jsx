@@ -1,5 +1,6 @@
 import React from "react";
 import { useState } from "react";
+import "./MainPageGallery.css";
 
 export default function MainPageGallery({data}) {
     const [current, setCurrent] = useState(0);

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import "./MainCategoriesMenu.css";
 
 const CATEGORIES = {
     Category1: ['Sub Category1', 'Sub Category2', 'Sub Category3'],

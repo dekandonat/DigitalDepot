@@ -1,0 +1,50 @@
+#navbar{ 
+  display: flex;
+  height: 50px;
+  justify-content: space-between; 
+  align-items: center; 
+  border-bottom: 1px solid darkgray; 
+  padding: 5px; 
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+#navbarLogo{
+  height: 12vh;
+  width: auto;
+}
+
+#navbarActions{
+  display: flex;
+  align-items: center;
+  gap: 6vw;
+  margin-right: 2vw;
+}
+
+#navbarCartBtn{
+  height: 4vh;
+  width: auto;
+  padding: 6px 12px;
+  cursor: pointer;
+  border: none;
+  background-image: url(../assets/NavImages/shopping-cart-icon.png);
+  background-color: white;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#navbarLoginBtn{
+  height: 4vh;
+  width: auto;
+  padding: 6px 12px;
+  cursor: pointer;
+  border: none;
+  background-image: url(../assets/NavImages/login-icon.png);
+  background-color: white;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
