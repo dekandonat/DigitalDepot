@@ -27,19 +27,19 @@
 }
 
 #searchIconId{
-    height: 3vh;
+    height: 2.5vh;
     width: auto;
 }
 
 @media(min-width: 768px){
     .searchBar{
-        width: 30vw;
+        width: 350px;
         border: 1px solid black;
         margin-right: 1vw;
     }
 
     #navSearchText{
-        width: 75%;
+        width: 100%;
         display: inline-block;
         flex: 1;
         padding: 4px 15px;
@@ -54,7 +54,7 @@
     }
 
     #navSearchButton{
-        width: 25%;
+        width: 70px;
         border-left: 1px solid black;
         background-color: lightblue;
     }

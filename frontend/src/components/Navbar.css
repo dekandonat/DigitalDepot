@@ -12,15 +12,15 @@
 }
 
 #navbarLogo{
-  height: 12vh;
+  height: 10vh;
   width: auto;
 }
 
 #navbarActions{
   display: flex;
   align-items: center;
-  gap: 6vw;
-  margin-right: 2vw;
+  gap: 30px;
+  margin-right: 20px;
 }
 
 #navbarCartBtn{
