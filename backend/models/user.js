@@ -23,7 +23,7 @@ module.exports = class User {
         data: { username: this.userName, email: this.email },
       };
     } catch (err) {
-      return { result: 'fail', message: err.message };
+      return { result: 'fail', data: err.message };
     }
   }
 
@@ -33,20 +33,27 @@ module.exports = class User {
     );
 
     if (rows.length == 0) {
-      return { result: 'fail', message: 'no such user exists' };
+      return { result: 'fail', data: 'no such user exists' };
     }
 
     const hashedPassword = rows[0].hashedPassword;
     const result = await bcrypt.compare(password, hashedPassword);
 
     if (result) {
-      const email = rows[0].email;
-      const userName = rows[0].userName;
-      const id = rows[0].userId;
-      return {
-        result: 'success',
-        message: { email: email, userName: userName, id: id },
-      };
+      try {
+        const userEmail = rows[0].email;
+        const userName = rows[0].userName;
+        const id = rows[0].userId;
+        const token = jwt.sign({ id: id }, process.env.SECRET, {
+          expiresIn: '1h',
+        });
+        return {
+          result: 'success',
+          message: { email: userEmail, userName: userName, token: token },
+        };
+      } catch (err) {
+        return { result: 'fail', data: 'token generation failed' };
+      }
     } else {
       return { result: 'fail', data: 'incorrect password' };
     }
