@@ -1,0 +1,136 @@
+.formBackground{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(3px);
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.formContent{
+    background-color: white;
+    width: 100%;
+    max-width: 400px;
+    padding: 25px 20px;
+    border-radius: 16px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease-out;
+    box-sizing: border-box;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+.formCloseBtn{
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    background: #f0f0f0;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: gray;
+    transition: background-color 0.2;
+}
+
+.formCloseBtn:hover{
+    cursor: pointer;
+    background-color: #e0e0e0;
+    color: black;
+}
+
+h2{
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.formItems{
+    margin-bottom: 16px;
+}
+
+.formItems label{
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: 600;
+}
+
+.formItems input{
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+    background-color: #fafafa;
+}
+
+.formItems input:focus{
+    outline: none;
+    border-color: lightblue;
+    background-color: white;
+}
+
+.submitBtn{
+    width: 100%;
+    padding: 14px;
+    background-color: lightblue;
+    color: black;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.submitBtn:active{
+    transform: scale(0.95);
+}
+
+.switchModeText{
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+    color: gray;
+    padding: 10px;
+    font-weight: 500;
+}
+
+.switchModeText:hover{
+    cursor: pointer;
+    color: #0066cc;
+}
+
+@media(min-width: 768px){
+    .formContent{
+        padding: 40px;
+    }
+
+    h2{
+        font-size: 1.8rem
+    }
+}
