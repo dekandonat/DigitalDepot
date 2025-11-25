@@ -26,31 +26,70 @@ export default function LoginForm({ onClose }){
     const [successMsg, setSuccessMsg] = useState('');
 
     const stopFormClosing = (e) => {
-        e.stopPropagation();
+        if(e.target === e.currentTarget){
+            onClose();
+        }
     }
 
     const submit = async(e) => {
-        let form = e.target;
-        let email = form.email.value;
-        let password = form.password.value;
-        let userName = form.userName.value;
-        let password2 = form.password2.value;
-        console.log(email, password, userName, password2);
-    }
+        e.preventDefault();
+        setErrorMsg('');
+        setSuccessMsg('');
 
-    if(!isLogin && password !== password2){ű
-        setErrorMsg('A két jelzsó nem egyezik!');
-        form.reset();
-        return;
+        let form = e.target;
+        let email = form.email.value.trim();
+        let password = form.password.value.trim();
+        let userName = form.userName?.value.trim();
+        let password2 = form.password2?.value.trim();
+
+        if(!isLogin && password !== password2){
+            setErrorMsg('A két jelzsó nem egyezik!');
+            return;
+        }
+
+        let url;
+        if(isLogin === true){
+            url = 'http://localhost:3000/user/login';
+        }
+        else{
+            url = 'http://localhost:3000/user/register';
+        }
+
+        let dataValues = {
+            email: email,
+            password: password,
+            userName : userName
+        }
+
+        try{
+            const response = await postMethodFetch(url, dataValues);
+
+            if(isLogin){
+                alert('Sikeres bejelentkezés!');
+                onClose();
+            }
+            else{
+                setSuccessMsg('Sikeres regisztrácó!');
+                setIsLogin(true);
+                form.reset();
+            }
+        }
+        catch(error){
+            console.error("Hiba történt: ", error)
+            setErrorMsg(error.message);
+        }
     }
 
     return (
-        <div className='formBackground' onClick={onClose}>
-            <div className='formContent' onClick={stopFormClosing}>
+        <div className='formBackground' onMouseDown={onClose}>
+            <div className='formContent' onMouseDown={(e) => e.stopPropagation()}>
                 <button className='formCloseBtn' onClick={onClose}>&times;</button>
                 <h2>{isLogin ? 'Bejelentkezés' : 'Regisztráció'}</h2>
 
-                <form>
+                {errorMsg && <p className='message' id="error">{errorMsg}</p>}
+                {successMsg && <p className='message' id="success">{successMsg}</p>}
+
+                <form onSubmit={submit}>
                     {!isLogin && (
                         <div className='formItems'>
                             <label for='userNameInput'>Felhasználónév</label>

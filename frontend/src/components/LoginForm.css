@@ -125,6 +125,27 @@ h2{
     color: #0066cc;
 }
 
+.message {
+    text-align: center;
+    font-weight: bold;
+    margin: 10px 0;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+#error{
+    color: red;
+    background-color: beige;
+    border: 1px solid lightgoldenrodyellow;
+}
+
+#success{
+    color: green;
+    background-color: beige;
+    border: 1px solid lightgoldenrodyellow;
+}
+
 @media(min-width: 768px){
     .formContent{
         padding: 40px;
