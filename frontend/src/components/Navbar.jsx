@@ -1,9 +1,18 @@
 import logo from '../assets/NavImages/logo.png'; 
 import SearchIcon from "../assets/NavImages/search-icon.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Navbar.css";
 
-export default function Navbar({ onLoginClick }){ 
+export default function Navbar({ onLoginClick, onProfileClick }){ 
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if(storedUser){
+            setUser(storedUser);
+        }
+    }, []);
+
     return ( 
     <nav id="navbar"> 
         <img 
@@ -19,10 +28,17 @@ export default function Navbar({ onLoginClick }){
                 id = "navbarCartBtn"
             ></button>
 
-            <button
+            {user ? (
+                <button
+                id = "navbarProfileBtn"
+                onClick={onProfileClick}
+                ></button>
+            ) : (
+                <button
                 id = "navbarLoginBtn"
                 onClick={onLoginClick}
-            ></button>
+                ></button>
+            )}
         </div>
     </nav> ); 
 }

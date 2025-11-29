@@ -51,6 +51,19 @@
   background-position: center;
 }
 
+#navbarProfileBtn{
+  height: 4vh;
+  width: auto;
+  padding: 6px 12px;
+  cursor: pointer;
+  border: none;
+  background-image: url(../assets/NavImages/profile-pic.png);
+  background-color: white;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .searchBar{
     display: flex;
     align-items: center;

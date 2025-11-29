@@ -65,8 +65,12 @@ export default function LoginForm({ onClose }){
             const response = await postMethodFetch(url, dataValues);
 
             if(isLogin){
+                localStorage.setItem('token', response.message.token);
+                localStorage.setItem('user', response.message.userName);
+                localStorage.setItem('email', response.message.email);
                 alert('Sikeres bejelentkezés!');
                 onClose();
+                window.location.reload();
             }
             else{
                 setSuccessMsg('Sikeres regisztrácó!');

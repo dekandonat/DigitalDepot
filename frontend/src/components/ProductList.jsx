@@ -52,15 +52,11 @@ export default function ProductList() {
     return (
         <div className="productListContainer">
             <h2 id="productGridTitle">Kiemelt termékeink</h2>
-            {products.length === 0 ? (
-                <p>Jelenleg nincsenek kiemelt termékek.</p>
-            ) : (
-                <div className="productGrid">
-                    {products.map(product => (
-                        <ProductCard key={product.prodId} product={product} />
-                    ))}
-                </div>
-            )}
+            <div className="productGrid">
+                {products.map(product => (
+                    <ProductCard key={product.prodId} product={product} />
+                ))}
+            </div>
         </div>
     );
 }
