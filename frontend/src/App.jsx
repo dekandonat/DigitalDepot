@@ -9,12 +9,14 @@ import "./main.css";
 
 export default function App() { 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  const [selectedCategoryId, setSelectedCategoryId] = useState(false);
   return ( 
     <> 
       <Navbar onLoginClick = {() => setIsLoginOpen(true)}/> 
       <MainPageGallery data = {slides}/>
-      <MainCategoriesMenu />
-      <ProductList />
+      <MainCategoriesMenu onCategorySelect={setSelectedCategoryId}/>
+      <ProductList selectedCategoryId={selectedCategoryId}/>
 
       {isLoginOpen && 
       <LoginForm onClose = {() => setIsLoginOpen(false)} />
