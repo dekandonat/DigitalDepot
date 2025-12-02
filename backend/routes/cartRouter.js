@@ -26,6 +26,28 @@ router.get('/', async (req, res) => {
         console.log(err);
         res.status(500).json({result: 'fail', message: 'failed to validate token'});
     }
+});
+
+router.post('/add/:id/:quantity', async (req, res) => {
+    const authorizationHeader = req.headers['authorization'];
+    const token = authorizationHeader && authorizationHeader.split(' ')[1];
+    const productId = req.params.id;
+    const quantity = req.params.quantity;
+    
+    if(!token){
+        return res.status(404).json({result: 'fail', message: 'no token found'});
+    }
+
+    try{
+        const decodedToken = await verifyAsync(token, process.env.SECRET);
+        const userId = decodedToken.id;
+        await db.execute(`INSERT INTO carts (userId, productId, quantity) VALUES (${userId}, ${productId}, ${quantity}) ON DUPLICATE KEY UPDATE quantity = quantity + 1;`)
+        res.status(201).json({result: 'success'});
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({result: 'fail', message: 'failed to validate token'});
+    }
 })
 
 module.exports = router;
