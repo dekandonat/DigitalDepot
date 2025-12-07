@@ -125,6 +125,83 @@ h2{
     color: #0066cc;
 }
 
+.message {
+    text-align: center;
+    font-weight: bold;
+    margin: 10px 0;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+#error{
+    color: red;
+    background-color: beige;
+    border: 1px solid lightgoldenrodyellow;
+}
+
+#success{
+    color: green;
+    background-color: beige;
+    border: 1px solid lightgoldenrodyellow;
+}
+
+.profilePicContainer{
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 15px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid lightblue;
+    overflow: hidden;
+}
+
+#profileImg{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profileDataSection{
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+
+.profileDataRow{
+    font-size: 1.1rem;
+    color: black;
+    margin: 10px 0;
+    padding-bottom: 8px;
+}
+
+.profileLabel{
+    font-weight: bold;
+    color: black;
+    margin-right: 8px;
+}
+
+.proileData{
+    color: black;
+}
+
+#logoutBtn{
+    background-color: #ffcccc;
+    color: red;
+    border: 1px solid #ffcdd2;
+    margin-top: 15px;
+}
+
+#logoutBtn:hover{
+    background-color: #ffb3b3;
+    box-shadow: 0 4px 6px rgba(211, 47, 47, 0.2);
+}
+
+#logoutBtn:active{
+    transform: scale(0.98);
+}
+
 @media(min-width: 768px){
     .formContent{
         padding: 40px;
