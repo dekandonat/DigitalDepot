@@ -51,7 +51,7 @@ export default function Cart({ onClose }){
         }
 
         try{
-            const response = await getCartFetch('http://localhost:3000/cart', token);
+            const response = await getCartFetch('/cart', token);
 
             if(response.result === 'success'){
                 setCartItems(response.data.items);
@@ -93,7 +93,7 @@ export default function Cart({ onClose }){
             <div id="cartContent" onClick={(e) => e.stopPropagation()}>
                 <div id="cartHeader">
                     <h2>Kosár</h2>
-                    <button id="cartCloseBtn" onClick={onCLose}>&times;</button>
+                    <button id="cartCloseBtn" onClick={onClose}>&times;</button>
                 </div>
 
                 <div id="cartItemsList">

@@ -3,7 +3,7 @@ import SearchIcon from "../assets/NavImages/search-icon.png";
 import { useEffect, useState } from "react";
 import "./Navbar.css";
 
-export default function Navbar({ onLoginClick, onProfileClick }){ 
+export default function Navbar({ onLoginClick, onProfileClick, onCartClick }){ 
     const [user, setUser] = useState(null);
 
     useEffect(() => {
@@ -26,6 +26,7 @@ export default function Navbar({ onLoginClick, onProfileClick }){
 
             <button 
                 id = "navbarCartBtn"
+                onClick={onCartClick}
             ></button>
 
             {user ? (
