@@ -20,7 +20,7 @@ export default function MainCategoriesMenu({ onCategorySelect }) {
         }
 
         const fetchCategories = async() => {
-            const url = 'http://localhost:3000/category';
+            const url = '/category';
 
             try{
                 const result = await getMethodFetch(url);

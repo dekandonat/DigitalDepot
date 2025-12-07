@@ -3,13 +3,50 @@ import { useState, useEffect } from 'react';
 import './ProductList.css';
 
 function ProductCard({ product }) {
+
+    const postToCartFetch = (url, token) => {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then((response) => {
+            if(!response.ok){
+                throw new Error(`POST hiba: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .catch((error) => {
+            throw new Error(`Hiba történt: ${error.message}`);
+        });
+    };
+
+    const addToCart = async () => {
+        const token = localStorage.getItem('token');
+
+        if(!token){
+            alert("Ehez be kell jelentkeznie!");
+            return;
+        }
+
+        const url = `/cart/add/${product.prodId}/1`;
+
+        try{
+            const response = await postToCartFetch(url, token);
+        } catch(error){
+            console.error("Hiba: ", error);
+            alert("Valami hiba van!");
+        }
+    };
+
     return (
         <div className="productCard">
             <img src={product.productImg} alt={product.productName} />
             <h3>{product.productName}</h3>
             <p>{product.productDescription}</p>
             <span className="productPrice">{product.productPrice} Ft</span>
-            <input type="button" value="Kosárba" id="intoCartButton"></input>
+            <input type="button" value="Kosárba" id="intoCartButton" onClick={addToCart}></input>
         </div>
     );
 }
@@ -33,8 +70,8 @@ export default function ProductList({ selectedCategoryId }) {
 
         const fetchProducts = async () => {
             try {
-                const productsResult = await getMethodFetch('http://localhost:3000/products');
-                const categoriesResult = await getMethodFetch('http://localhost:3000/category');
+                const productsResult = await getMethodFetch('/products');
+                const categoriesResult = await getMethodFetch('/category');
 
                 let allProducts = [];
                 if (productsResult.data) {

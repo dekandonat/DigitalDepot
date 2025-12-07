@@ -6,7 +6,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      '/cart': 'http://localhost:3000',
       '/products': 'http://localhost:3000',
+      '/category': 'http://localhost:3000',
+      '/user': 'http://localhost:3000'
     }
   }
 });

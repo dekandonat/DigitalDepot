@@ -1,0 +1,124 @@
+#cartBackground{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: flex-end;
+    z-index: 2000;
+    backdrop-filter: blur(3px);
+}
+
+#cartContent{
+    background-color: white;
+    width: 100%;
+    max-width: 450px;
+    height: 100%;
+    padding: 20px;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.3s ease-out;
+    box-sizing: border-box;
+    position: relative;
+}
+
+@keyframes slideIn{
+    from {transform: translateX(100%);}
+    to {transform: translateX(0);}
+}
+
+#cartHeader h2{
+    margin: 0;
+    color: #333;
+}
+
+#cartCloseBtn{
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #666;
+    padding: 0 10px;
+}
+
+#cartCloseBtn:hover{
+    color: black;
+}
+
+#cartItemsList{
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.cartItem{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+}
+
+.cartItemInfo h4{
+    margin: 0 0 5px 0;
+    font-size: 1rem;
+}
+
+.cartItemInfo p{
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.cartControls{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantityBtn{
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.quantityBtn:hover{
+    background-color: #e0e0e0;
+}
+
+#cartFooter{
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+    margin-top: auto;
+}
+
+#totalRow{
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+#checkoutBtn{
+    width: 100%;
+    padding: 15px;
+    background-color: lightblue;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: transform 0.1s;
+}
+
+#checkoutBtn:active{
+    transform: scale(0.98);
+}
