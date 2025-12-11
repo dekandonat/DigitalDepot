@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import './ProductList.css';
 
 function ProductCard({ product }) {
@@ -51,8 +52,12 @@ function ProductCard({ product }) {
     );
 }
 
-export default function ProductList({ selectedCategoryId }) {
+export default function ProductList() {
     const [products, setProducts] = useState([]);
+
+    const { categoryId } = useParams();
+    const [searchParams] = useSearchParams();
+    const searchWord = searchParams.get('q');
 
     useEffect(() => {
         const getMethodFetch = (url) => {
@@ -69,68 +74,64 @@ export default function ProductList({ selectedCategoryId }) {
         }
 
         const fetchProducts = async () => {
-            try {
-                const productsResult = await getMethodFetch('/products');
+            try{
+                let url = '/products';
+
+                if(searchWord){
+                    url = `/products?search=${searchWord}`;
+                }
+
+                const productsResult = await getMethodFetch(url);
                 const categoriesResult = await getMethodFetch('/category');
 
-                let allProducts = [];
-                if (productsResult.data) {
-                    allProducts = productsResult.data;
-                }
+                let allProducts = productsResult.data || [];
+                let allCategories = categoriesResult.data || [];
 
-                let allCategories = [];
-                if (categoriesResult.data) {
-                    allCategories = categoriesResult.data;
-                }
-
-                if (!selectedCategoryId) {
+                if(searchWord){
                     setProducts(allProducts);
-                } else {
-                    const relevantCategoryIds = [];
-                    relevantCategoryIds.push(selectedCategoryId);
-
-                    for (let i = 0; i < allCategories.length; i++) {
-                        if (allCategories[i].parentId === selectedCategoryId) {
-                            relevantCategoryIds.push(allCategories[i].categoryId);
-                        }
-                    }
-
-                    const filteredProducts = [];
-                    for (let i = 0; i < allProducts.length; i++) {
-                        let isMatch = false;
-                        for (let j = 0; j < relevantCategoryIds.length; j++) {
-                            if (allProducts[i].categoryId === relevantCategoryIds[j]) {
-                                isMatch = true;
-                                break;
-                            }
-                        }
-                        
-                        if (isMatch) {
-                            filteredProducts.push(allProducts[i]);
-                        }
-                    }
-
-                    setProducts(filteredProducts);
                 }
+                else if(categoryId){
+                    const selectedIds = [parseInt(categoryId)];
 
-            } catch (error) {
-                console.error("Hiba történt: ", error);
+                    allCategories.forEach(category => {
+                        if(category.parentId == categoryId) {
+                            selectedIds.push(category.categoryId);
+                        }
+                    });
+
+                    const filtered = allProducts.filter(p => selectedIds.includes(p.categoryId));
+                    setProducts(filtered);
+                }
+                else{
+                    setProducts(allProducts);
+                }
+            }
+            catch(error) 
+            {
+                console.error("Hiba: ", error);
                 setProducts([]);
             }
+
         }
 
         fetchProducts();
-    }, [selectedCategoryId]);
+    }, [categoryId, searchWord]);
 
+    let title = "Kiemelt termékeink";
+    if(searchWord){
+        title = `Találatok err: ${searchWord}`;
+    }
+
+    if(categoryId){
+        title = "Kategória termékei";
+    }
     return (
-        <div className="productListContainer">
-            <h2 id="productGridTitle">
-                {selectedCategoryId ? "Kategória termékei" : "Kiemelt termékeink"}
-            </h2>
+        <div id="productListContainer">
+            <h2 id="productGridTitle">{title}</h2>
             {products.length === 0 ? (
-                <p>Jelenleg nincsenek termékek ebben a kategóriában.</p>
+                <p>Nincs találat</p>
             ) : (
-                <div className="productGrid">
+                <div id="productGrid">
                     {products.map(product => (
                         <ProductCard key={product.prodId} product={product} />
                     ))}

@@ -1,127 +1,138 @@
-#navbar{ 
+#navbar { 
   display: flex;
-  height: 50px;
+  height: 60px;
   justify-content: space-between; 
   align-items: center; 
-  border-bottom: 1px solid darkgray; 
-  padding: 5px; 
+  border-bottom: 1px solid #eee; 
+  padding: 0 15px; 
   position: sticky;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(5px);
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-#navbarLogo{
-  height: 10vh;
+#navbarLogo {
+  height: 40px;
   width: auto;
+  object-fit: contain;
+  cursor: pointer;
 }
 
-#navbarActions{
+#navbarActions {
   display: flex;
   align-items: center;
-  gap: 30px;
-  margin-right: 20px;
+  gap: 15px;
 }
 
-#navbarCartBtn{
-  height: 4vh;
-  width: auto;
-  padding: 6px 12px;
+#navbarCartBtn,
+#navbarLoginBtn,
+#navbarProfileBtn {
+  height: 36px;
+  width: 36px;
+  padding: 8px;
   cursor: pointer;
-  border: none;
-  background-image: url(../assets/NavImages/shopping-cart-icon.png);
-  background-color: white;
-  background-size: contain;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background-color: #f8f9fa;
+  background-size: 20px;
   background-repeat: no-repeat;
   background-position: center;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
-#navbarLoginBtn{
-  height: 4vh;
-  width: auto;
-  padding: 6px 12px;
-  cursor: pointer;
-  border: none;
-  background-image: url(../assets/NavImages/login-icon.png);
-  background-color: white;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+#navbarCartBtn { background-image: url(../assets/NavImages/shopping-cart-icon.png); }
+#navbarLoginBtn { background-image: url(../assets/NavImages/login-icon.png); }
+#navbarProfileBtn { background-image: url(../assets/NavImages/profile-pic.png); }
+
+#navbarCartBtn:hover,
+#navbarLoginBtn:hover,
+#navbarProfileBtn:hover {
+  background-color: #e2e6ea;
+  border-color: #dae0e5;
 }
 
-#navbarProfileBtn{
-  height: 4vh;
-  width: auto;
-  padding: 6px 12px;
-  cursor: pointer;
-  border: none;
-  background-image: url(../assets/NavImages/profile-pic.png);
-  background-color: white;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.searchBar{
+.searchBar {
     display: flex;
     align-items: center;
-    border-radius: 25px;
-    overflow: hidden;
-    background-color: white;
+    border-radius: 20px;
+    background-color: #f1f3f5;
+    transition: width 0.3s;
+    border: 1px solid transparent;
 }
 
-#navSearchText{
+.searchBar:focus-within {
+    background-color: white;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.1);
+}
+
+#navSearchText {
     display: none;
 }
 
-#navSearchButton{
+#navSearchButton {
     display: flex;
-    padding: 4px 15px;
+    padding: 8px;
     cursor: pointer;    
     border: none;
-    height: 100%;
-    width: 5vw;
+    height: 36px;
+    width: 36px;
     background: none;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
 }
 
-#navSearchButton:hover{
-    filter:brightness(0.90);
-}
-
-#searchIconId{
-    height: 2.5vh;
+#searchIconId {
+    height: 18px;
     width: auto;
+    opacity: 0.6;
 }
 
-@media(min-width: 768px){
-    .searchBar{
-        width: 350px;
-        border: 1px solid black;
-        margin-right: 1vw;
+@media(min-width: 768px) {
+    #navbar {
+        height: 70px;
+        padding: 0 30px;
     }
 
-    #navSearchText{
-        width: 100%;
-        display: inline-block;
+    #navbarLogo {
+        height: 50px;
+    }
+
+    #navbarActions {
+        gap: 25px;
+    }
+
+    .searchBar {
+        width: 300px;
+        background-color: white;
+        border: 1px solid #ced4da;
+        overflow: hidden;
+    }
+
+    #navSearchText {
+        display: block;
         flex: 1;
-        padding: 4px 15px;
+        padding: 8px 15px;
         border: none;
         outline: none;
-        font-size: 1rem;
-        color: black;
+        background: transparent;
+        font-size: 0.95rem;
+        color: #495057;
     }
 
-    #navSearchText::placeholder{
-        color: darkgray;
+    #navSearchButton {
+        width: 50px;
+        border-radius: 0 20px 20px 0;
+        border-left: 1px solid #ced4da;
+        background-color: #f8f9fa;
     }
 
-    #navSearchButton{
-        width: 70px;
-        border-left: 1px solid black;
-        background-color: lightblue;
+    #navSearchButton:hover {
+        background-color: #e9ecef;
     }
 }

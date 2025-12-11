@@ -2,12 +2,14 @@ import logo from '../assets/NavImages/logo.png';
 import SearchIcon from "../assets/NavImages/search-icon.png";
 import { useEffect, useState } from "react";
 import "./Navbar.css";
+import { useNavigate } from 'react-router-dom';
 
-export default function Navbar({ onLoginClick, onProfileClick, onCartClick }){ 
+export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSearch }){ 
     const [user, setUser] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem('userName');
         if(storedUser){
             setUser(storedUser);
         }
@@ -19,10 +21,11 @@ export default function Navbar({ onLoginClick, onProfileClick, onCartClick }){
             src = {logo} 
             alt = "Digital Depot logo" 
             id = "navbarLogo"
+            onClick={() => navigate('/')}
         ></img> 
     
         <div id="navbarActions">
-            <NavSearchBar />
+            <NavSearchBar onSearch={onSearch} />
 
             <button 
                 id = "navbarCartBtn"
@@ -49,7 +52,9 @@ function NavSearchBar({onSearch}) {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        if (onSearch) onSearch(searched);
+        if (onSearch){
+            onSearch(searched);
+        }
     };
 
     return (
@@ -61,9 +66,9 @@ function NavSearchBar({onSearch}) {
                 placeholder="Keressen rá valamire"
                 id="navSearchText"
             ></input>
-            <button
-            id="navSearchButton"
-            ><img src={SearchIcon} alt="Search Icon" id="searchIconId"></img></button>
+            <button id="navSearchButton" type="submit">
+                <img src={SearchIcon} alt="Search Icon" id="searchIconId"></img>
+            </button>
         </form>
     );
 }

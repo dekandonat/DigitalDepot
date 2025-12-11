@@ -1,33 +1,52 @@
 #mainCategoriesNav {
   width: 100%;
-  border-bottom: 1px solid darkgray;
-  background-color: white;
-  overflow: visible; 
+  background-color: #fcfcfc;
   position: relative;
-  z-index: 100;
+  z-index: 90;
+  border-bottom: 1px solid #e0e0e0;
+  border-top: 1px solid #f0f0f0;
 }
 
 #mainCategoriesList {
   display: flex;
-  justify-content: space-around;
-  gap: 30px;
+  overflow-x: auto;
+  white-space: nowrap;
+  gap: 5px;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 10px 10px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#mainCategoriesList::-webkit-scrollbar {
+  display: none;
 }
 
 #mainCategoriesList > li {
   position: relative;
   cursor: pointer;
-  padding: 15px 20px;
+  padding: 8px 16px;
   text-align: center;
   font-weight: 500;
-  transition: color 0.2s;
+  font-size: 0.9rem;
+  color: #666;
+  transition: all 0.2s;
   text-transform: capitalize;
+  border-radius: 6px;
 }
 
-#mainCategoriesList > li:hover {
+#mainCategoriesList > li:hover, 
+#mainCategoriesList > li.active {
   color: #007bff;
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+#allItemsId {
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
 }
 
 .subCategories {
@@ -35,53 +54,64 @@
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  
   background-color: white;
   min-width: 200px;
   list-style: none;
-  padding: 10px 0;
-  margin-top: 0;
-  
+  padding: 5px 0;
+  margin-top: 2px;
   border: 1px solid #eee;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
   z-index: 1000;
-  
   opacity: 0;
-  animation: expandDown 0.3s ease forwards;
+  animation: expandDown 0.2s ease forwards;
 }
 
 .subCategories li {
   padding: 10px 20px;
-  color: #333;
-  text-align: center;
-  border-bottom: 1px solid #f0f0f0;
-  white-space: nowrap;
-}
-
-.subCategories li:last-child {
-  border-bottom: none;
+  color: #555;
+  text-align: left;
+  font-size: 0.9rem;
 }
 
 .subCategories li:hover {
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
   color: #007bff;
 }
 
-#allItemsId {
-  font-weight: bold;
-  color: black;
-  display: flex;
-  align-items: center;
+@keyframes expandDown {
+  from { opacity: 0; transform: translate(-50%, 5px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
 }
 
-@keyframes expandDown {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 10px);
+@media(min-width: 768px) {
+  #mainCategoriesNav {
+      background-color: white;
+      border-top: none;
   }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
+
+  #mainCategoriesList {
+    justify-content: center;
+    overflow-x: visible;
+    padding: 0;
+    gap: 0;
+    border-bottom: none;
+  }
+
+  #mainCategoriesList > li {
+    background-color: transparent;
+    padding: 15px 25px;
+    font-size: 0.95rem;
+    border-radius: 0;
+    border-right: 1px solid #f0f0f0; 
+  }
+
+  #mainCategoriesList > li:first-child {
+    border-left: 1px solid #f0f0f0;
+  }
+
+  #mainCategoriesList > li:hover {
+    background-color: #f9f9f9;
+    color: #007bff;
   }
 }
