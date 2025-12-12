@@ -1,17 +1,18 @@
 const db = require('../util/database');
 
 module.exports = class Products {
-  constructor(prodName, prodDescription, prodPrice, prodImg) {
+  constructor(prodName, prodDescription, prodPrice, prodImg, categoryId) {
     this.prodName = prodName;
     this.prodDescription = prodDescription;
     this.prodPrice = prodPrice;
     this.prodImg = prodImg;
+    this.categoryId = categoryId;
   }
 
   async save() {
     try {
       await db.execute(
-        `INSERT INTO products (productName, productDescription, productPrice, productImg) VALUES ("${this.prodName}", "${this.prodDescription}", ${this.prodPrice}, "${this.prodImg}")`
+        `INSERT INTO products (productName, productDescription, productPrice, productImg, categoryId) VALUES ("${this.prodName}", "${this.prodDescription}", ${this.prodPrice}, "${this.prodImg}", ${this.categoryId})`
       );
       return { result: 'success' };
     } catch (err) {
@@ -22,7 +23,6 @@ module.exports = class Products {
   static async fetchAll() {
     try {
       const [rows] = await db.execute('SELECT * FROM products');
-      console.log(rows);
       return rows;
     } catch (err) {
       throw err;

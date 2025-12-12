@@ -8,10 +8,11 @@ router.post('/', async (req, res) => {
     req.body.prodName,
     req.body.prodDescription,
     req.body.prodPrice,
-    req.body.prodImg
+    req.body.prodImg,
+    req.body.categoryId
   );
   const result = await product.save();
-  if (result.message === 'success') {
+  if (result.result === 'success') {
     res.status(201).json(result);
   } else {
     res.status(500).json(result);
