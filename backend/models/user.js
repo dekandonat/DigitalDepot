@@ -16,7 +16,7 @@ module.exports = class User {
       const hashedPassword = await bcrypt.hash(this.password, 10);
       this.password = hashedPassword;
       await db.execute(
-        `INSERT INTO users (userName, hashedPassword, email, verified) VALUES ('${this.userName}', '${this.password}', '${this.email}', FALSE);`
+        `INSERT INTO users (userName, hashedPassword, email, verified, role) VALUES ('${this.userName}', '${this.password}', '${this.email}', FALSE, 'user');`
       );
       return {
         result: 'success',
@@ -45,12 +45,16 @@ module.exports = class User {
         const userName = rows[0].userName;
         const id = rows[0].userId;
         const role = rows[0].role;
-        const token = jwt.sign({ 
-          id: id,
-          role: role
-        }, process.env.SECRET, {
-          expiresIn: '1h',
-        });
+        const token = jwt.sign(
+          {
+            id: id,
+            role: role,
+          },
+          process.env.SECRET,
+          {
+            expiresIn: '1h',
+          }
+        );
         return {
           result: 'success',
           message: { email: userEmail, userName: userName, token: token },

@@ -1,0 +1,40 @@
+.addProductDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#addProductForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  border: 1px solid black;
+  width: 50%;
+  padding: 20px;
+}
+
+#addProductForm input {
+  height: 30px;
+}
+
+#addProductForm label {
+  font-size: x-large;
+  margin-top: 10px;
+}
+
+#addProductForm select {
+  height: 40px;
+  width: 175px;
+  text-align: center;
+}
+
+#addProductForm button {
+  margin-bottom: 10px;
+  margin-top: 25px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(83, 212, 212);
+  height: 50px;
+  width: 150px;
+}
