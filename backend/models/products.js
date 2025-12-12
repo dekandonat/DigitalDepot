@@ -40,4 +40,15 @@ module.exports = class Products {
       throw err;
     }
   }
+
+  static async find(string) {
+    try {
+      const [rows] = await db.execute(
+        `SELECT * FROM products WHERE products.productName LIKE "%${string}%" OR products.productDescription LIKE "%${string}%";`
+      );
+      return rows;
+    } catch (err) {
+      throw err;
+    }
+  }
 };

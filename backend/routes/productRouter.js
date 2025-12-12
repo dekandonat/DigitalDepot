@@ -34,6 +34,16 @@ router.get('/:prodId', async (req, res) => {
   }
 });
 
+router.get('/search/:string', async (req, res) => {
+  try {
+    const string = req.params.string;
+    const results = await Products.find(string);
+    res.status(200).json({ result: 'success', data: results });
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
+
 router.get('/', async (req, res) => {
   try {
     const data = await Products.fetchAll();
@@ -44,7 +54,7 @@ router.get('/', async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'Server error' });
   }
 });
 
