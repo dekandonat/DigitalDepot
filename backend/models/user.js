@@ -44,7 +44,11 @@ module.exports = class User {
         const userEmail = rows[0].email;
         const userName = rows[0].userName;
         const id = rows[0].userId;
-        const token = jwt.sign({ id: id }, process.env.SECRET, {
+        const role = rows[0].role;
+        const token = jwt.sign({ 
+          id: id,
+          role: role
+        }, process.env.SECRET, {
           expiresIn: '1h',
         });
         return {

@@ -68,7 +68,6 @@ export default function LoginForm({ onClose }){
                 localStorage.setItem('token', response.message.token);
                 localStorage.setItem('user', response.message.userName);
                 localStorage.setItem('email', response.message.email);
-                alert('Sikeres bejelentkezés!');
                 onClose();
                 window.location.reload();
             }

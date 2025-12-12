@@ -9,7 +9,7 @@ export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSe
     const navigate = useNavigate();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('userName');
+        const storedUser = localStorage.getItem('user');
         if(storedUser){
             setUser(storedUser);
         }

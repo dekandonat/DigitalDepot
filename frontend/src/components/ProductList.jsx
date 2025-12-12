@@ -78,7 +78,7 @@ export default function ProductList() {
                 let url = '/products';
 
                 if(searchWord){
-                    url = `/products?search=${searchWord}`;
+                    url = `/products/search/${searchWord}`;
                 }
 
                 const productsResult = await getMethodFetch(url);
@@ -119,7 +119,7 @@ export default function ProductList() {
 
     let title = "Kiemelt termékeink";
     if(searchWord){
-        title = `Találatok err: ${searchWord}`;
+        title = `Találatok erre: ${searchWord}`;
     }
 
     if(categoryId){
