@@ -1,0 +1,14 @@
+.selectBtn {
+  border: none;
+  background-color: aquamarine;
+  height: 50px;
+  width: 100px;
+  margin: 5px;
+}
+
+.selectDiv {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
