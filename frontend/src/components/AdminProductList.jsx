@@ -42,6 +42,7 @@ export default function AdminProductList() {
               price={product.productPrice}
               description={product.productDescription}
               key={product.prodId}
+              img={product.productImg}
             />
           );
         })}

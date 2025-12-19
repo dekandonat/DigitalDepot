@@ -1,0 +1,47 @@
+.adminProductCardDiv {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  box-shadow: 3px 3px rgba(158, 159, 160, 0.493);
+  border-radius: 15px;
+  background-color: azure;
+}
+
+.adminProductCardDiv p {
+  width: 30%;
+}
+
+.adminProductCardDiv img {
+  width: 25%;
+  border-radius: 10px;
+  box-shadow: 4px 4px rgba(119, 120, 121, 0.493);
+}
+
+.NamePriceBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.price {
+  color: red;
+}
+
+@media (max-width: 768px) {
+  .adminProductCardDiv {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .adminProductCardDiv p,
+  .adminProductCardDiv img,
+  .NamePriceBox {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
