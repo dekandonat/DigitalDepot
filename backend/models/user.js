@@ -5,10 +5,11 @@ const db = require('../util/database');
 const users = [];
 
 module.exports = class User {
-  constructor(userName, password, email) {
+  constructor(userName, password, email, role) {
     this.userName = userName;
     this.password = password;
     this.email = email;
+    this.role = role;
   }
 
   async register() {
@@ -16,7 +17,7 @@ module.exports = class User {
       const hashedPassword = await bcrypt.hash(this.password, 10);
       this.password = hashedPassword;
       await db.execute(
-        `INSERT INTO users (userName, hashedPassword, email, verified, role) VALUES ('${this.userName}', '${this.password}', '${this.email}', FALSE, 'user');`
+        `INSERT INTO users (userName, hashedPassword, email, verified, role) VALUES ('${this.userName}', '${this.password}', '${this.email}', FALSE, '${this.role}');`
       );
       return {
         result: 'success',

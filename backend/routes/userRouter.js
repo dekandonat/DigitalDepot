@@ -5,7 +5,12 @@ const User = require('../models/user');
 const router = express.Router();
 
 router.post('/register', async (req, res) => {
-  const user = new User(req.body.userName, req.body.password, req.body.email);
+  const user = new User(
+    req.body.userName,
+    req.body.password,
+    req.body.email,
+    'user'
+  );
   const result = await user.register();
   if (result.result == 'success') {
     res.status(201).json(result);
