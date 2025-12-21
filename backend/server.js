@@ -10,6 +10,7 @@ const userRouter = require('./routes/userRouter');
 const categoryRouter = require('./routes/categoryRouter');
 const cartRouter = require('./routes/cartRouter');
 const adminRouter = require('./routes/adminRouter');
+const orderRouter = require('./routes/orderRouter');
 
 const IP = process.env.IP;
 const PORT = process.env.PORT;
@@ -22,6 +23,7 @@ app.use('/user', userRouter);
 app.use('/category', categoryRouter);
 app.use('/cart', cartRouter);
 app.use('/admin', adminRouter);
+app.use('/order', orderRouter);
 
 app.listen(PORT, IP, () => {
   console.log(`Server running on: ${IP}:${PORT}`);

@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import './Cart.css';
 
 export default function Cart({ onClose }){
     const [cartItems, setCartItems] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
+
+    const navigate = useNavigate();
 
     const getCartFetch = (url, token) => {
         return fetch(url, {
@@ -119,9 +122,12 @@ export default function Cart({ onClose }){
                 <div id="cartFooter">
                     <div id="totalRow">
                         <span>Végösszeg: </span>
-                        <span>{cartTotal ? cartTotal.toLocaleString() : 0} Ft</span>
+                        <span>{cartTotal.toLocaleString('hu-HU')} Ft</span>
                     </div>
-                    <button id="checkoutBtn">Tovább a fizetéshez</button>
+                    <button id="checkoutBtn" onClick={() => {
+                        onClose(); 
+                        navigate('/checkout');
+                    }}>Tovább a fizetéshez</button>
                 </div>
             </div>
         </div>

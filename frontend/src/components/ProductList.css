@@ -100,6 +100,15 @@
     transform: scale(0.98);
 }
 
+.productCard .loginErrorMsg {
+    color: red;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    margin: -10px 15px 15px 15px;
+    animation: fadeIn 0.3s forwards;
+}
+
 @media(min-width: 768px) {
     #productListContainer {
         padding: 40px 20px;

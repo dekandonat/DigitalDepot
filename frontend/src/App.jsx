@@ -9,6 +9,7 @@ import Cart from './components/Cart';
 import ProfilePopup from './components/ProfilePopup';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminPage from './components/AdminPage';
+import Checkout from './components/Checkout';
 import {slides} from "./data/MainPageGalleryData.json";
 import "./main.css";
 
@@ -59,16 +60,14 @@ export default function App() {
         <Route path="/" element={<ProductList />} />
         <Route path="/category/:categoryId" element={<ProductList />} />
         <Route path="/search" element={<ProductList />} />
+        <Route path = "/checkout" element = {<Checkout />}></Route>
 
-        <Route 
-          path = "/admin" 
-          element = {
-            <ProtectedRoute>
-              <AdminPage />
-            </ProtectedRoute>
-          }>
+        <Route path = "/admin" element = {
+          <ProtectedRoute>
+            <AdminPage />
+          </ProtectedRoute>
+        }></Route>
 
-        </Route>
       </Routes>
 
       {isLoginOpen && <LoginForm onClose={() => setIsLoginOpen(false)} />}

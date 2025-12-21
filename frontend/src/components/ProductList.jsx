@@ -4,6 +4,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import './ProductList.css';
 
 function ProductCard({ product }) {
+    const [loginMsg, setLoginMsg] = useState("");
 
     const postToCartFetch = (url, token) => {
         return fetch(url, {
@@ -27,7 +28,12 @@ function ProductCard({ product }) {
         const token = localStorage.getItem('token');
 
         if(!token){
-            alert("Ehez be kell jelentkeznie!");
+            setLoginMsg("Jelentkezzen be!");
+
+            setTimeout(() => {
+                setLoginMsg("");
+            }, 3000);
+
             return;
         }
 
@@ -37,7 +43,8 @@ function ProductCard({ product }) {
             const response = await postToCartFetch(url, token);
         } catch(error){
             console.error("Hiba: ", error);
-            alert("Valami hiba van!");
+            setLoginMsg("Hiba történt a kosárba rakáskor.");
+            setTimeout(() => setLoginMsg(""), 3000);
         }
     };
 
@@ -48,6 +55,11 @@ function ProductCard({ product }) {
             <p>{product.productDescription}</p>
             <span className="productPrice">{product.productPrice} Ft</span>
             <input type="button" value="Kosárba" id="intoCartButton" onClick={addToCart}></input>
+            {loginMsg && (
+                <p className="loginErrorMsg">
+                    {loginMsg}
+                </p>
+            )}
         </div>
     );
 }
