@@ -7,6 +7,28 @@ const Order = require('../models/order');
 
 const verifyAsync = promisify(jwt.verify);
 
+router.get('/my-orders', async (req, res) => {
+    const authorizationHeader = req.headers['authorization'];
+    const token = authorizationHeader && authorizationHeader.split(' ')[1];
+  
+    if (!token) {
+      return res.status(401).json({ result: 'fail', message: 'no token found' });
+    }
+  
+    try {
+      const decodedToken = await verifyAsync(token, process.env.SECRET);
+      const userId = decodedToken.id;
+  
+      const orders = await Order.fetchByUserId(userId);
+      
+      res.status(200).json({ result: 'success', data: orders });
+  
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ result: 'fail', message: 'server error' });
+    }
+});
+
 router.post('/place-order', async (req, res) => {
   const authorizationHeader = req.headers['authorization'];
   const token = authorizationHeader && authorizationHeader.split(' ')[1];
@@ -18,9 +40,10 @@ router.post('/place-order', async (req, res) => {
   try {
     const decodedToken = await verifyAsync(token, process.env.SECRET);
     const userId = decodedToken.id;
-    const { shippingAddress } = req.body;
+    
+    const { shippingAddress, paymentMethod, couponCode } = req.body;
 
-    const order = new Order(userId, shippingAddress);
+    const order = new Order(userId, shippingAddress, paymentMethod, couponCode);
     
     const result = await order.save();
 

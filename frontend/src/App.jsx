@@ -10,6 +10,7 @@ import ProfilePopup from './components/ProfilePopup';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminPage from './components/AdminPage';
 import Checkout from './components/Checkout';
+import UserOrders from './components/UserOrders';
 import {slides} from "./data/MainPageGalleryData.json";
 import "./main.css";
 
@@ -52,7 +53,7 @@ export default function App() {
         <MainPageGallery data={slides} />
       )}
 
-      {!location.pathname.startsWith('/admin') && (
+      {!location.pathname.startsWith('/admin') && location.pathname !== '/checkout' && location.pathname !== '/my-orders' && (
         <MainCategoriesMenu onCategorySelect={handleCategorySelect}/>
       )}
 
@@ -60,13 +61,20 @@ export default function App() {
         <Route path="/" element={<ProductList />} />
         <Route path="/category/:categoryId" element={<ProductList />} />
         <Route path="/search" element={<ProductList />} />
-        <Route path = "/checkout" element = {<Checkout />}></Route>
+        
+        <Route path="/checkout" element={<Checkout />} />
 
-        <Route path = "/admin" element = {
+        <Route path="/my-orders" element={
+            <ProtectedRoute>
+                <UserOrders />
+            </ProtectedRoute>
+        } />
+
+        <Route path="/admin" element={
           <ProtectedRoute>
             <AdminPage />
           </ProtectedRoute>
-        }></Route>
+        } />
 
       </Routes>
 

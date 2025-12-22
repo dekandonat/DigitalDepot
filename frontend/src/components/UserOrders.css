@@ -1,0 +1,114 @@
+.userOrdersContainer {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.userOrdersTitle {
+    font-size: 1.3rem;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.backButton {
+    width: 100%;
+    max-width: 200px;
+    margin-bottom: 20px;
+    padding: 12px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #6c757d;
+    color: white;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.backButton:hover {
+    background-color: #5a6268;
+}
+
+.loadingText, .noOrdersText {
+    text-align: center;
+    font-size: 1rem;
+    color: #666;
+    margin-top: 20px;
+}
+
+.ordersList {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.orderCard {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.orderCardHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.orderId {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #007bff;
+}
+
+.orderDate {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+@media (min-width: 600px) {
+    .userOrdersContainer {
+        padding: 40px 20px;
+    }
+
+    .userOrdersTitle {
+        font-size: 2rem;
+    }
+
+    .orderCard {
+        padding: 25px;
+    }
+
+    .orderCardHeader {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.orderCardBody {
+    line-height: 1.6;
+}
+
+.orderDetailRow {
+    margin: 5px 0;
+    font-size: 0.95rem;
+}
+
+.orderTotalAmount {
+    font-size: 1.1rem;
+    font-weight: bold;
+}

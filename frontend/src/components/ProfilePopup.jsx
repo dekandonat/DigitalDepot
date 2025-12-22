@@ -1,10 +1,12 @@
 import React from "react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import './LoginForm.css';
 import profileIcon from '../assets/NavImages/profile-pic.png';
 
 export default function ProfilePopup({onClose}){
     const [userData, setUserData] = useState({name: '', email: ''});
+    const navigate = useNavigate();
 
     useEffect(() => {
         const name = localStorage.getItem('user');
@@ -30,11 +32,11 @@ export default function ProfilePopup({onClose}){
                 <button className='formCloseBtn' onClick={onClose}>&times;</button>
                 <h2>Profilom</h2>
 
-                <div class='profilePicContainer'>
+                <div className='profilePicContainer'>
                     <img src={profileIcon} alt='Profilkép' id='profileImg'></img>
                 </div>
 
-                <div class='profileDataSection'>
+                <div className='profileDataSection'>
                     <div className='profileDataRow'>
                         <span className='profileLabel'>Felhasználónév:</span>
                         <span className='profileData'>{userData.name}</span>
@@ -45,6 +47,8 @@ export default function ProfilePopup({onClose}){
                         <span className='profileData'>{userData.email}</span>
                     </div>
                 </div>
+
+                <button onClick={() => { onClose(); navigate('/my-orders'); }} className='myOrdersBtn'>Rendeléseim</button>
 
                 <button onClick={handleLogout} className='submitBtn' id='logoutBtn'>Kijelentkezés</button>
             </div>

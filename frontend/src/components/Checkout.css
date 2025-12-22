@@ -1,16 +1,19 @@
 .checkoutContainer {
+    width: 100%;
     max-width: 500px;
-    margin: 50px auto;
-    padding: 30px;
+    margin: 20px auto;
+    padding: 20px;
     background-color: white;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     border-radius: 10px;
+    box-sizing: border-box;
 }
 
 .checkoutContainer h2 {
     text-align: center;
     color: #333;
     margin-bottom: 20px;
+    font-size: 1.5rem;
 }
 
 .checkoutForm {
@@ -24,23 +27,38 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.checkoutForm .inputRow {
+.inputRow, .couponInputContainer, .cardDetailsInputRow {
     display: flex;
+    flex-direction: column; 
     gap: 10px;
 }
 
-.checkoutForm .inputRow input {
+@media (min-width: 600px) {
+    .inputRow, .couponInputContainer, .cardDetailsInputRow {
+        flex-direction: row;
+    }
+    
+    .checkoutContainer {
+        margin: 50px auto;
+        padding: 30px;
+    }
+}
+
+.inputRow input, .couponInput {
     flex: 1;
 }
 
-.checkoutForm h3 {
+.checkoutForm h3, .couponSectionTitle, .cardDetailsTitle {
     margin-top: 15px;
-    font-size: 18px;
+    font-size: 1.1rem;
     color: #555;
     border-bottom: 1px solid #eee;
     padding-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 .payButton {
@@ -50,12 +68,86 @@
     color: white;
     border: none;
     border-radius: 5px;
-    font-size: 18px;
+    font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
     transition: background 0.3s;
+    width: 100%;
 }
 
 .payButton:hover {
     background-color: #0056b3;
+}
+
+.couponSection {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.couponButton {
+    width: 100%;
+    padding: 12px;
+    margin: 0;
+}
+
+@media (min-width: 600px) {
+    .couponButton {
+        width: auto;
+        padding: 0 20px;
+    }
+}
+
+.paymentMethods {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.paymentOptionLabel {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 15px;
+    font-size: 1rem;
+    padding: 15px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    background-color: #fafafa;
+}
+
+.paymentOptionLabel:hover {
+    border-color: #007bff;
+    background-color: #f0f8ff;
+}
+
+.paymentOptionLabel:has(input:checked) {
+    border-color: #007bff;
+    background-color: #e7f1ff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.paymentOptionLabel input[type="radio"] {
+    transform: scale(1.2);
+    accent-color: #007bff;
+}
+
+@media (min-width: 600px) {
+    .paymentMethods {
+        flex-direction: row;
+    }
+    
+    .paymentOptionLabel {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+.cardDetails {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fdfdfd;
+    margin-bottom: 20px;
 }

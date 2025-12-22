@@ -1,9 +1,11 @@
 const db = require('../util/database');
 
 module.exports = class Order {
-  constructor(userId, shippingAddress) {
+  constructor(userId, shippingAddress, paymentMethod, couponCode) {
     this.userId = userId;
     this.shippingAddress = shippingAddress;
+    this.paymentMethod = paymentMethod;
+    this.couponCode = couponCode;
   }
 
   async save() {
@@ -22,8 +24,8 @@ module.exports = class Order {
       }
 
       await db.execute(
-        `INSERT INTO orders (userId, totalAmount, shippingAddress) 
-         VALUES (${this.userId}, ${totalAmount}, '${this.shippingAddress}')`
+        `INSERT INTO orders (userId, totalAmount, shippingAddress, paymentMethod, couponCode, orderDate) 
+         VALUES (${this.userId}, ${totalAmount}, '${this.shippingAddress}', '${this.paymentMethod}', '${this.couponCode}', NOW())`
       );
 
       await db.execute(`DELETE FROM carts WHERE userId = ${this.userId}`);
@@ -31,6 +33,17 @@ module.exports = class Order {
       return { result: 'success' };
     } catch (err) {
       return { result: 'fail', message: err.message };
+    }
+  }
+
+  static async fetchByUserId(userId) {
+    try {
+      const [rows] = await db.execute(
+        `SELECT * FROM orders WHERE userId = ${userId} ORDER BY orderId DESC`
+      );
+      return rows;
+    } catch (err) {
+      throw err;
     }
   }
 };
