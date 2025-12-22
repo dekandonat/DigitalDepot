@@ -21,7 +21,7 @@ app.use('/products', productRouter);
 app.use('/user', userRouter);
 app.use('/category', categoryRouter);
 app.use('/cart', cartRouter);
-app.use('/admin', adminRouter);
+app.use('/adminRoute', adminRouter);
 
 app.listen(PORT, IP, () => {
   console.log(`Server running on: ${IP}:${PORT}`);
