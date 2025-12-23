@@ -12,3 +12,11 @@
   align-items: center;
   justify-content: center;
 }
+
+.activeBtn {
+  background-color: rgb(11, 173, 119);
+  height: 50px;
+  width: 100px;
+  margin: 5px;
+  border: none;
+}

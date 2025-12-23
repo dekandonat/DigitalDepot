@@ -44,22 +44,23 @@ export default function AdminCreateAccount() {
 
   return (
     <div className="adminCreationDiv">
+      <h1>Admin fiók létrehozása</h1>
       <form className="adminCreation">
-        <label htmlFor="nameId">Felhasználónév: </label>
+        <label htmlFor="nameId">Felhasználónév</label>
         <input
           type="text"
           id="nameId"
           value={name}
           onChange={handleNameChange}
         ></input>
-        <label htmlFor="emailId">Email: </label>
+        <label htmlFor="emailId">Email</label>
         <input
           type="email"
           id="emailId"
           value={email}
           onChange={handleEmailChange}
         ></input>
-        <label htmlFor="passwordId">Jelszó: </label>
+        <label htmlFor="passwordId">Jelszó</label>
         <input
           type="password"
           id="passwordId"

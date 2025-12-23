@@ -16,7 +16,7 @@ export default function AdminPage() {
           onClick={() => {
             setCurrentPage('list');
           }}
-          className="selectBtn"
+          className={currentPage == 'list' ? 'activeBtn' : 'selectBtn'}
         >
           Termékek
         </button>
@@ -24,7 +24,7 @@ export default function AdminPage() {
           onClick={() => {
             setCurrentPage('add');
           }}
-          className="selectBtn"
+          className={currentPage == 'add' ? 'activeBtn' : 'selectBtn'}
         >
           Termék hozzáadása
         </button>
@@ -32,7 +32,7 @@ export default function AdminPage() {
           onClick={() => {
             setCurrentPage('createAccount');
           }}
-          className="selectBtn"
+          className={currentPage == 'createAccount' ? 'activeBtn' : 'selectBtn'}
         >
           Admin fiók létrehozása
         </button>
