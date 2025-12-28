@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import AdminAddProduct from './AdminAddProduct';
 import AdminProductList from './AdminProductList';
+import AdminCreateAccount from './AdminCreateAccount';
 import './AdminPage.css';
 
 export default function AdminPage() {
@@ -15,7 +16,7 @@ export default function AdminPage() {
           onClick={() => {
             setCurrentPage('list');
           }}
-          className="selectBtn"
+          className={currentPage == 'list' ? 'activeBtn' : 'selectBtn'}
         >
           Termékek
         </button>
@@ -23,12 +24,22 @@ export default function AdminPage() {
           onClick={() => {
             setCurrentPage('add');
           }}
-          className="selectBtn"
+          className={currentPage == 'add' ? 'activeBtn' : 'selectBtn'}
         >
           Termék hozzáadása
         </button>
+        <button
+          onClick={() => {
+            setCurrentPage('createAccount');
+          }}
+          className={currentPage == 'createAccount' ? 'activeBtn' : 'selectBtn'}
+        >
+          Admin fiók létrehozása
+        </button>
       </div>
-      {currentPage == 'list' ? <AdminProductList /> : <AdminAddProduct />}
+      {currentPage === 'list' && <AdminProductList />}
+      {currentPage === 'add' && <AdminAddProduct />}
+      {currentPage === 'createAccount' && <AdminCreateAccount />}
     </div>
   );
 }
