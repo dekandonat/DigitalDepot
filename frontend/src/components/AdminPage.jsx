@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import AdminAddProduct from './AdminAddProduct';
 import AdminProductList from './AdminProductList';
 import AdminCreateAccount from './AdminCreateAccount';
+import AdminOrdersList from './AdminOrdersList';
 import './AdminPage.css';
 
 export default function AdminPage() {
@@ -36,10 +37,19 @@ export default function AdminPage() {
         >
           Admin fiók létrehozása
         </button>
+        <button
+          onClick={() => {
+            setCurrentPage('ordersList');
+          }}
+          className={currentPage == 'ordersList' ? 'activeBtn' : 'selectBtn'}
+        >
+          Rendelések megtekintése
+        </button>
       </div>
       {currentPage === 'list' && <AdminProductList />}
       {currentPage === 'add' && <AdminAddProduct />}
       {currentPage === 'createAccount' && <AdminCreateAccount />}
+      {currentPage === 'ordersList' && <AdminOrdersList />}
     </div>
   );
 }
