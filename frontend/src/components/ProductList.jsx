@@ -1,16 +1,16 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import './ProductList.css';
 
 function ProductCard({ product }) {
-    const [loginMsg, setLoginMsg] = useState("");
+    const [loginMessage, setLoginMessage] = useState("");
 
-    const postToCartFetch = (url, token) => {
-        return fetch(url, {
+    const sendCartRequest = (requestUrl, userToken) => {
+        return fetch(requestUrl, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${userToken}`
             }
         })
         .then((response) => {
@@ -25,26 +25,26 @@ function ProductCard({ product }) {
     };
 
     const addToCart = async () => {
-        const token = localStorage.getItem('token');
+        const userToken = localStorage.getItem('token');
 
-        if(!token){
-            setLoginMsg("Jelentkezzen be!");
+        if(!userToken){
+            setLoginMessage("Jelentkezzen be!");
 
             setTimeout(() => {
-                setLoginMsg("");
+                setLoginMessage("");
             }, 3000);
 
             return;
         }
 
-        const url = `/cart/add/${product.prodId}/1`;
+        const requestUrl = `/cart/add/${product.prodId}/1`;
 
         try{
-            const response = await postToCartFetch(url, token);
+            await sendCartRequest(requestUrl, userToken);
         } catch(error){
             console.error("Hiba: ", error);
-            setLoginMsg("Hiba történt a kosárba rakáskor.");
-            setTimeout(() => setLoginMsg(""), 3000);
+            setLoginMessage("Hiba történt a kosárba rakáskor.");
+            setTimeout(() => setLoginMessage(""), 3000);
         }
     };
 
@@ -55,9 +55,9 @@ function ProductCard({ product }) {
             <p>{product.productDescription}</p>
             <span className="productPrice">{product.productPrice} Ft</span>
             <input type="button" value="Kosárba" id="intoCartButton" onClick={addToCart}></input>
-            {loginMsg && (
-                <p className="loginErrorMsg">
-                    {loginMsg}
+            {loginMessage && (
+                <p className="loginErrorMessage">
+                    {loginMessage}
                 </p>
             )}
         </div>
@@ -66,17 +66,19 @@ function ProductCard({ product }) {
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
+    const [currentCategoryName, setCurrentCategoryName] = useState("");
+    const navigate = useNavigate();
 
     const { categoryId } = useParams();
     const [searchParams] = useSearchParams();
-    const searchWord = searchParams.get('q');
+    const searchQuery = searchParams.get('q');
 
     useEffect(() => {
-        const getMethodFetch = (url) => {
-            return fetch(url)
+        const getRequest = (fetchUrl) => {
+            return fetch(fetchUrl)
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error(`$GET hiba: ${response.status} ${response.statusText}`);
+                        throw new Error(`GET hiba: ${response.status} ${response.statusText}`);
                     }
                     return response.json();
                 })
@@ -85,37 +87,47 @@ export default function ProductList() {
                 });
         }
 
-        const fetchProducts = async () => {
+        const fetchProductsAndCategories = async () => {
             try{
-                let url = '/products';
+                let fetchUrl = '/products';
 
-                if(searchWord){
-                    url = `/products/search/${searchWord}`;
+                if(searchQuery){
+                    fetchUrl = `/products/search/${searchQuery}`;
                 }
 
-                const productsResult = await getMethodFetch(url);
-                const categoriesResult = await getMethodFetch('/category');
+                const productsResult = await getRequest(fetchUrl);
+                const categoriesResult = await getRequest('/category');
 
                 let allProducts = productsResult.data || [];
                 let allCategories = categoriesResult.data || [];
 
-                if(searchWord){
+                if(searchQuery){
                     setProducts(allProducts);
+                    setCurrentCategoryName(`Keresés: "${searchQuery}"`);
                 }
                 else if(categoryId){
-                    const selectedIds = [parseInt(categoryId)];
+                    const currentId = parseInt(categoryId);
+                    const selectedCategoryIds = [currentId];
+
+                    const currentCategory = allCategories.find(category => category.categoryId === currentId);
+                    if (currentCategory) {
+                        setCurrentCategoryName(currentCategory.categoryName);
+                    } else {
+                        setCurrentCategoryName("Kategória");
+                    }
 
                     allCategories.forEach(category => {
-                        if(category.parentId == categoryId) {
-                            selectedIds.push(category.categoryId);
+                        if(category.parentId === currentId) {
+                            selectedCategoryIds.push(category.categoryId);
                         }
                     });
 
-                    const filtered = allProducts.filter(p => selectedIds.includes(p.categoryId));
-                    setProducts(filtered);
+                    const filteredProducts = allProducts.filter(product => selectedCategoryIds.includes(product.categoryId));
+                    setProducts(filteredProducts);
                 }
                 else{
                     setProducts(allProducts);
+                    setCurrentCategoryName("");
                 }
             }
             catch(error) 
@@ -126,22 +138,26 @@ export default function ProductList() {
 
         }
 
-        fetchProducts();
-    }, [categoryId, searchWord]);
+        fetchProductsAndCategories();
+    }, [categoryId, searchQuery]);
 
-    let title = "Kiemelt termékeink";
-    if(searchWord){
-        title = `Találatok erre: ${searchWord}`;
+    const clearFilter = () => {
+        navigate('/');
     }
 
-    if(categoryId){
-        title = "Kategória termékei";
-    }
     return (
         <div id="productListContainer">
-            <h2 id="productGridTitle">{title}</h2>
+            {(categoryId || searchQuery) && (
+                <div id="activeFilterContainer">
+                    <span id="activeFilterName">{currentCategoryName}</span>
+                    <button id="clearFilterButton" onClick={clearFilter} title="Szűrés törlése">
+                        &times;
+                    </button>
+                </div>
+            )}
+            
             {products.length === 0 ? (
-                <p>Nincs találat</p>
+                <p>Nincs találat ebben a kategóriában.</p>
             ) : (
                 <div id="productGrid">
                     {products.map(product => (

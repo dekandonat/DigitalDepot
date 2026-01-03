@@ -11,7 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminPage from './components/AdminPage';
 import Checkout from './components/Checkout';
 import UserOrders from './components/UserOrders';
-import {slides} from "./data/MainPageGalleryData.json";
+import { slides } from "./data/MainPageGalleryData.json";
 import "./main.css";
 
 export default function App() { 
@@ -27,13 +27,13 @@ export default function App() {
     setIsProfileOpen(true);
   }
 
-  const handleSearch = (text) => {
-    navigate(`/search?q=${text}`);
+  const handleSearch = (searchText) => {
+    navigate(`/search?q=${searchText}`);
   }
 
-  const handleCategorySelect = (id) => {
-    if(id){
-      navigate(`/category/${id}`);
+  const handleCategorySelect = (categoryId) => {
+    if(categoryId){
+      navigate(`/category/${categoryId}`);
     }
     else{
       navigate('/');

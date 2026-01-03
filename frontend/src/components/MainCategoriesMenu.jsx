@@ -2,28 +2,27 @@ import { useState, useEffect } from 'react';
 import "./MainCategoriesMenu.css";
 
 export default function MainCategoriesMenu({ onCategorySelect }) {
-    const [open, setOpen] = useState(null);
+    const [openCategoryName, setOpenCategoryName] = useState(null);
     const [menuItems, setMenuItems] = useState({});
 
     useEffect(() => {
-        const getMethodFetch = (url) => {
-            return fetch(url)
-            .then((response) => {
-                if(!response.ok) {
+        const getRequest = async (fetchUrl) => {
+            try {
+                const response = await fetch(fetchUrl);
+                if (!response.ok) {
                     throw new Error(`GET hiba: ${response.status} ${response.statusText}`);
                 }
-                return response.json();
-            })
-            .catch((error) => {
+                return await response.json();
+            } catch (error) {
                 throw new Error(`Hiba történt: ${error.message}`);
-            });
+            }
         }
 
         const fetchCategories = async() => {
-            const url = '/category';
+            const categoryApiUrl = '/category';
 
             try{
-                const result = await getMethodFetch(url);
+                const result = await getRequest(categoryApiUrl);
                 if(result.data){
                     processCategories(result.data);
                 }
@@ -35,63 +34,53 @@ export default function MainCategoriesMenu({ onCategorySelect }) {
         const processCategories = (categories) => {
             if(categories.length === 0) return;
 
-            const tempMenu = {};
+            const temporaryMenuItems = {};
             
             for(let i = 0; i < categories.length; i++){
                 if(categories[i].parentId === null){
-                    const children = [];
-                    
-                    for(let j = 0; j < categories.length; j++){
-                        if(categories[j].parentId === categories[i].categoryId){
-                            children.push(categories[j]);
-                        }
-                    }
+                    const childrenCategories = categories.filter(category => category.parentId === categories[i].categoryId);
 
-                    tempMenu[categories[i].categoryName] = {
+                    temporaryMenuItems[categories[i].categoryName] = {
                         id: categories[i].categoryId,
-                        subCategories: children
+                        subCategories: childrenCategories
                     };
                 }
             }
-            setMenuItems(tempMenu);
+            setMenuItems(temporaryMenuItems);
         }
 
         fetchCategories();
     }, []);
 
     return(
-        <nav id='mainCategoriesNav'>
-            <ul id='mainCategoriesList'>
-                {Object.entries(menuItems).map(([mainCatName, data]) => (
+        <nav id="mainCategoriesNav">
+            <ul id="mainCategoriesList">
+                {Object.entries(menuItems).map(([mainCategoryName, categoryGroupData]) => (
                     <li
-                        key = {data.id}
-                        onMouseEnter={() => setOpen(mainCatName)}
-                        onMouseLeave={() => setOpen(null)}
-                        onClick={() => onCategorySelect(data.id)}
+                        key={categoryGroupData.id}
+                        onMouseEnter={() => setOpenCategoryName(mainCategoryName)}
+                        onMouseLeave={() => setOpenCategoryName(null)}
+                        onClick={() => onCategorySelect(categoryGroupData.id)}
                     >
-                        {mainCatName}
+                        {mainCategoryName}
 
-                        {open === mainCatName && data.subCategories.length > 0 && (
-                            <ul className = "subCategories">
-                                {data.subCategories.map((sub) => (
+                        {openCategoryName === mainCategoryName && categoryGroupData.subCategories.length > 0 && (
+                            <ul className="subCategories">
+                                {categoryGroupData.subCategories.map((subCategory) => (
                                     <li 
-                                        key={sub.categoryId}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onCategorySelect(sub.categoryId);
+                                        key={subCategory.categoryId}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            onCategorySelect(subCategory.categoryId);
                                         }}
                                     >
-                                        {sub.categoryName}
+                                        {subCategory.categoryName}
                                     </li>
                                 ))}
                             </ul>
                         )}
                     </li>
                 ))}
-
-                <li onClick={() => onCategorySelect(null)} id="allItemsId">
-                    &times;
-                </li>
             </ul>
         </nav>
     );
