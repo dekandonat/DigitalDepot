@@ -6,7 +6,7 @@ export default function AdminAddProduct() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
-  const [img, setImg] = useState('');
+  const [img, setImg] = useState(undefined);
 
   const selectRef = useRef();
 
@@ -39,8 +39,7 @@ export default function AdminAddProduct() {
   const postMethodFetch = (url, body) => {
     return fetch(url, {
       method: 'POST',
-      body: JSON.stringify(body),
-      headers: { 'Content-Type': 'application/json' },
+      body: body,
     })
       .then((response) => {
         if (!response.ok) {
@@ -69,7 +68,7 @@ export default function AdminAddProduct() {
   }
 
   function handleImgChange(event) {
-    setImg(event.target.value);
+    setImg(event.target.files[0]);
   }
 
   return (
@@ -91,12 +90,7 @@ export default function AdminAddProduct() {
           value={description}
         ></input>
         <label htmlFor="imgId">Termék képe</label>
-        <input
-          type="text"
-          id="imgId"
-          onChange={handleImgChange}
-          value={img}
-        ></input>
+        <input type="file" id="imgId" onChange={handleImgChange}></input>
         <label htmlFor="priceId">Termék ára (HUF)</label>
         <input
           type="number"
@@ -115,19 +109,24 @@ export default function AdminAddProduct() {
         <button
           type="button"
           onClick={() => {
-            postMethodFetch('/products', {
-              prodName: name,
-              prodDescription: description,
-              prodPrice: price,
-              prodImg: img,
-              categoryId: selectRef.current.value,
-            })
-              .then((data) => {
-                alert(data.result);
-              })
-              .catch((err) => {
-                console.error(err.message);
-              });
+            if (img == undefined) {
+              alert('Nem adott meg képet!');
+            } else {
+              const formData = new FormData();
+              formData.append('prodName', name);
+              formData.append('prodDescription', description);
+              formData.append('prodPrice', price);
+              formData.append('categoryId', selectRef.current.value);
+              formData.append('file', img);
+
+              postMethodFetch('/products', formData)
+                .then((data) => {
+                  alert(data.result);
+                })
+                .catch((err) => {
+                  console.error(err.message);
+                });
+            }
           }}
         >
           Hozzáadás
