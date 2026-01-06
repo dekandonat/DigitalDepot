@@ -2,13 +2,16 @@ const express = require('express');
 const router = express.Router();
 
 const Products = require('../models/products');
+const upload = require('../util/multer');
 
-router.post('/', async (req, res) => {
+router.post('/', upload.single('file'), async (req, res) => {
+  const img = `uploads/products/${req.file.filename}`;
+
   const product = new Products(
     req.body.prodName,
     req.body.prodDescription,
     req.body.prodPrice,
-    req.body.prodImg,
+    img,
     req.body.categoryId
   );
   const result = await product.save();
