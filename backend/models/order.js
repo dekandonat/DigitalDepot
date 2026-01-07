@@ -23,10 +23,24 @@ module.exports = class Order {
         return { result: 'fail', message: 'Cart is empty' };
       }
 
-      await db.execute(
+      const [orderResult] = await db.execute(
         `INSERT INTO orders (userId, totalAmount, shippingAddress, paymentMethod, couponCode, orderDate) 
          VALUES (${this.userId}, ${totalAmount}, '${this.shippingAddress}', '${this.paymentMethod}', '${this.couponCode}', NOW())`
       );
+
+      const orderId = orderResult.insertId;
+
+      const [products] = await db.execute(
+        `SELECT * FROM carts WHERE userId = ?`,
+        [this.userId]
+      );
+
+      for (const product of products) {
+        await db.execute(
+          `INSERT INTO order_items (orderId, productId, quantity) VALUES (?, ?, ?)`,
+          [orderId, product.productId, product.quantity]
+        );
+      }
 
       await db.execute(`DELETE FROM carts WHERE userId = ${this.userId}`);
 
