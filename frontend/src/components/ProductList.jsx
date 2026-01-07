@@ -43,7 +43,7 @@ function ProductCard({ product }) {
             await sendCartRequest(requestUrl, userToken);
         } catch(error){
             console.error("Hiba: ", error);
-            setLoginMessage("Hiba történt a kosárba rakáskor.");
+            setLoginMessage("A kosár használatához jelentkezzen be!");
             setTimeout(() => setLoginMessage(""), 3000);
         }
     };
@@ -70,8 +70,9 @@ export default function ProductList() {
     const navigate = useNavigate();
 
     const { categoryId } = useParams();
-    const [searchParams] = useSearchParams();
-    const searchQuery = searchParams.get('q');
+    
+    const [queryParams] = useSearchParams();
+    const searchText = queryParams.get('q');
 
     useEffect(() => {
         const getRequest = (fetchUrl) => {
@@ -91,8 +92,8 @@ export default function ProductList() {
             try{
                 let fetchUrl = '/products';
 
-                if(searchQuery){
-                    fetchUrl = `/products/search/${searchQuery}`;
+                if(searchText){
+                    fetchUrl = `/products/search/${searchText}`;
                 }
 
                 const productsResult = await getRequest(fetchUrl);
@@ -101,9 +102,9 @@ export default function ProductList() {
                 let allProducts = productsResult.data || [];
                 let allCategories = categoriesResult.data || [];
 
-                if(searchQuery){
+                if(searchText){
                     setProducts(allProducts);
-                    setCurrentCategoryName(`Keresés: "${searchQuery}"`);
+                    setCurrentCategoryName(`Keresés: "${searchText}"`);
                 }
                 else if(categoryId){
                     const currentId = parseInt(categoryId);
@@ -139,7 +140,7 @@ export default function ProductList() {
         }
 
         fetchProductsAndCategories();
-    }, [categoryId, searchQuery]);
+    }, [categoryId, searchText]);
 
     const clearFilter = () => {
         navigate('/');
@@ -147,7 +148,7 @@ export default function ProductList() {
 
     return (
         <div id="productListContainer">
-            {(categoryId || searchQuery) && (
+            {(categoryId || searchText) && (
                 <div id="activeFilterContainer">
                     <span id="activeFilterName">{currentCategoryName}</span>
                     <button id="clearFilterButton" onClick={clearFilter} title="Szűrés törlése">
