@@ -7,6 +7,17 @@ const Order = require('../models/order');
 
 const verifyAsync = promisify(jwt.verify);
 
+router.get('/items/:orderId', async (req, res) => {
+    const orderId = req.params.orderId;
+    try {
+        const items = await Order.getOrderItems(orderId);
+        res.status(200).json({ result: 'success', data: items });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ result: 'fail', message: 'server error' });
+    }
+});
+
 router.get('/my-orders', async (req, res) => {
     const authorizationHeader = req.headers['authorization'];
     const token = authorizationHeader && authorizationHeader.split(' ')[1];

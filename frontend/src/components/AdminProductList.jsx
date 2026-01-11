@@ -38,6 +38,7 @@ export default function AdminProductList() {
         {products.map((product) => {
           return (
             <AdminProductCard
+              id={product.prodId}
               name={product.productName}
               price={product.productPrice}
               description={product.productDescription}

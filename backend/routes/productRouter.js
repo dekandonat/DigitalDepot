@@ -2,16 +2,13 @@ const express = require('express');
 const router = express.Router();
 
 const Products = require('../models/products');
-const upload = require('../util/multer');
 
-router.post('/', upload.single('file'), async (req, res) => {
-  const img = `uploads/products/${req.file.filename}`;
-
+router.post('/', async (req, res) => {
   const product = new Products(
     req.body.prodName,
     req.body.prodDescription,
     req.body.prodPrice,
-    img,
+    req.body.prodImg,
     req.body.categoryId
   );
   const result = await product.save();
@@ -20,6 +17,22 @@ router.post('/', upload.single('file'), async (req, res) => {
   } else {
     res.status(500).json(result);
   }
+});
+
+router.patch('/:prodId', async (req, res) => {
+    const id = req.params.prodId;
+    const { prodName, prodDescription, prodPrice } = req.body;
+    
+    try {
+        const result = await Products.update(id, prodName, prodDescription, prodPrice);
+        if (result.result === 'success') {
+            res.status(200).json(result);
+        } else {
+            res.status(500).json(result);
+        }
+    } catch (err) {
+        res.status(500).json({ result: 'fail', message: err.message });
+    }
 });
 
 router.get('/:prodId', async (req, res) => {

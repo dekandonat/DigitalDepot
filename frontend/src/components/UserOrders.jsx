@@ -5,6 +5,9 @@ import './UserOrders.css';
 export default function UserOrders() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [expandedOrderId, setExpandedOrderId] = useState(null);
+    const [orderDetails, setOrderDetails] = useState({}); 
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -27,7 +30,7 @@ export default function UserOrders() {
                     setOrders(data.data || []); 
                 }
             } catch (error) {
-                console.error("Hiba a rendelések lekérésekor:", error);
+                console.error(error);
             } finally {
                 setLoading(false);
             }
@@ -35,6 +38,30 @@ export default function UserOrders() {
 
         fetchOrders();
     }, [navigate]);
+
+    const viewOrderDetails = async (orderId) => {
+        if (expandedOrderId === orderId) {
+            setExpandedOrderId(null);
+            return;
+        }
+
+        setExpandedOrderId(orderId);
+
+        if (!orderDetails[orderId]) {
+            try {
+                const response = await fetch(`http://localhost:3000/order/items/${orderId}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    const details = { ...orderDetails };
+                    details[orderId] = result.data;
+                    setOrderDetails(details);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    };
 
     return (
         <div className="userOrdersContainer">
@@ -56,26 +83,54 @@ export default function UserOrders() {
                     {orders.map(order => (
                         <div key={order.orderId} className="orderCard">
                             <div className="orderCardHeader">
-                                <span className="orderId">
-                                    Rendelés #{order.orderId}
-                                </span>
-                                <span className="orderDate">
-                                    {order.orderDate ? new Date(order.orderDate).toLocaleString('hu-HU') : 'Dátum nem elérhető'}
-                                </span>
+                                <div className="headerLeft">
+                                    <span className="orderId">Rendelés #{order.orderId}</span>
+                                    <span className="orderDate">
+                                        {order.orderDate ? new Date(order.orderDate).toLocaleString('hu-HU') : 'Dátum nem elérhető'}
+                                    </span>
+                                </div>
+                                <div className="headerRight">
+                                    <span className="orderTotalAmount">
+                                        {order.totalAmount ? order.totalAmount.toLocaleString() : 0} Ft
+                                    </span>
+                                    <button 
+                                        className="expandButton"
+                                        onClick={() => viewOrderDetails(order.orderId)}
+                                    >
+                                        {expandedOrderId === order.orderId ? 'Bezárás' : 'Részletek'}
+                                    </button>
+                                </div>
                             </div>
                             
                             <div className="orderCardBody">
                                 <p className="orderDetailRow">
-                                    <strong>Végösszeg: </strong> 
-                                    <span className="orderTotalAmount">
-                                        {order.totalAmount ? order.totalAmount.toLocaleString() : 0} Ft
-                                    </span>
-                                </p>
-                                <p className="orderDetailRow">
-                                    <strong>Szállítási cím: </strong> 
-                                    {order.shippingAddress}
+                                    <strong>Szállítási cím: </strong> {order.shippingAddress}
                                 </p>
                             </div>
+
+                            {expandedOrderId === order.orderId && (
+                                <div className="orderItemsContainer">
+                                    <h3>Megrendelt termékek:</h3>
+                                    {orderDetails[order.orderId] ? (
+                                        <div className="itemsList">
+                                            {orderDetails[order.orderId].map((item, index) => (
+                                                <div key={index} className="orderItemRow">
+                                                    <img src={item.productImg} alt={item.productName} className="itemThumb"/>
+                                                    <div className="itemInfo">
+                                                        <span className="itemName">{item.productName}</span>
+                                                        <span className="itemQty">{item.quantity} db</span>
+                                                    </div>
+                                                    <span className="itemPrice">
+                                                        {(item.price * item.quantity).toLocaleString()} Ft
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p>Részletek betöltése...</p>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

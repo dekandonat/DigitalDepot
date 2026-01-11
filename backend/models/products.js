@@ -51,4 +51,15 @@ module.exports = class Products {
       throw err;
     }
   }
+
+  static async update(id, name, desc, price) {
+    try {
+        await db.execute(
+            `UPDATE products SET productName = "${name}", productDescription = "${desc}", productPrice = ${price} WHERE prodId = ${id}`
+        );
+        return { result: 'success' };
+    } catch (err) {
+        return { result: 'fail', message: err.message };
+    }
+  }
 };

@@ -57,15 +57,22 @@
     padding: 15px;
     background-color: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.2s;
 }
 
 .orderCardHeader {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 10px;
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
     margin-bottom: 10px;
+}
+
+.headerLeft, .headerRight {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .orderId {
@@ -77,6 +84,84 @@
 .orderDate {
     color: #666;
     font-size: 0.9rem;
+}
+
+.expandButton {
+    background: none;
+    border: none;
+    color: #007bff;
+    padding: 0;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    font-family: inherit;
+}
+
+.expandButton:hover {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+.orderItemsContainer {
+    margin-top: 15px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 6px;
+    animation: fadeIn 0.3s;
+}
+
+.orderItemsContainer h3 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+.orderItemRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.orderItemRow:last-child {
+    border-bottom: none;
+}
+
+.itemThumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.itemInfo {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.itemName {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.itemQty {
+    font-size: 0.85rem;
+    color: #777;
+}
+
+.itemPrice {
+    font-weight: bold;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @media (min-width: 600px) {
@@ -97,18 +182,12 @@
         justify-content: space-between;
         align-items: center;
     }
-}
+    
+    .headerLeft, .headerRight {
+        align-items: flex-start;
+    }
 
-.orderCardBody {
-    line-height: 1.6;
-}
-
-.orderDetailRow {
-    margin: 5px 0;
-    font-size: 0.95rem;
-}
-
-.orderTotalAmount {
-    font-size: 1.1rem;
-    font-weight: bold;
+    .headerRight {
+        align-items: flex-end;
+    }
 }
