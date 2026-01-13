@@ -1,4 +1,15 @@
 const db = require('../util/database');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
 
 module.exports = class Order {
   constructor(userId, shippingAddress, paymentMethod, couponCode) {
@@ -22,7 +33,7 @@ module.exports = class Order {
       }
 
       let totalAmount = 0;
-      cartItems.forEach(item => {
+      cartItems.forEach((item) => {
         totalAmount += item.productPrice * item.quantity;
       });
 
@@ -38,6 +49,29 @@ module.exports = class Order {
           `INSERT INTO order_items (orderId, productId, quantity, price) 
            VALUES (${orderId}, ${item.prodId}, ${item.quantity}, ${item.productPrice})`
         );
+      }
+
+      //E-mail küldése
+      let email;
+      let ordered_products;
+      try {
+        email = await db.execute(
+          'SELECT users.email FROM users WHERE userId = ?',
+          [this.userId]
+        );
+      } catch (err) {
+        console.log(err.message);
+      }
+
+      try {
+        await transporter.sendMail({
+          from: `"DigitalDepot" <${process.env.EMAIL_USER}>`,
+          to: email[0][0].email,
+          subject: 'Sikeres Rendelés',
+          text: 'Rendszerünk sikeresen rögzítette rendelését!',
+        });
+      } catch (err) {
+        console.log(err.message);
       }
 
       await db.execute(`DELETE FROM carts WHERE userId = ${this.userId}`);
