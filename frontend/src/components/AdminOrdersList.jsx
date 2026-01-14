@@ -36,6 +36,30 @@ export default function AdminOrdersList() {
       });
   }, []);
 
+  const handleDelete = async (orderId) => {
+    if (!window.confirm("Biztosan törölni szeretnéd ezt a rendelést?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/adminRoute/orders/${orderId}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (response.ok) {
+            setOrders(orders.filter(order => order.orderId !== orderId));
+        } else {
+            alert("Hiba történt a törlés során.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Szerver hiba történt.");
+    }
+  };
+
   return (
     <div>
       <h1>Rendelések</h1>
@@ -46,6 +70,7 @@ export default function AdminOrdersList() {
               <h1>{order.totalAmount}</h1>
               <p>{order.shippingAddress}</p>
               <p>{new Date(order.orderDate).toLocaleDateString()}</p>
+              <button onClick={() => handleDelete(order.orderId)}>Törlés</button>
             </div>
           );
         })}

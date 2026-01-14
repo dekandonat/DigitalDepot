@@ -72,4 +72,14 @@ module.exports = class Order {
       throw err;
     }
   }
+
+  static async delete(id) {
+    try {
+      await db.execute(`DELETE FROM order_items WHERE orderId = ${id}`);
+      await db.execute(`DELETE FROM orders WHERE orderId = ${id}`);
+      return { result: 'success' };
+    } catch (err) {
+      return { result: 'fail', message: err.message };
+    }
+  }
 };
