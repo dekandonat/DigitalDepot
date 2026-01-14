@@ -59,9 +59,23 @@ module.exports = class Order {
           'SELECT users.email FROM users WHERE userId = ?',
           [this.userId]
         );
+        ordered_products = await db.execute(
+          'SELECT products.productName, products.productPrice, order_items.quantity FROM products INNER JOIN order_items ON products.prodId = order_items.productId WHERE order_items.orderId = ?',
+          [orderId]
+        );
       } catch (err) {
         console.log(err.message);
       }
+
+      ordered_products = ordered_products[0];
+      let htmlbody =
+        '<h1>Rendszerünk sikeresen rögzítette rendelését!</h1><table style="width:100%; border-collapse: collapse; font-family: Arial, sans-serif;"><tr><th style="border-bottom: 2px solid #ddd; padding: 8px; text-align:left;">Termék</th><th style="border-bottom: 2px solid #ddd; padding: 8px; text-align:right;">Ár</th><th style="border-bottom: 2px solid #ddd; padding: 8px; text-align:right;">Mennyiség</th></tr>';
+
+      for (const row of ordered_products) {
+        htmlbody += `<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;">${row.productName}</td><td style="padding: 8px; border-bottom: 1px solid #ddd; text-align:right;">${row.productPrice}</td><td style="padding: 8px; border-bottom: 1px solid #ddd; text-align:right;">${row.quantity}</td></tr>`;
+      }
+
+      htmlbody += `</table><br><h1>Fizetendő összeg: ${totalAmount} Ft</h1>`;
 
       try {
         await transporter.sendMail({
@@ -69,6 +83,7 @@ module.exports = class Order {
           to: email[0][0].email,
           subject: 'Sikeres Rendelés',
           text: 'Rendszerünk sikeresen rögzítette rendelését!',
+          html: htmlbody,
         });
       } catch (err) {
         console.log(err.message);
