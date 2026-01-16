@@ -34,7 +34,6 @@ module.exports = class Products {
       const [rows] = await db.execute(
         `SELECT * FROM products WHERE prodId = ${id}`
       );
-      console.log(rows);
       return rows;
     } catch (err) {
       throw err;

@@ -1,0 +1,141 @@
+.reviewModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.reviewModalContent {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    width: 90%; 
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.closeModalBtn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #666;
+    line-height: 1;
+    padding: 0;
+    z-index: 10;
+}
+
+.addReviewSection {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.starInput {
+    font-size: 2rem;
+    cursor: pointer;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.star {
+    color: #ccc;
+    transition: color 0.2s;
+}
+
+.star.filled {
+    color: #ffc107;
+}
+
+.addReviewSection textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.submitReviewBtn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px; 
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%; 
+    font-size: 1rem;
+}
+
+.submitReviewBtn:hover {
+    background-color: #0056b3;
+}
+
+.reviewsList {
+    margin-top: 10px;
+}
+
+.reviewItem {
+    background-color: #f9f9f9;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.reviewStars {
+    color: #ffc107;
+}
+
+.reviewDate {
+    color: #888;
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 5px;
+    text-align: right;
+}
+
+.errorMsg {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .reviewModalContent {
+        width: 500px; 
+        padding: 25px;
+    }
+
+    .submitReviewBtn {
+        width: auto; 
+    }
+}
