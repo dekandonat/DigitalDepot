@@ -1,8 +1,19 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../util/database');
+const nodemailer = require('nodemailer');
 
-const users = [];
+let recoveryCodes = [];
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
 
 module.exports = class User {
   constructor(userName, password, email, role) {
@@ -10,6 +21,100 @@ module.exports = class User {
     this.password = password;
     this.email = email;
     this.role = role;
+  }
+
+  static async resetPassword(email, code, password) {
+    try {
+      const [rows] = await db.execute(
+        'SELECT users.userId FROM users WHERE email = ?',
+        [email]
+      );
+
+      if (rows.length == 0) {
+        return { result: 'fail', message: 'no such account' };
+      }
+
+      const userId = rows[0].userId;
+      const recoveryCode = recoveryCodes.find((codes) => codes.id == userId);
+
+      if (!recoveryCode) {
+        return {
+          result: 'fail',
+          message: 'no code for account',
+        };
+      }
+
+      if (recoveryCode.expiresAt > Date.now()) {
+        if (recoveryCode.code === code) {
+          try {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await db.execute(
+              'UPDATE users SET hashedPassword = ? WHERE userId = ?;',
+              [hashedPassword, userId]
+            );
+
+            recoveryCodes = recoveryCodes.filter((code) => code.id != userId);
+            return { result: 'success' };
+          } catch (err) {
+            console.log(err);
+            return { result: 'fail', message: 'server error' };
+          }
+        } else {
+          return { result: 'fail', message: 'code doesnt match' };
+        }
+      } else {
+        return { result: 'fail', message: 'code expired' };
+      }
+    } catch (err) {
+      console.log(err);
+      return { result: 'fail', message: 'server error' };
+    }
+  }
+
+  static async getCode(email) {
+    try {
+      //id keresése
+      const [rows] = await db.execute(
+        'SELECT users.userId FROM users WHERE email = ?',
+        [email]
+      );
+
+      if (rows.length > 0) {
+        //Kód generálása
+        const code = Math.floor(100000 + Math.random() * 900000);
+
+        //lejárt kódok törlése
+        recoveryCodes = recoveryCodes.filter(
+          (code) => code.expiresAt > Date.now()
+        );
+
+        //felhasználó régi kódjainak a törlése
+        recoveryCodes = recoveryCodes.filter(
+          (code) => code.id != rows[0].userId
+        );
+
+        recoveryCodes.push({
+          id: rows[0].userId,
+          code: code,
+          expiresAt: Date.now() + 5 * 60 * 1000,
+        });
+
+        //Email küldése
+        await transporter.sendMail({
+          from: `"DigitalDepot" <${process.env.EMAIL_USER}>`,
+          to: email,
+          subject: 'Helyreállító Kód',
+          text: `Ezt a kódot tudja használni a helyreállításhoz: ${code}`,
+        });
+
+        return { result: 'success' };
+      } else {
+        return { result: 'fail', message: 'no email found' };
+      }
+    } catch (err) {
+      console.log(err);
+      return { result: 'fail', message: 'server error' };
+    }
   }
 
   async register() {

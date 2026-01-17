@@ -34,4 +34,31 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/reset-code', async (req, res) => {
+  const email = req.body.email;
+
+  if (!email) {
+    return res.status(404).json({ result: 'fail', message: 'no email given' });
+  }
+
+  const response = await User.getCode(email);
+
+  if (response.result == 'success') {
+    res.status(200).json(response);
+  } else {
+    res.status(500).json(response);
+  }
+});
+
+router.post('/reset-password', async (req, res) => {
+  const { email, code, password } = req.body;
+  const response = await User.resetPassword(email, code, password);
+
+  if (response.result == 'success') {
+    return res.status(200).json(response);
+  } else {
+    return res.status(400).json(response);
+  }
+});
+
 module.exports = router;

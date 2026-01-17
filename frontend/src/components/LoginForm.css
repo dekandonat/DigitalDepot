@@ -1,237 +1,252 @@
-.formBackground{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    backdrop-filter: blur(3px);
-    padding: 15px;
-    box-sizing: border-box;
+.formBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(3px);
+  padding: 15px;
+  box-sizing: border-box;
 }
 
-.formContent{
-    background-color: white;
-    width: 100%;
-    max-width: 400px;
-    padding: 25px 20px;
-    border-radius: 16px;
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 0.3s ease-out;
-    box-sizing: border-box;
+.formContent {
+  background-color: white;
+  width: 100%;
+  max-width: 400px;
+  padding: 25px 20px;
+  border-radius: 16px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease-out;
+  box-sizing: border-box;
 }
 
 @keyframes fadeIn {
-    from {opacity: 0; transform: translateY(20px);}
-    to {opacity: 1; transform: translateY(0);}
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.formCloseBtn{
-    position: absolute;
-    top: 12px;
-    right: 15px;
-    background: #f0f0f0;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: gray;
-    transition: background-color 0.2;
+.formCloseBtn {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  background: #f0f0f0;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: gray;
+  transition: background-color 0.2;
 }
 
-.formCloseBtn:hover{
-    cursor: pointer;
-    background-color: #e0e0e0;
-    color: black;
+.formCloseBtn:hover {
+  cursor: pointer;
+  background-color: #e0e0e0;
+  color: black;
 }
 
-h2{
-    text-align: center;
-    margin-top: 5px;
-    margin-bottom: 25px;
-    font-size: 1.5rem;
-    color: #333;
+h2 {
+  text-align: center;
+  margin-top: 5px;
+  margin-bottom: 25px;
+  font-size: 1.5rem;
+  color: #333;
 }
 
-.formItems{
-    margin-bottom: 16px;
+.formItems {
+  margin-bottom: 16px;
 }
 
-.formItems label{
-    display: block;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    color: #555;
-    font-weight: 600;
+.formItems label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 600;
 }
 
-.formItems input{
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #eee;
-    border-radius: 8px;
-    font-size: 16px;
-    box-sizing: border-box;
-    transition: border-color 0.2s;
-    background-color: #fafafa;
+.formItems input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  background-color: #fafafa;
 }
 
-.formItems input:focus{
-    outline: none;
-    border-color: lightblue;
-    background-color: white;
+.formItems input:focus {
+  outline: none;
+  border-color: lightblue;
+  background-color: white;
 }
 
-.submitBtn{
-    width: 100%;
-    padding: 14px;
-    background-color: lightblue;
-    color: black;
-    font-weight: 700;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    transition: transform 0.1s, box-shadow 0.1s;
+.submitBtn {
+  width: 100%;
+  padding: 14px;
+  background-color: lightblue;
+  color: black;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
-.submitBtn:active{
-    transform: scale(0.95);
+.submitBtn:active {
+  transform: scale(0.95);
 }
 
-.switchModeText{
-    text-align: center;
-    margin-top: 20px;
-    margin-bottom: 0;
-    font-size: 0.95rem;
-    color: gray;
-    padding: 10px;
-    font-weight: 500;
+.switchModeText {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 0;
+  font-size: 0.95rem;
+  color: gray;
+  padding: 10px;
+  font-weight: 500;
 }
 
-.switchModeText:hover{
-    cursor: pointer;
-    color: #0066cc;
+.switchModeText:hover {
+  cursor: pointer;
+  color: #0066cc;
 }
 
 .message {
-    text-align: center;
-    font-weight: bold;
-    margin: 10px 0;
-    padding: 8px;
-    border-radius: 6px;
-    font-size: 0.9rem;
+  text-align: center;
+  font-weight: bold;
+  margin: 10px 0;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.9rem;
 }
 
-#error{
-    color: red;
-    background-color: beige;
-    border: 1px solid lightgoldenrodyellow;
+#error {
+  color: red;
+  background-color: beige;
+  border: 1px solid lightgoldenrodyellow;
 }
 
-#success{
-    color: green;
-    background-color: beige;
-    border: 1px solid lightgoldenrodyellow;
+#success {
+  color: green;
+  background-color: beige;
+  border: 1px solid lightgoldenrodyellow;
 }
 
-.profilePicContainer{
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    margin: 0 auto 15px auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid lightblue;
-    overflow: hidden;
+.profilePicContainer {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 15px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid lightblue;
+  overflow: hidden;
 }
 
-#profileImg{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+#profileImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.profileDataSection{
-    margin-top: 50px;
-    margin-bottom: 30px;
+.profileDataSection {
+  margin-top: 50px;
+  margin-bottom: 30px;
 }
 
-.profileDataRow{
-    font-size: 1.1rem;
-    color: black;
-    margin: 10px 0;
-    padding-bottom: 8px;
+.profileDataRow {
+  font-size: 1.1rem;
+  color: black;
+  margin: 10px 0;
+  padding-bottom: 8px;
 }
 
-.profileLabel{
-    font-weight: bold;
-    color: black;
-    margin-right: 8px;
+.profileLabel {
+  font-weight: bold;
+  color: black;
+  margin-right: 8px;
 }
 
-.proileData{
-    color: black;
+.proileData {
+  color: black;
 }
 
-#logoutBtn{
-    background-color: #ffcccc;
-    color: red;
-    border: 1px solid #ffcdd2;
-    margin-top: 15px;
+#logoutBtn {
+  background-color: #ffcccc;
+  color: red;
+  border: 1px solid #ffcdd2;
+  margin-top: 15px;
 }
 
-#logoutBtn:hover{
-    background-color: #ffb3b3;
-    box-shadow: 0 4px 6px rgba(211, 47, 47, 0.2);
+#logoutBtn:hover {
+  background-color: #ffb3b3;
+  box-shadow: 0 4px 6px rgba(211, 47, 47, 0.2);
 }
 
-#logoutBtn:active{
-    transform: scale(0.98);
+#logoutBtn:active {
+  transform: scale(0.98);
 }
 
 .myOrdersBtn {
-    width: 100%;
-    padding: 14px;
-    background-color: #007bff;
-    color: white;
-    font-weight: 700;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+  width: 100%;
+  padding: 14px;
+  background-color: #007bff;
+  color: white;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
 }
 
 .myOrdersBtn:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .myOrdersBtn:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
 }
 
-@media(min-width: 768px){
-    .formContent{
-        padding: 40px;
-    }
+.forgotPassword {
+  text-align: center;
+}
 
-    h2{
-        font-size: 1.8rem
-    }
+.forgotPassword:hover {
+  cursor: pointer;
+  color: #0066cc;
+}
+
+@media (min-width: 768px) {
+  .formContent {
+    padding: 40px;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
 }
