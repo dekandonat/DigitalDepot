@@ -1,4 +1,15 @@
 const db = require('../util/database');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
 
 module.exports = class Order {
   constructor(userId, shippingAddress, paymentMethod, couponCode) {
@@ -22,7 +33,7 @@ module.exports = class Order {
       }
 
       let totalAmount = 0;
-      cartItems.forEach(item => {
+      cartItems.forEach((item) => {
         totalAmount += item.productPrice * item.quantity;
       });
 
@@ -38,6 +49,44 @@ module.exports = class Order {
           `INSERT INTO order_items (orderId, productId, quantity, price) 
            VALUES (${orderId}, ${item.prodId}, ${item.quantity}, ${item.productPrice})`
         );
+      }
+
+      //E-mail küldése
+      let email;
+      let ordered_products;
+      try {
+        email = await db.execute(
+          'SELECT users.email FROM users WHERE userId = ?',
+          [this.userId]
+        );
+        ordered_products = await db.execute(
+          'SELECT products.productName, products.productPrice, order_items.quantity FROM products INNER JOIN order_items ON products.prodId = order_items.productId WHERE order_items.orderId = ?',
+          [orderId]
+        );
+      } catch (err) {
+        console.log(err.message);
+      }
+
+      ordered_products = ordered_products[0];
+      let htmlbody =
+        '<h1>Rendszerünk sikeresen rögzítette rendelését!</h1><table style="width:100%; border-collapse: collapse; font-family: Arial, sans-serif;"><tr><th style="border-bottom: 2px solid #ddd; padding: 8px; text-align:left;">Termék</th><th style="border-bottom: 2px solid #ddd; padding: 8px; text-align:right;">Ár</th><th style="border-bottom: 2px solid #ddd; padding: 8px; text-align:right;">Mennyiség</th></tr>';
+
+      for (const row of ordered_products) {
+        htmlbody += `<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;">${row.productName}</td><td style="padding: 8px; border-bottom: 1px solid #ddd; text-align:right;">${row.productPrice}</td><td style="padding: 8px; border-bottom: 1px solid #ddd; text-align:right;">${row.quantity}</td></tr>`;
+      }
+
+      htmlbody += `</table><br><h1>Fizetendő összeg: ${totalAmount} Ft</h1>`;
+
+      try {
+        await transporter.sendMail({
+          from: `"DigitalDepot" <${process.env.EMAIL_USER}>`,
+          to: email[0][0].email,
+          subject: 'Sikeres Rendelés',
+          text: 'Rendszerünk sikeresen rögzítette rendelését!',
+          html: htmlbody,
+        });
+      } catch (err) {
+        console.log(err.message);
       }
 
       await db.execute(`DELETE FROM carts WHERE userId = ${this.userId}`);
