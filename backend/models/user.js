@@ -45,7 +45,7 @@ module.exports = class User {
       }
 
       if (recoveryCode.expiresAt > Date.now()) {
-        if (recoveryCode.code === code) {
+        if (recoveryCode.code == code) {
           try {
             const hashedPassword = await bcrypt.hash(password, 10);
             await db.execute(

@@ -53,7 +53,6 @@ router.post('/reset-code', async (req, res) => {
 router.post('/reset-password', async (req, res) => {
   const { email, code, password } = req.body;
   const response = await User.resetPassword(email, code, password);
-
   if (response.result == 'success') {
     return res.status(200).json(response);
   } else {
