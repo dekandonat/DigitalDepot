@@ -69,6 +69,22 @@ router.get('/search/:string', async (req, res) => {
   }
 });
 
+router.patch('/addInventory', async (req, res) => {
+  try {
+    const { id, quantity } = req.body;
+    const result = await Products.addInventory(id, quantity);
+
+    if (result.result == 'success') {
+      res.status(200).json(result);
+    } else {
+      res.status(500).json(result);
+    }
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
+
 router.get('/', async (req, res) => {
   try {
     const data = await Products.fetchAll();
