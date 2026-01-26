@@ -5,54 +5,51 @@ import AdminProductList from './AdminProductList';
 import AdminCreateAccount from './AdminCreateAccount';
 import AdminOrdersList from './AdminOrdersList';
 import AdminInventory from './AdminInventory';
+import AdminUsedProducts from './AdminUsedProducts';
 import './AdminPage.css';
 
 export default function AdminPage() {
   const [currentPage, setCurrentPage] = useState('list');
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '100px' }}>
+    <div className="adminPageContainer">
       <h1>Adminisztrátor felület</h1>
       <div className="selectDiv">
         <button
-          onClick={() => {
-            setCurrentPage('list');
-          }}
+          onClick={() => setCurrentPage('list')}
           className={currentPage == 'list' ? 'activeBtn' : 'selectBtn'}
         >
           Termékek
         </button>
         <button
-          onClick={() => {
-            setCurrentPage('add');
-          }}
+          onClick={() => setCurrentPage('add')}
           className={currentPage == 'add' ? 'activeBtn' : 'selectBtn'}
         >
           Termék hozzáadása
         </button>
         <button
-          onClick={() => {
-            setCurrentPage('inventory');
-          }}
+          onClick={() => setCurrentPage('inventory')}
           className={currentPage == 'inventory' ? 'activeBtn' : 'selectBtn'}
         >
           Leltár
         </button>
         <button
-          onClick={() => {
-            setCurrentPage('createAccount');
-          }}
+          onClick={() => setCurrentPage('createAccount')}
           className={currentPage == 'createAccount' ? 'activeBtn' : 'selectBtn'}
         >
-          Admin fiók létrehozása
+          Admin fiók
         </button>
         <button
-          onClick={() => {
-            setCurrentPage('ordersList');
-          }}
+          onClick={() => setCurrentPage('ordersList')}
           className={currentPage == 'ordersList' ? 'activeBtn' : 'selectBtn'}
         >
-          Rendelések megtekintése
+          Rendelések
+        </button>
+        <button
+          onClick={() => setCurrentPage('usedProducts')}
+          className={currentPage == 'usedProducts' ? 'activeBtn' : 'selectBtn'}
+        >
+          Használt termékek
         </button>
       </div>
       {currentPage === 'list' && <AdminProductList />}
@@ -60,6 +57,7 @@ export default function AdminPage() {
       {currentPage === 'createAccount' && <AdminCreateAccount />}
       {currentPage === 'ordersList' && <AdminOrdersList />}
       {currentPage === 'inventory' && <AdminInventory />}
+      {currentPage === 'usedProducts' && <AdminUsedProducts />}
     </div>
   );
 }
