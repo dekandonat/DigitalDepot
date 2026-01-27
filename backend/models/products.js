@@ -53,12 +53,37 @@ module.exports = class Products {
 
   static async update(id, name, desc, price) {
     try {
-        await db.execute(
-            `UPDATE products SET productName = "${name}", productDescription = "${desc}", productPrice = ${price} WHERE prodId = ${id}`
-        );
-        return { result: 'success' };
+      await db.execute(
+        `UPDATE products SET productName = "${name}", productDescription = "${desc}", productPrice = ${price} WHERE prodId = ${id}`
+      );
+      return { result: 'success' };
     } catch (err) {
-        return { result: 'fail', message: err.message };
+      return { result: 'fail', message: err.message };
+    }
+  }
+
+  static async addInventory(id, quantity) {
+    try {
+      if (!Number.isInteger(quantity) || quantity <= 0) {
+        return {
+          result: 'fail',
+          message: 'quantity must be a positive integer',
+        };
+      }
+
+      const [result] = await db.execute(
+        'UPDATE products SET quantity = quantity + ? WHERE products.prodId = ?;',
+        [quantity, id]
+      );
+
+      if (result.affectedRows == 0) {
+        return { result: 'fail', message: 'no product found' };
+      } else {
+        return { result: 'success', message: 'quantity updated' };
+      }
+    } catch (err) {
+      console.log(err.message);
+      return { result: 'fail', message: 'server error' };
     }
   }
 };

@@ -22,24 +22,29 @@ router.post('/', upload.single('file'), async (req, res) => {
   }
 });
 
-router.patch('/:prodId', async (req, res) => {
-  const id = req.params.prodId;
-  const { prodName, prodDescription, prodPrice } = req.body;
-
+router.get('/search/:string', async (req, res) => {
   try {
-    const result = await Products.update(
-      id,
-      prodName,
-      prodDescription,
-      prodPrice
-    );
-    if (result.result === 'success') {
+    const string = req.params.string;
+    const results = await Products.find(string);
+    res.status(200).json({ result: 'success', data: results });
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
+
+router.patch('/addInventory', async (req, res) => {
+  try {
+    const { id, quantity } = req.body;
+    const result = await Products.addInventory(id, quantity);
+
+    if (result.result == 'success') {
       res.status(200).json(result);
     } else {
+      console.log(result);
       res.status(500).json(result);
     }
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'server error' });
   }
 });
 
@@ -59,13 +64,24 @@ router.get('/:prodId', async (req, res) => {
   }
 });
 
-router.get('/search/:string', async (req, res) => {
+router.patch('/:prodId', async (req, res) => {
+  const id = req.params.prodId;
+  const { prodName, prodDescription, prodPrice } = req.body;
+
   try {
-    const string = req.params.string;
-    const results = await Products.find(string);
-    res.status(200).json({ result: 'success', data: results });
+    const result = await Products.update(
+      id,
+      prodName,
+      prodDescription,
+      prodPrice
+    );
+    if (result.result === 'success') {
+      res.status(200).json(result);
+    } else {
+      res.status(500).json(result);
+    }
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: 'server error' });
+    res.status(500).json({ result: 'fail', message: err.message });
   }
 });
 

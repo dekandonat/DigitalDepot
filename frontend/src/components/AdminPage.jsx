@@ -4,6 +4,7 @@ import AdminAddProduct from './AdminAddProduct';
 import AdminProductList from './AdminProductList';
 import AdminCreateAccount from './AdminCreateAccount';
 import AdminOrdersList from './AdminOrdersList';
+import AdminInventory from './AdminInventory';
 import './AdminPage.css';
 
 export default function AdminPage() {
@@ -31,6 +32,14 @@ export default function AdminPage() {
         </button>
         <button
           onClick={() => {
+            setCurrentPage('inventory');
+          }}
+          className={currentPage == 'inventory' ? 'activeBtn' : 'selectBtn'}
+        >
+          Leltár
+        </button>
+        <button
+          onClick={() => {
             setCurrentPage('createAccount');
           }}
           className={currentPage == 'createAccount' ? 'activeBtn' : 'selectBtn'}
@@ -50,6 +59,7 @@ export default function AdminPage() {
       {currentPage === 'add' && <AdminAddProduct />}
       {currentPage === 'createAccount' && <AdminCreateAccount />}
       {currentPage === 'ordersList' && <AdminOrdersList />}
+      {currentPage === 'inventory' && <AdminInventory />}
     </div>
   );
 }
