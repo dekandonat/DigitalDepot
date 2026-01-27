@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+
+const verifyToken = require('./util/tokenVerify');
+
 dotenv.config();
 
 const app = express();
@@ -24,7 +27,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/products', productRouter);
 app.use('/user', userRouter);
 app.use('/category', categoryRouter);
-app.use('/cart', cartRouter);
+app.use('/cart', verifyToken, cartRouter);
 app.use('/order', orderRouter);
 app.use('/adminRoute', adminRouter);
 app.use('/reviews', reviewRouter);
