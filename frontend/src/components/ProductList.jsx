@@ -1,9 +1,10 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import ReviewModal from './ReviewModal';
 import './ProductList.css';
 
-function ProductCard({ product }) {
+function ProductCard({ product, onOpenReviews }) {
     const [loginMessage, setLoginMessage] = useState("");
 
     const sendCartRequest = (requestUrl, userToken) => {
@@ -48,13 +49,36 @@ function ProductCard({ product }) {
         }
     };
 
+    const avgRating = parseFloat(product.averageRating) || 0;
+    const reviewCount = product.reviewCount || 0;
+
     return (
         <div className="productCard">
             <img src={product.productImg} alt={product.productName} />
             <h3>{product.productName}</h3>
+            
+            <div className="ratingDisplay" onClick={() => onOpenReviews(product)}>
+                <div className="starsContainer">
+                    <span className="starFilled">{'★'.repeat(Math.round(avgRating))}</span>
+                    <span className="starEmpty">{'★'.repeat(5 - Math.round(avgRating))}</span>
+                </div>
+                <div className="ratingInfoRow">
+                     <span className="ratingText">
+                        ({avgRating.toFixed(1)}) - {reviewCount} értékelés
+                    </span>
+                </div>
+                <div className="reviewLinkText">
+                    Vélemények megtekintése &rarr;
+                </div>
+            </div>
+
             <p>{product.productDescription}</p>
             <span className="productPrice">{product.productPrice} Ft</span>
-            <input type="button" value="Kosárba" id="intoCartButton" onClick={addToCart}></input>
+            
+            <div className="cardButtonsContainer">
+                <input type="button" value="Kosárba" id="intoCartButton" onClick={addToCart}></input>
+            </div>
+           
             {loginMessage && (
                 <p className="loginErrorMessage">
                     {loginMessage}
@@ -67,10 +91,11 @@ function ProductCard({ product }) {
 export default function ProductList() {
     const [products, setProducts] = useState([]);
     const [currentCategoryName, setCurrentCategoryName] = useState("");
-    const navigate = useNavigate();
-
-    const { categoryId } = useParams();
     
+    const [selectedProductForReview, setSelectedProductForReview] = useState(null);
+
+    const navigate = useNavigate();
+    const { categoryId } = useParams();
     const [queryParams] = useSearchParams();
     const searchText = queryParams.get('q');
 
@@ -140,7 +165,7 @@ export default function ProductList() {
         }
 
         fetchProductsAndCategories();
-    }, [categoryId, searchText]);
+    }, [categoryId, searchText, selectedProductForReview]);
 
     const clearFilter = () => {
         navigate('/');
@@ -162,9 +187,20 @@ export default function ProductList() {
             ) : (
                 <div id="productGrid">
                     {products.map(product => (
-                        <ProductCard key={product.prodId} product={product} />
+                        <ProductCard 
+                            key={product.prodId} 
+                            product={product} 
+                            onOpenReviews={(p) => setSelectedProductForReview(p)} 
+                        />
                     ))}
                 </div>
+            )}
+
+            {selectedProductForReview && (
+                <ReviewModal 
+                    product={selectedProductForReview} 
+                    onClose={() => setSelectedProductForReview(null)} 
+                />
             )}
         </div>
     );
