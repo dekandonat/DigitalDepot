@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 
 const verifyToken = require('./util/tokenVerify');
+const verifyAdmin = require('./util/verifyAdmin');
 
 dotenv.config();
 
@@ -29,7 +30,7 @@ app.use('/user', userRouter);
 app.use('/category', categoryRouter);
 app.use('/cart', verifyToken, cartRouter);
 app.use('/order', orderRouter);
-app.use('/adminRoute', adminRouter);
+app.use('/adminRoute', verifyAdmin, adminRouter);
 app.use('/reviews', reviewRouter);
 
 app.listen(PORT, IP, () => {

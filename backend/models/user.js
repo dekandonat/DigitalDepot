@@ -151,19 +151,19 @@ module.exports = class User {
         const userName = rows[0].userName;
         const id = rows[0].userId;
         const role = rows[0].role;
-        const token = jwt.sign(
+        const accessToken = jwt.sign(
           {
             id: id,
             role: role,
           },
           process.env.SECRET,
           {
-            expiresIn: '1h',
+            expiresIn: '15m',
           }
         );
         return {
           result: 'success',
-          message: { email: userEmail, userName: userName, token: token },
+          message: { email: userEmail, userName: userName, token: accessToken },
         };
       } catch (err) {
         return { result: 'fail', data: 'token generation failed' };
