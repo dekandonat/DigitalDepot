@@ -22,7 +22,12 @@ const IP = process.env.IP;
 const PORT = process.env.PORT;
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/products', productRouter);

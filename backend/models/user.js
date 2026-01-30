@@ -2,8 +2,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../util/database');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 let recoveryCodes = [];
+let refreshTokens = [];
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -151,6 +153,7 @@ module.exports = class User {
         const userName = rows[0].userName;
         const id = rows[0].userId;
         const role = rows[0].role;
+        //Access Token generálás
         const accessToken = jwt.sign(
           {
             id: id,
@@ -161,15 +164,40 @@ module.exports = class User {
             expiresIn: '15m',
           }
         );
+        //refresh token generálás
+        const refreshtoken = crypto.randomBytes(64).toString('hex');
+        refreshTokens.push({
+          tokenId: crypto
+            .createHash('sha256')
+            .update(refreshtoken)
+            .digest('hex'),
+          userId: rows[0].userId,
+          createdAt: Date.now(),
+          expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        });
         return {
           result: 'success',
           message: { email: userEmail, userName: userName, token: accessToken },
+          refreshToken: refreshtoken,
         };
       } catch (err) {
         return { result: 'fail', data: 'token generation failed' };
       }
     } else {
       return { result: 'fail', data: 'incorrect password' };
+    }
+  }
+
+  static async refresh(token) {
+    try {
+      const hashedToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+      //Ide kerül az ellenőrzés, és adatok kikeresése
+    } catch (err) {
+      console.log('Hiba: ' + err.message);
+      return { result: 'fail', message: 'server error' };
     }
   }
 };

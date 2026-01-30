@@ -25,7 +25,16 @@ router.post('/login', async (req, res) => {
     const password = req.body.password;
     const userData = await User.login(email, password);
     if (userData.result === 'success') {
-      res.status(200).json(userData);
+      res.cookie('refresh_token', userData.refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      res
+        .status(200)
+        .json({ result: userData.result, message: userData.message });
     } else {
       res.status(401).json(userData);
     }
@@ -59,5 +68,7 @@ router.post('/reset-password', async (req, res) => {
     return res.status(400).json(response);
   }
 });
+
+router.get('/refresh', async (req, res) => {});
 
 module.exports = router;
