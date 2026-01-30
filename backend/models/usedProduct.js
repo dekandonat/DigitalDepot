@@ -16,7 +16,6 @@ module.exports = class UsedProduct {
          VALUES (?, ?, ?, ?, ?, 'pending')`,
         [this.userId, this.productName, this.productDescription, this.conditionState, this.productImage]
       );
-
       return { result: 'success' };
     } catch (err) {
       return { result: 'fail', message: err.message };
@@ -51,13 +50,26 @@ module.exports = class UsedProduct {
 
   static async updateStatus(submissionId, status, offerPrice) {
     try {
-        await db.execute(
-            `UPDATE used_product_submissions SET status = ?, adminOfferPrice = ? WHERE submissionId = ?`,
-            [status, offerPrice, submissionId]
-        );
-        return { result: 'success' };
+      await db.execute(
+        `UPDATE used_product_submissions SET status = ?, adminOfferPrice = ? WHERE submissionId = ?`,
+        [status, offerPrice, submissionId]
+      );
+      return { result: 'success' };
     } catch (err) {
-        return { result: 'fail', message: err.message };
+      return { result: 'fail', message: err.message };
+    }
+  }
+
+  static async userRespondToOffer(submissionId, decision) {
+    try {
+      const newStatus = decision == 'accept' ? 'offer_accepted' : 'offer_rejected';
+      await db.execute(
+        `UPDATE used_product_submissions SET status = ? WHERE submissionId = ?`,
+        [newStatus, submissionId]
+      );
+      return { result: 'success' };
+    } catch (err) {
+      return { result: 'fail', message: err.message };
     }
   }
 };
