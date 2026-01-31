@@ -6,6 +6,10 @@ import './ProductList.css';
 function ProductCard({ product }) {
     const [loginMessage, setLoginMessage] = useState("");
 
+    const formatPrice = (price) => {
+        return parseInt(price).toLocaleString('hu-HU').replaceAll(',', ' ');
+    };
+
     const sendCartRequest = (requestUrl, userToken) => {
         return fetch(requestUrl, {
             method: 'POST',
@@ -29,11 +33,9 @@ function ProductCard({ product }) {
 
         if(!userToken){
             setLoginMessage("Jelentkezzen be!");
-
             setTimeout(() => {
                 setLoginMessage("");
             }, 3000);
-
             return;
         }
 
@@ -43,22 +45,39 @@ function ProductCard({ product }) {
             await sendCartRequest(requestUrl, userToken);
         } catch(error){
             console.error("Hiba: ", error);
-            setLoginMessage("A kosár használatához jelentkezzen be!");
+            setLoginMessage("Hiba történt!");
             setTimeout(() => setLoginMessage(""), 3000);
         }
     };
 
     return (
         <div className="productCard">
-            <img src={product.productImg} alt={product.productName} />
-            <h3>{product.productName}</h3>
-            <p>{product.productDescription}</p>
-            <span className="productPrice">{product.productPrice} Ft</span>
-            <input type="button" value="Kosárba" id="intoCartButton" onClick={addToCart}></input>
+            {product.conditionState && (
+                <div className={`conditionBadge ${product.conditionState}`}>
+                    {product.conditionState}
+                </div>
+            )}
+            
+            <div className="imageContainer">
+                <img src={product.productImg} alt={product.productName} loading="lazy" />
+            </div>
+
+            <div className="cardContent">
+                <h3>{product.productName}</h3>
+                <p className="productDescription">{product.productDescription}</p>
+                
+                <div className="cardFooter">
+                    <span className="productPrice">{formatPrice(product.productPrice)} Ft</span>
+                    <button id="intoCartButton" onClick={addToCart}>
+                        Kosárba
+                    </button>
+                </div>
+            </div>
+
             {loginMessage && (
-                <p className="loginErrorMessage">
+                <div className="loginErrorMessage">
                     {loginMessage}
-                </p>
+                </div>
             )}
         </div>
     );
@@ -66,6 +85,7 @@ function ProductCard({ product }) {
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
+    const [allCategories, setAllCategories] = useState([]);
     const [currentCategoryName, setCurrentCategoryName] = useState("");
     const navigate = useNavigate();
 
@@ -73,6 +93,15 @@ export default function ProductList() {
     
     const [queryParams] = useSearchParams();
     const searchText = queryParams.get('q');
+
+    useEffect(() => {
+        fetch('http://localhost:3000/category')
+            .then(res => res.json())
+            .then(data => {
+                if(data.data) setAllCategories(data.data);
+            })
+            .catch(err => console.error(err));
+    }, []);
 
     useEffect(() => {
         const getRequest = (fetchUrl) => {
@@ -88,7 +117,7 @@ export default function ProductList() {
                 });
         }
 
-        const fetchProductsAndCategories = async () => {
+        const fetchProducts = async () => {
             try{
                 let fetchUrl = '/products';
 
@@ -97,16 +126,13 @@ export default function ProductList() {
                 }
 
                 const productsResult = await getRequest(fetchUrl);
-                const categoriesResult = await getRequest('/category');
-
                 let allProducts = productsResult.data || [];
-                let allCategories = categoriesResult.data || [];
 
                 if(searchText){
                     setProducts(allProducts);
                     setCurrentCategoryName(`Keresés: "${searchText}"`);
                 }
-                else if(categoryId){
+                else if(categoryId && allCategories.length > 0){
                     const currentId = parseInt(categoryId);
                     const selectedCategoryIds = [currentId];
 
@@ -136,11 +162,10 @@ export default function ProductList() {
                 console.error("Hiba: ", error);
                 setProducts([]);
             }
-
         }
 
-        fetchProductsAndCategories();
-    }, [categoryId, searchText]);
+        fetchProducts();
+    }, [categoryId, searchText, allCategories]);
 
     const clearFilter = () => {
         navigate('/');

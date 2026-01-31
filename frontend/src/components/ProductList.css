@@ -1,127 +1,177 @@
 #productListContainer {
-    display: flex;
-    flex-direction: column;
-    padding: 20px 10px;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    align-items: center;
+    padding: 20px;
     box-sizing: border-box;
 }
 
 #activeFilterContainer {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    background-color: #f0f8ff;
-    border: 1px solid #cce5ff;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
     padding: 8px 16px;
-    border-radius: 20px;
-    margin-bottom: 25px;
-    color: #004085;
+    border-radius: 50px;
+    margin-bottom: 30px;
+    color: #495057;
     gap: 10px;
+    font-weight: 500;
 }
 
 #activeFilterName {
-    font-weight: 600;
-    font-size: 1rem;
     text-transform: capitalize;
 }
 
 #clearFilterButton {
     background: none;
     border: none;
-    color: #004085;
+    color: #dc3545;
     font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
-    padding: 0 4px;
+    padding: 0;
     line-height: 1;
     display: flex;
     align-items: center;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-}
-
-#clearFilterButton:hover {
-    opacity: 1;
 }
 
 #productGrid {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 30px;
     width: 100%;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
 }
 
 .productCard {
-    width: 100%;
-    max-width: 300px;
     background-color: white;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
-    padding: 0; 
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform, box-shadow;
+    backface-visibility: hidden;
 }
 
 .productCard:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-color: #d1d5db;
+}
+
+.imageContainer {
+    width: 100%;
+    height: 250px;
+    background-color: #f3f4f6;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .productCard img {
     width: 100%;
-    height: 200px;
+    height: 100%;
     object-fit: cover;
-    border-bottom: 1px solid #f0f0f0;
-    margin-bottom: 10px;
-    background-color: #fff;
+    display: block;
+    transition: transform 0.3s ease;
+    will-change: transform;
+}
+
+.productCard:hover img {
+    transform: scale(1.05);
+}
+
+.conditionBadge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    z-index: 5;
+    backdrop-filter: blur(4px);
+}
+
+.conditionBadge.bontatlan { background-color: rgba(16, 185, 129, 0.9); }
+.conditionBadge.felbontott { background-color: rgba(245, 158, 11, 0.9); }
+.conditionBadge.használt { background-color: rgba(239, 68, 68, 0.9); }
+
+.cardContent {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    background-color: white;
+    border-top: 1px solid #f0f0f0;
 }
 
 .productCard h3 {
-    font-size: 1.1rem;
-    margin: 10px 15px;
-    color: #222;
+    font-size: 1.15rem;
+    margin: 0 0 8px 0;
+    color: #111827;
+    line-height: 1.4;
+    font-weight: 700;
+    height: 2.8em; 
+    overflow: hidden;
 }
 
-.productCard p {
+.productDescription {
     font-size: 0.9rem;
-    color: #666;
-    margin: 0 15px 15px 15px;
-    line-height: 1.4;
+    color: #6b7280;
+    margin: 0 0 20px 0;
+    line-height: 1.5;
     flex-grow: 1;
+    height: 4.5em; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cardFooter {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
 }
 
 .productPrice {
-    display: block;
-    font-size: 1.3rem;
-    font-weight: 700;
+    font-size: 1.35rem;
+    font-weight: 800;
     color: #007bff;
-    margin: 5px 15px 15px 15px;
+    letter-spacing: -0.5px;
 }
 
 #intoCartButton {
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 12px;
-    margin: 0 15px 20px 15px;
+    padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     transition: background-color 0.2s, transform 0.1s;
-    width: calc(100% - 30px);
+    white-space: nowrap;
 }
 
 #intoCartButton:hover {
     background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
 }
 
 #intoCartButton:active {
@@ -129,28 +179,33 @@
 }
 
 .loginErrorMessage {
-    color: red;
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    background-color: rgba(220, 53, 69, 0.95);
+    color: white;
+    padding: 10px;
+    text-align: center;
     font-size: 0.9rem;
     font-weight: 600;
-    text-align: center;
-    margin: -10px 15px 15px 15px;
-    animation: fadeIn 0.3s forwards;
+    z-index: 10;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    animation: fadeIn 0.3s ease;
 }
 
-@media(min-width: 768px) {
+@media(max-width: 480px) {
     #productListContainer {
-        padding: 40px 20px;
+        padding: 15px;
     }
-
+    
     #productGrid {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 30px;
+        grid-template-columns: 1fr; 
     }
 
-    .productCard {
-        width: 280px; 
-        max-width: none;
+    .imageContainer {
+        height: 280px;
     }
 }

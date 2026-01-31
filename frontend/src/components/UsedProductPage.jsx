@@ -33,6 +33,10 @@ const patchMethodFetch = async (url, body, token) => {
     }
 };
 
+const formatPrice = (price) => {
+    return parseInt(price).toLocaleString('hu-HU').replaceAll(',', ' ');
+};
+
 export default function UsedProductPage(props) {
     const [activeTab, setActiveTab] = useState('form');
     const [productName, setProductName] = useState('');
@@ -101,12 +105,18 @@ export default function UsedProductPage(props) {
 
     async function handleSubmit(e) {
         e.preventDefault();
+        
+        if (!image) {
+            setMessage('Kép feltöltése kötelező!');
+            return;
+        }
+
         const formData = new FormData();
         formData.append('productName', productName);
         formData.append('productDescription', productDescription);
         formData.append('conditionState', conditionState);
         formData.append('email', email);
-        if (image) formData.append('file', image);
+        formData.append('file', image);
 
         try {
             const response = await fetch('http://localhost:3000/used-products/submit', {
@@ -159,7 +169,7 @@ export default function UsedProductPage(props) {
                     <h1>Használt termék leadása</h1>
                     <div className="warningBox">
                         <h3>Hiányzó adatok!</h3>
-                        <p>A leadáshoz add meg a bankszámlaszámod a profilban.</p>
+                        <p>A leadáshoz bankszámlaszám szükséges.</p>
                         <button className="goToProfileBtn" onClick={props.openProfile}>
                             Profil megnyitása
                         </button>
@@ -212,9 +222,9 @@ export default function UsedProductPage(props) {
                                 </select>
                             </div>
                             <div className="formGroup">
-                                <label>Kép:</label>
-                                <input type="file" onChange={handleImageChange} accept="image/*" />
-                                <small className="fileHelperText">Tölts fel egy jól látható képet!</small>
+                                <label>Kép (Kötelező):</label>
+                                <input type="file" onChange={handleImageChange} accept="image/*" required />
+                                <small className="fileHelperText">Jól látható képet töltsön fel!</small>
                             </div>
                             <div className="formGroup">
                                 <label>E-mail cím értesítéshez:</label>
@@ -250,7 +260,7 @@ export default function UsedProductPage(props) {
                                         {sub.adminOfferPrice && (
                                             <div className="offerBox">
                                                 <span>Kapott ajánlat:</span>
-                                                <span className="offerPrice">{sub.adminOfferPrice} Ft</span>
+                                                <span className="offerPrice">{formatPrice(sub.adminOfferPrice)} Ft</span>
                                                 
                                                 {sub.status == 'accepted' && (
                                                     <div className="userDecisionButtons">
