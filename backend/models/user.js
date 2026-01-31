@@ -5,7 +5,6 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
 let recoveryCodes = [];
-let refreshTokens = [];
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -136,19 +135,20 @@ module.exports = class User {
   }
 
   static async login(email, password) {
-    const [rows] = await db.execute(
-      `SELECT * FROM users WHERE users.email LIKE "${email}"`
-    );
+    try {
+      const [rows] = await db.execute(
+        `SELECT * FROM users WHERE users.email LIKE ?`,
+        [email]
+      );
 
-    if (rows.length == 0) {
-      return { result: 'fail', data: 'no such user exists' };
-    }
+      if (rows.length == 0) {
+        return { result: 'fail', data: 'no such user exists' };
+      }
 
-    const hashedPassword = rows[0].hashedPassword;
-    const result = await bcrypt.compare(password, hashedPassword);
+      const hashedPassword = rows[0].hashedPassword;
+      const result = await bcrypt.compare(password, hashedPassword);
 
-    if (result) {
-      try {
+      if (result) {
         const userEmail = rows[0].email;
         const userName = rows[0].userName;
         const id = rows[0].userId;
@@ -165,26 +165,32 @@ module.exports = class User {
           }
         );
         //refresh token generálás
+        await db.execute('DELETE FROM refreshTokens WHERE userId = ?', [
+          rows[0].userId,
+        ]);
         const refreshtoken = crypto.randomBytes(64).toString('hex');
-        refreshTokens.push({
-          tokenId: crypto
-            .createHash('sha256')
-            .update(refreshtoken)
-            .digest('hex'),
-          userId: rows[0].userId,
-          createdAt: Date.now(),
-          expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
-        });
+        const hashedToken = crypto
+          .createHash('sha256')
+          .update(refreshtoken)
+          .digest('hex');
+        await db.execute(
+          'INSERT INTO refreshTokens (tokenId, userId, createdAt ,expiresAt) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))',
+          [hashedToken, rows[0].userId]
+        );
         return {
           result: 'success',
-          message: { email: userEmail, userName: userName, token: accessToken },
+          message: {
+            email: userEmail,
+            userName: userName,
+            token: accessToken,
+          },
           refreshToken: refreshtoken,
         };
-      } catch (err) {
-        return { result: 'fail', data: 'token generation failed' };
+      } else {
+        return { result: 'fail', data: 'incorrect password' };
       }
-    } else {
-      return { result: 'fail', data: 'incorrect password' };
+    } catch (err) {
+      return { result: 'fail', message: 'server error' };
     }
   }
 
@@ -194,7 +200,54 @@ module.exports = class User {
         .createHash('sha256')
         .update(token)
         .digest('hex');
-      //Ide kerül az ellenőrzés, és adatok kikeresése
+      const [rows] = await db.execute(
+        'SELECT * FROM refreshtokens WHERE tokenId = ?',
+        [hashedToken]
+      );
+
+      if (rows.length == 0) {
+        return { result: 'fail', message: 'no token found' };
+      }
+
+      if (new Date(rows[0].expiresAt) <= new Date()) {
+        return { result: 'fail', message: 'expired token' };
+      }
+
+      const [userData] = await db.execute(
+        'SELECT * FROM users WHERE userId = ?',
+        [rows[0].userId]
+      );
+
+      const accessToken = jwt.sign(
+        {
+          id: userData[0].userId,
+          role: userData[0].role,
+        },
+        process.env.SECRET,
+        {
+          expiresIn: '15m',
+        }
+      );
+
+      await db.execute('DELETE FROM refreshTokens WHERE userId = ?', [
+        userData[0].userId,
+      ]);
+
+      const refreshtoken = crypto.randomBytes(64).toString('hex');
+      const hashedRefreshtoken = crypto
+        .createHash('sha256')
+        .update(refreshtoken)
+        .digest('hex');
+      await db.execute(
+        'INSERT INTO refreshTokens (tokenId, userId, createdAt ,expiresAt) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))',
+        [hashedRefreshtoken, rows[0].userId]
+      );
+
+      return {
+        result: 'success',
+        data: accessToken,
+        refreshToken: refreshtoken,
+      };
     } catch (err) {
       console.log('Hiba: ' + err.message);
       return { result: 'fail', message: 'server error' };

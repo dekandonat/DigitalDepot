@@ -69,6 +69,33 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
-router.get('/refresh', async (req, res) => {});
+router.get('/refresh', async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refresh_token;
+    console.log(req.cookies);
+
+    if (!refreshToken) {
+      return res
+        .status(401)
+        .json({ result: 'fail', message: 'no refresh token' });
+    }
+
+    const result = await User.refresh(refreshToken);
+    console.log(result);
+    if (result.result == 'success') {
+      res.cookie('refresh_token', result.refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      res.status(200).json({ result: result.result, data: result.data });
+    }
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
 
 module.exports = router;

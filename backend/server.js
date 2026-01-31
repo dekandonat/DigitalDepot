@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const cookieparser = require('cookie-parser');
 
 const verifyToken = require('./util/tokenVerify');
 const verifyAdmin = require('./util/verifyAdmin');
@@ -22,6 +23,7 @@ const IP = process.env.IP;
 const PORT = process.env.PORT;
 
 app.use(express.json());
+app.use(cookieparser());
 app.use(
   cors({
     origin: 'http://localhost:5173',
