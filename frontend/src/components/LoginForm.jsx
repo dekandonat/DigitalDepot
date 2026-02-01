@@ -8,6 +8,7 @@ const postMethodFetch = async (url, data) => {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
 
@@ -50,9 +51,9 @@ export default function LoginForm({ onClose }) {
 
     let url;
     if (isLogin === true) {
-      url = 'http://localhost:3000/user/login';
+      url = '/user/login';
     } else {
-      url = 'http://localhost:3000/user/register';
+      url = '/user/register';
     }
 
     let dataValues = {

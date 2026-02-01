@@ -15,6 +15,7 @@ router.get('/:productId', async (req, res) => {
 
 router.post('/', verifyToken, async (req, res) => {
   try {
+    console.log(req.cookies);
     const userId = req.user.id;
     const { productId, rating, comment } = req.body;
 
