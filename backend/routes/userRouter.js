@@ -28,7 +28,7 @@ router.post('/login', async (req, res) => {
       res.cookie('refresh_token', userData.refreshToken, {
         httpOnly: true,
         secure: false,
-        sameSite: 'none',
+        sameSite: 'lax',
         path: '/',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });

@@ -35,7 +35,6 @@ export default function ReviewModal({ product, onClose }) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include',
         body: JSON.stringify({
           productId: product.prodId,
           rating: rating,
