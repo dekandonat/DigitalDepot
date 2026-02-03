@@ -21,13 +21,18 @@ export async function apiFetch(url, options = {}) {
       if (refreshData.result === 'success') {
         localStorage.setItem('token', refreshData.data);
 
-        const newOptions = {
+        let newOptions = {
           ...options,
           headers: {
             ...options.headers,
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${refreshData.data}`,
           },
         };
+
+        if (options.body !== undefined) {
+          newOptions.body = JSON.stringify(options.body);
+        }
 
         response = await fetch(url, newOptions);
       } else {

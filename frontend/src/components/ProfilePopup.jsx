@@ -7,14 +7,17 @@ import profileIcon from '../assets/NavImages/profile-pic.png';
 import { jwtDecode } from 'jwt-decode';
 
 export default function ProfilePopup({ onClose, onProfileUpdate }) {
-  const [userData, setUserData] = useState({ name: '', email: '', bankAccountNumber: '' });
+  const [userData, setUserData] = useState({
+    name: '',
+    email: '',
+    bankAccountNumber: '',
+  });
   const [bankAccountInput, setBankAccountInput] = useState('');
   const [isEditingBank, setIsEditingBank] = useState(false);
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
   let role;
   try {
-    role = jwtDecode(token);
+    role = jwtDecode(localStorage.getItem('token'));
     role = role.role;
   } catch (err) {
     console.log('Hiba: ' + err.message);
@@ -22,20 +25,20 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
 
   useEffect(() => {
     const fetchProfile = async () => {
-        try {
-            const data = await apiFetch('/user/profile', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if(data.result === 'success'){
-                setUserData(data.data);
-                setBankAccountInput(data.data.bankAccountNumber || '');
-            }
-        } catch(err) {
-            console.log(err);
+      try {
+        const data = await apiFetch('/user/profile', {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        if (data.result === 'success') {
+          setUserData(data.data);
+          setBankAccountInput(data.data.bankAccountNumber || '');
         }
+      } catch (err) {
+        console.log(err);
+      }
     };
     fetchProfile();
-  }, [token]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -47,21 +50,21 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
   };
 
   const saveBankAccount = async () => {
-      try {
-          await apiFetch('/user/bank-account', {
-              method: 'PATCH',
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              },
-              body: { bankAccountNumber: bankAccountInput }
-          });
-          setUserData({...userData, bankAccountNumber: bankAccountInput});
-          setIsEditingBank(false);
-          if (onProfileUpdate) onProfileUpdate();
-      } catch (err) {
-          console.error(err);
-      }
-  }
+    try {
+      await apiFetch('/user/bank-account', {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: { bankAccountNumber: bankAccountInput },
+      });
+      setUserData({ ...userData, bankAccountNumber: bankAccountInput });
+      setIsEditingBank(false);
+      if (onProfileUpdate) onProfileUpdate();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="formBackground" onMouseDown={onClose}>
@@ -87,20 +90,29 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
           <div className="profileDataRow">
             <span className="profileLabel">Számlaszám:</span>
             {isEditingBank ? (
-                <div className="bankEditContainer">
-                    <input 
-                        value={bankAccountInput} 
-                        onChange={(e) => setBankAccountInput(e.target.value)}
-                        placeholder="Pl. 117733..."
-                        className="bankInput"
-                    />
-                    <button onClick={saveBankAccount} className="saveBankBtn">Mentés</button>
-                </div>
+              <div className="bankEditContainer">
+                <input
+                  value={bankAccountInput}
+                  onChange={(e) => setBankAccountInput(e.target.value)}
+                  placeholder="Pl. 117733..."
+                  className="bankInput"
+                />
+                <button onClick={saveBankAccount} className="saveBankBtn">
+                  Mentés
+                </button>
+              </div>
             ) : (
-                <div className="bankDisplayContainer">
-                    <span className="profileData">{userData.bankAccountNumber || 'Nincs megadva'}</span>
-                    <button onClick={() => setIsEditingBank(true)} className="editBankBtn">✏️</button>
-                </div>
+              <div className="bankDisplayContainer">
+                <span className="profileData">
+                  {userData.bankAccountNumber || 'Nincs megadva'}
+                </span>
+                <button
+                  onClick={() => setIsEditingBank(true)}
+                  className="editBankBtn"
+                >
+                  ✏️
+                </button>
+              </div>
             )}
           </div>
         </div>

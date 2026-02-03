@@ -4,7 +4,7 @@ const db = require('../util/database');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const verifyAsync = promisify(jwt.verify);
-
+const verifyToken = require('../util/tokenVerify');
 const router = express.Router();
 
 router.post('/register', async (req, res) => {
@@ -70,9 +70,9 @@ router.post('/reset-password', async (req, res) => {
 });
 
 router.get('/refresh', async (req, res) => {
+  console.log('refresh');
   try {
     const refreshToken = req.cookies.refresh_token;
-    console.log(req.cookies);
 
     if (!refreshToken) {
       return res
@@ -81,7 +81,6 @@ router.get('/refresh', async (req, res) => {
     }
 
     const result = await User.refresh(refreshToken);
-    console.log(result);
     if (result.result == 'success') {
       res.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
@@ -93,43 +92,37 @@ router.get('/refresh', async (req, res) => {
       res.status(200).json({ result: result.result, data: result.data });
     }
   } catch (err) {
-    console.log(err.message);
     res.status(500).json({ result: 'fail', message: 'server error' });
   }
 });
 
-module.exports = router;
-router.get('/profile', async (req, res) => {
-    const authorizationHeader = req.headers['authorization'];
-    const token = authorizationHeader && authorizationHeader.split(' ')[1];
-    if (!token) return res.status(401).json({ result: 'fail' });
-
-    try {
-        const decodedToken = await verifyAsync(token, process.env.SECRET);
-        const [rows] = await db.execute('SELECT userName, email, bankAccountNumber FROM users WHERE userId = ?', [decodedToken.id]);
-        if (rows.length > 0) {
-            res.status(200).json({ result: 'success', data: rows[0] });
-        } else {
-            res.status(404).json({ result: 'fail' });
-        }
-    } catch (err) {
-        res.status(500).json({ result: 'fail' });
+router.get('/profile', verifyToken, async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      'SELECT userName, email, bankAccountNumber FROM users WHERE userId = ?',
+      [req.user.id]
+    );
+    if (rows.length > 0) {
+      res.status(200).json({ result: 'success', data: rows[0] });
+    } else {
+      res.status(404).json({ result: 'fail' });
     }
+  } catch (err) {
+    res.status(500).json({ result: 'fail' });
+  }
 });
 
-router.patch('/bank-account', async (req, res) => {
-    const authorizationHeader = req.headers['authorization'];
-    const token = authorizationHeader && authorizationHeader.split(' ')[1];
-    if (!token) return res.status(401).json({ result: 'fail' });
-
-    try {
-        const decodedToken = await verifyAsync(token, process.env.SECRET);
-        const { bankAccountNumber } = req.body;
-        await db.execute('UPDATE users SET bankAccountNumber = ? WHERE userId = ?', [bankAccountNumber, decodedToken.id]);
-        res.status(200).json({ result: 'success' });
-    } catch (err) {
-        res.status(500).json({ result: 'fail' });
-    }
+router.patch('/bank-account', verifyToken, async (req, res) => {
+  try {
+    const { bankAccountNumber } = req.body;
+    await db.execute(
+      'UPDATE users SET bankAccountNumber = ? WHERE userId = ?',
+      [bankAccountNumber, req.user.id]
+    );
+    res.status(200).json({ result: 'success' });
+  } catch (err) {
+    res.status(500).json({ result: 'fail' });
+  }
 });
 
 module.exports = router;
