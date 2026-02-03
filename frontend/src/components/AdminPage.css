@@ -1,3 +1,8 @@
+.adminPageContainer {
+    text-align: center;
+    margin-top: 100px;
+}
+
 .selectBtn {
   border: none;
   background-color: aquamarine;

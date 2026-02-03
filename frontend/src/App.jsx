@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminPage from './components/AdminPage';
 import Checkout from './components/Checkout';
 import UserOrders from './components/UserOrders';
+import UsedProductPage from './components/UsedProductPage';
 import { slides } from "./data/MainPageGalleryData.json";
 import "./main.css";
 
@@ -18,6 +19,7 @@ export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,6 +42,10 @@ export default function App() {
     }
   }
 
+  const handleProfileUpdate = () => {
+    setRefreshTrigger(prev => prev + 1);
+  }
+
   return ( 
     <> 
       <Navbar 
@@ -53,7 +59,7 @@ export default function App() {
         <MainPageGallery data={slides} />
       )}
 
-      {!location.pathname.startsWith('/admin') && location.pathname !== '/checkout' && location.pathname !== '/my-orders' && (
+      {!location.pathname.startsWith('/admin') && location.pathname !== '/checkout' && location.pathname !== '/my-orders' && location.pathname !== '/used-products' && (
         <MainCategoriesMenu onCategorySelect={handleCategorySelect}/>
       )}
 
@@ -70,6 +76,12 @@ export default function App() {
             </ProtectedRoute>
         } />
 
+        <Route path="/used-products" element={
+            <ProtectedRoute>
+                <UsedProductPage openProfile={openProfile} refreshTrigger={refreshTrigger} />
+            </ProtectedRoute>
+        } />
+
         <Route path="/admin" element={
           <ProtectedRoute>
             <AdminPage />
@@ -80,7 +92,7 @@ export default function App() {
 
       {isLoginOpen && <LoginForm onClose={() => setIsLoginOpen(false)} />}
       {isCartOpen && <Cart onClose={() => setIsCartOpen(false)} />}
-      {isProfileOpen && <ProfilePopup onClose={() => setIsProfileOpen(false)} />}
+      {isProfileOpen && <ProfilePopup onClose={() => setIsProfileOpen(false)} onProfileUpdate={handleProfileUpdate} />}
     </> 
   ) 
 }

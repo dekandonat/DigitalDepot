@@ -12,6 +12,7 @@ const categoryRouter = require('./routes/categoryRouter');
 const cartRouter = require('./routes/cartRouter');
 const adminRouter = require('./routes/adminRouter');
 const orderRouter = require('./routes/orderRouter');
+const usedProductRouter = require('./routes/usedProductRouter');
 const reviewRouter = require('./routes/reviewRouter');
 
 const IP = process.env.IP;
@@ -27,6 +28,7 @@ app.use('/category', categoryRouter);
 app.use('/cart', cartRouter);
 app.use('/order', orderRouter);
 app.use('/adminRoute', adminRouter);
+app.use('/used-products', usedProductRouter);
 app.use('/reviews', reviewRouter);
 
 app.listen(PORT, IP, () => {
