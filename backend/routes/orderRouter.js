@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const { promisify } = require('util');
 
 const Order = require('../models/order');
 
-const verifyAsync = promisify(jwt.verify);
+const verifyToken = require('../util/tokenVerify');
 
 router.get('/items/:orderId', async (req, res) => {
   const orderId = req.params.orderId;
@@ -18,17 +16,9 @@ router.get('/items/:orderId', async (req, res) => {
   }
 });
 
-router.get('/my-orders', async (req, res) => {
-  const authorizationHeader = req.headers['authorization'];
-  const token = authorizationHeader && authorizationHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ result: 'fail', message: 'no token found' });
-  }
-
+router.get('/my-orders', verifyToken, async (req, res) => {
   try {
-    const decodedToken = await verifyAsync(token, process.env.SECRET);
-    const userId = decodedToken.id;
+    const userId = req.user.id;
 
     const orders = await Order.fetchByUserId(userId);
 
@@ -39,17 +29,9 @@ router.get('/my-orders', async (req, res) => {
   }
 });
 
-router.post('/place-order', async (req, res) => {
-  const authorizationHeader = req.headers['authorization'];
-  const token = authorizationHeader && authorizationHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ result: 'fail', message: 'no token found' });
-  }
-
+router.post('/place-order', verifyToken, async (req, res) => {
   try {
-    const decodedToken = await verifyAsync(token, process.env.SECRET);
-    const userId = decodedToken.id;
+    const userId = req.user.id;
 
     const { shippingAddress, paymentMethod, couponCode } = req.body;
 

@@ -2,6 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const cookieparser = require('cookie-parser');
+
+const verifyToken = require('./util/tokenVerify');
+const verifyAdmin = require('./util/verifyAdmin');
+
 dotenv.config();
 
 const app = express();
@@ -19,15 +24,21 @@ const IP = process.env.IP;
 const PORT = process.env.PORT;
 
 app.use(express.json());
-app.use(cors());
+app.use(cookieparser());
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/products', productRouter);
 app.use('/user', userRouter);
 app.use('/category', categoryRouter);
-app.use('/cart', cartRouter);
+app.use('/cart', verifyToken, cartRouter);
 app.use('/order', orderRouter);
-app.use('/adminRoute', adminRouter);
+app.use('/adminRoute', verifyAdmin, adminRouter);
 app.use('/used-products', usedProductRouter);
 app.use('/reviews', reviewRouter);
 

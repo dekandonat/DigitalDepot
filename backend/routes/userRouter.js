@@ -28,7 +28,16 @@ router.post('/login', async (req, res) => {
     const password = req.body.password;
     const userData = await User.login(email, password);
     if (userData.result === 'success') {
-      res.status(200).json(userData);
+      res.cookie('refresh_token', userData.refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      res
+        .status(200)
+        .json({ result: userData.result, message: userData.message });
     } else {
       res.status(401).json(userData);
     }
@@ -60,6 +69,36 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+router.get('/refresh', async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refresh_token;
+    console.log(req.cookies);
+
+    if (!refreshToken) {
+      return res
+        .status(401)
+        .json({ result: 'fail', message: 'no refresh token' });
+    }
+
+    const result = await User.refresh(refreshToken);
+    console.log(result);
+    if (result.result == 'success') {
+      res.cookie('refresh_token', result.refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      res.status(200).json({ result: result.result, data: result.data });
+    }
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
+
+module.exports = router;
 router.get('/profile', async (req, res) => {
     const authorizationHeader = req.headers['authorization'];
     const token = authorizationHeader && authorizationHeader.split(' ')[1];
