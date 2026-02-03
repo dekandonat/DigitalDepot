@@ -66,14 +66,15 @@ router.get('/:prodId', async (req, res) => {
 
 router.patch('/:prodId', async (req, res) => {
   const id = req.params.prodId;
-  const { prodName, prodDescription, prodPrice } = req.body;
+  const { prodName, prodDescription, prodPrice, conditionState } = req.body;
 
   try {
     const result = await Products.update(
       id,
       prodName,
       prodDescription,
-      prodPrice
+      prodPrice,
+      conditionState
     );
     if (result.result === 'success') {
       res.status(200).json(result);

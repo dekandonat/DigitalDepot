@@ -12,7 +12,8 @@ module.exports = class Products {
   async save() {
     try {
       await db.execute(
-        `INSERT INTO products (productName, productDescription, productPrice, productImg, categoryId) VALUES ("${this.prodName}", "${this.prodDescription}", ${this.prodPrice}, "${this.prodImg}", ${this.categoryId})`
+        `INSERT INTO products (productName, productDescription, productPrice, productImg, categoryId) VALUES (?, ?, ?, ?, ?)`,
+        [this.prodName, this.prodDescription, this.prodPrice, this.prodImg, this.categoryId]
       );
       return { result: 'success' };
     } catch (err) {
@@ -32,7 +33,8 @@ module.exports = class Products {
   static async fetch(id) {
     try {
       const [rows] = await db.execute(
-        `SELECT * FROM products WHERE prodId = ${id}`
+        `SELECT * FROM products WHERE prodId = ?`,
+        [id]
       );
       return rows;
     } catch (err) {
@@ -43,7 +45,8 @@ module.exports = class Products {
   static async find(string) {
     try {
       const [rows] = await db.execute(
-        `SELECT * FROM products WHERE products.productName LIKE "%${string}%" OR products.productDescription LIKE "%${string}%";`
+        `SELECT * FROM products WHERE products.productName LIKE ? OR products.productDescription LIKE ?`,
+        [`%${string}%`, `%${string}%`]
       );
       return rows;
     } catch (err) {
@@ -51,10 +54,11 @@ module.exports = class Products {
     }
   }
 
-  static async update(id, name, desc, price) {
+  static async update(id, name, desc, price, condition) {
     try {
       await db.execute(
-        `UPDATE products SET productName = "${name}", productDescription = "${desc}", productPrice = ${price} WHERE prodId = ${id}`
+        `UPDATE products SET productName = ?, productDescription = ?, productPrice = ?, conditionState = ? WHERE prodId = ?`,
+        [name, desc, price, condition, id]
       );
       return { result: 'success' };
     } catch (err) {
@@ -72,7 +76,7 @@ module.exports = class Products {
       }
 
       const [result] = await db.execute(
-        'UPDATE products SET quantity = quantity + ? WHERE products.prodId = ?;',
+        'UPDATE products SET quantity = quantity + ? WHERE products.prodId = ?',
         [quantity, id]
       );
 

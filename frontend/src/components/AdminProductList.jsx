@@ -44,6 +44,7 @@ export default function AdminProductList() {
               description={product.productDescription}
               key={product.prodId}
               img={product.productImg}
+              condition={product.conditionState}
             />
           );
         })}

@@ -5,8 +5,10 @@ import './LoginForm.css';
 import profileIcon from '../assets/NavImages/profile-pic.png';
 import { jwtDecode } from 'jwt-decode';
 
-export default function ProfilePopup({ onClose }) {
-  const [userData, setUserData] = useState({ name: '', email: '' });
+export default function ProfilePopup({ onClose, onProfileUpdate }) {
+  const [userData, setUserData] = useState({ name: '', email: '', bankAccountNumber: '' });
+  const [bankAccountInput, setBankAccountInput] = useState('');
+  const [isEditingBank, setIsEditingBank] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   let role;
@@ -18,14 +20,17 @@ export default function ProfilePopup({ onClose }) {
   }
 
   useEffect(() => {
-    const name = localStorage.getItem('user');
-    const email = localStorage.getItem('email');
-
-    setUserData({
-      name: name,
-      email: email,
+    fetch('http://localhost:3000/user/profile', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.result === 'success'){
+            setUserData(data.data);
+            setBankAccountInput(data.data.bankAccountNumber || '');
+        }
     });
-  }, []);
+  }, [token]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -35,6 +40,20 @@ export default function ProfilePopup({ onClose }) {
     onClose();
     window.location.reload();
   };
+
+  const saveBankAccount = async () => {
+      await fetch('http://localhost:3000/user/bank-account', {
+          method: 'PATCH',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ bankAccountNumber: bankAccountInput })
+      });
+      setUserData({...userData, bankAccountNumber: bankAccountInput});
+      setIsEditingBank(false);
+      if (onProfileUpdate) onProfileUpdate();
+  }
 
   return (
     <div className="formBackground" onMouseDown={onClose}>
@@ -56,7 +75,28 @@ export default function ProfilePopup({ onClose }) {
             <span className="profileLabel">E-mail:</span>
             <span className="profileData">{userData.email}</span>
           </div>
+
+          <div className="profileDataRow">
+            <span className="profileLabel">Számlaszám:</span>
+            {isEditingBank ? (
+                <div className="bankEditContainer">
+                    <input 
+                        value={bankAccountInput} 
+                        onChange={(e) => setBankAccountInput(e.target.value)}
+                        placeholder="Pl. 117733..."
+                        className="bankInput"
+                    />
+                    <button onClick={saveBankAccount} className="saveBankBtn">Mentés</button>
+                </div>
+            ) : (
+                <div className="bankDisplayContainer">
+                    <span className="profileData">{userData.bankAccountNumber || 'Nincs megadva'}</span>
+                    <button onClick={() => setIsEditingBank(true)} className="editBankBtn">✏️</button>
+                </div>
+            )}
+          </div>
         </div>
+
         {role === 'admin' ? (
           <button
             onClick={() => {
@@ -68,6 +108,16 @@ export default function ProfilePopup({ onClose }) {
             Adminisztrátor
           </button>
         ) : null}
+
+        <button
+          onClick={() => {
+            onClose();
+            navigate('/used-products');
+          }}
+          className="usedProductBtn"
+        >
+          Használt termék leadása
+        </button>
 
         <button
           onClick={() => {

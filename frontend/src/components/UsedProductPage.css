@@ -1,0 +1,366 @@
+.pageWrapper {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+.tabHeader {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: -1px; 
+    position: relative;
+    z-index: 10;
+    padding-left: 0;
+}
+
+.tabButton {
+    flex: 1;
+    background-color: #e9ecef; 
+    border: 1px solid #999;
+    border-bottom: none;
+    padding: 12px 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #555;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.2s;
+    margin-right: -1px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.tabButton:hover {
+    background-color: #dee2e6;
+}
+
+.tabButton.active {
+    background-color: white;
+    color: #007bff;
+    border-bottom: 1px solid white;
+    z-index: 11;
+}
+
+.usedProductContainer {
+    background-color: white;
+    border: 1px solid #999;
+    border-radius: 0 0 8px 8px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    min-height: 400px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+    display: inline-block;
+    font-size: 1.5rem;
+}
+
+.submissionForm {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.formGroup {
+    margin-bottom: 15px;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #222; 
+    font-size: 1rem;
+}
+
+.formGroup input[type="text"],
+.formGroup input[type="email"],
+.formGroup textarea,
+.formGroup select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ccc; 
+    border-radius: 6px;
+    box-sizing: border-box;
+    background-color: #fff;
+    font-size: 1rem;
+    color: #000;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus,
+.formGroup select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.formGroup textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.fileHelperText {
+    color: #666;
+    font-style: italic;
+    display: block;
+    margin-top: 5px;
+    font-size: 0.9rem;
+}
+
+.loadingText {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.submitBtn {
+    background-color: #007bff;
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+.submitBtn:hover {
+    background-color: #0056b3;
+}
+
+.statusMessage {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #008000;
+    text-align: center;
+    font-size: 1rem;
+    background-color: #e8f5e9;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #c8e6c9;
+}
+
+.warningBox {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 2px solid #ffeeba;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.goToProfileBtn {
+    background-color: #856404;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 1rem;
+    width: 100%;
+}
+
+.goToProfileBtn:hover {
+    background-color: #6d5203;
+}
+
+.cardsGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.mySubmissionCard {
+    background-color: white;
+    border: 2px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mySubmissionCard:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-color: #bbb;
+}
+
+.cardHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    gap: 5px;
+}
+
+.cardHeader h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #007bff;
+}
+
+.cardDate {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.cardStatusRow {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.statusLabel {
+    font-weight: bold;
+    padding: 6px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    text-align: center;
+}
+
+.statusLabel.pending { 
+    color: #856404; 
+    background-color: #fff3cd; 
+    border: 1px solid #ffeeba;
+}
+
+.statusLabel.accepted { 
+    color: #004085; 
+    background-color: #cce5ff; 
+    border: 1px solid #b8daff;
+}
+
+.statusLabel.rejected { 
+    color: #721c24; 
+    background-color: #f8d7da; 
+    border: 1px solid #f5c6cb;
+}
+
+.statusLabel.offer_accepted {
+    color: #155724; 
+    background-color: #d4edda; 
+    border: 1px solid #c3e6cb;
+}
+
+.statusLabel.offer_rejected {
+    color: #721c24; 
+    background-color: #f8d7da; 
+    border: 1px solid #f5c6cb;
+}
+
+.offerBox {
+    background-color: #f0f8ff;
+    padding: 15px;
+    border-radius: 6px;
+    border: 2px solid #cce5ff;
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.offerPrice {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #0056b3;
+}
+
+.userDecisionButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.userAcceptBtn, .userRejectBtn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    color: white;
+}
+
+.userAcceptBtn {
+    background-color: #28a745;
+}
+
+.userAcceptBtn:hover {
+    background-color: #218838;
+}
+
+.userRejectBtn {
+    background-color: #dc3545;
+}
+
+.userRejectBtn:hover {
+    background-color: #c82333;
+}
+
+@media (min-width: 768px) {
+    .pageWrapper {
+        max-width: 850px;
+        padding: 0 20px;
+        margin: 40px auto;
+    }
+
+    .tabButton {
+        flex: none;
+        padding: 10px 20px;
+    }
+
+    .usedProductContainer {
+        padding: 30px;
+        border-radius: 0 8px 8px 8px;
+    }
+
+    .submissionForm {
+        max-width: 600px;
+    }
+
+    .cardHeader {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cardStatusRow {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .statusLabel {
+        margin-left: 10px;
+    }
+
+    .goToProfileBtn {
+        width: auto;
+    }
+
+    .userDecisionButtons {
+        flex-direction: row;
+    }
+
+    .userAcceptBtn, .userRejectBtn {
+        flex: 1;
+        width: auto;
+    }
+}
