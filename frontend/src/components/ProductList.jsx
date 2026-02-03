@@ -1,14 +1,37 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import ReviewModal from './ReviewModal';
 import './ProductList.css';
 
-function ProductCard({ product }) {
+function ProductCard({ product, onOpenReviews }) {
     const [loginMessage, setLoginMessage] = useState("");
+    const [avgRating, setAvgRating] = useState(0);
+    const [reviewCount, setReviewCount] = useState(0);
 
     const formatPrice = (price) => {
         return parseInt(price).toLocaleString('hu-HU').replaceAll(',', ' ');
     };
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const response = await fetch(`/reviews/${product.prodId}`);
+                const data = await response.json();
+                if (data.result === 'success' && data.data.length > 0) {
+                    const total = data.data.reduce((acc, curr) => acc + curr.rating, 0);
+                    setAvgRating(total / data.data.length);
+                    setReviewCount(data.data.length);
+                } else {
+                    setAvgRating(0);
+                    setReviewCount(0);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchReviews();
+    }, [product.prodId]);
 
     const sendCartRequest = (requestUrl, userToken) => {
         return fetch(requestUrl, {
@@ -64,6 +87,19 @@ function ProductCard({ product }) {
 
             <div className="cardContent">
                 <h3>{product.productName}</h3>
+                
+                <div className="ratingDisplay" onClick={() => onOpenReviews(product)}>
+                    <div className="starsContainer">
+                        <span className="starFilled">{'★'.repeat(Math.round(avgRating))}</span>
+                        <span className="starEmpty">{'★'.repeat(5 - Math.round(avgRating))}</span>
+                    </div>
+                    <div className="ratingInfoRow">
+                        <span className="ratingText">
+                            ({avgRating.toFixed(1)}) - {reviewCount} értékelés
+                        </span>
+                    </div>
+                </div>
+
                 <p className="productDescription">{product.productDescription}</p>
                 
                 <div className="cardFooter">
@@ -87,10 +123,10 @@ export default function ProductList() {
     const [products, setProducts] = useState([]);
     const [allCategories, setAllCategories] = useState([]);
     const [currentCategoryName, setCurrentCategoryName] = useState("");
+    const [selectedProductForReview, setSelectedProductForReview] = useState(null);
     const navigate = useNavigate();
 
     const { categoryId } = useParams();
-    
     const [queryParams] = useSearchParams();
     const searchText = queryParams.get('q');
 
@@ -187,9 +223,20 @@ export default function ProductList() {
             ) : (
                 <div id="productGrid">
                     {products.map(product => (
-                        <ProductCard key={product.prodId} product={product} />
+                        <ProductCard 
+                            key={product.prodId} 
+                            product={product} 
+                            onOpenReviews={setSelectedProductForReview}
+                        />
                     ))}
                 </div>
+            )}
+
+            {selectedProductForReview && (
+                <ReviewModal 
+                    product={selectedProductForReview} 
+                    onClose={() => setSelectedProductForReview(null)} 
+                />
             )}
         </div>
     );
