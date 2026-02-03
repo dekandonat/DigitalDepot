@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiFetch } from '../assets/util/fetch';
 import './ReviewModal.css';
 
 export default function ReviewModal({ product, onClose }) {
@@ -9,14 +10,17 @@ export default function ReviewModal({ product, onClose }) {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    fetch(`/reviews/${product.prodId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.result === 'success') {
-          setReviews(data.data);
+    const fetchReviews = async () => {
+        try {
+            const data = await apiFetch(`/reviews/${product.prodId}`);
+            if (data.result === 'success') {
+                setReviews(data.data);
+            }
+        } catch (err) {
+            console.error(err);
         }
-      })
-      .catch((err) => console.error(err));
+    };
+    fetchReviews();
   }, [product.prodId]);
 
   const handleSubmit = async (e) => {
@@ -29,33 +33,32 @@ export default function ReviewModal({ product, onClose }) {
     }
 
     try {
-      const response = await fetch('/reviews/', {
+      const result = await apiFetch('/reviews/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
+        body: {
           productId: product.prodId,
           rating: rating,
           comment: comment,
-        }),
+        },
       });
 
-      const result = await response.json();
-
-      if (response.ok && result.result === 'success') {
+      if (result.result === 'success') {
         setComment('');
-        const newReviewRes = await fetch(`/reviews/${product.prodId}`);
-        const newData = await newReviewRes.json();
-        setReviews(newData.data);
+        
+        const newData = await apiFetch(`/reviews/${product.prodId}`);
+        if(newData.data) {
+            setReviews(newData.data);
+        }
         setErrorMessage('');
       } else {
         setErrorMessage('Hiba történt a mentéskor.');
       }
     } catch (error) {
       console.error(error);
-      setErrorMessage('Szerver hiba.');
+      setErrorMessage(error.message || 'Szerver hiba.');
     }
   };
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../assets/util/fetch';
 import './LoginForm.css';
 import profileIcon from '../assets/NavImages/profile-pic.png';
 import { jwtDecode } from 'jwt-decode';
@@ -20,16 +21,20 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
   }
 
   useEffect(() => {
-    fetch('http://localhost:3000/user/profile', {
-        headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.result === 'success'){
-            setUserData(data.data);
-            setBankAccountInput(data.data.bankAccountNumber || '');
+    const fetchProfile = async () => {
+        try {
+            const data = await apiFetch('/user/profile', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if(data.result === 'success'){
+                setUserData(data.data);
+                setBankAccountInput(data.data.bankAccountNumber || '');
+            }
+        } catch(err) {
+            console.log(err);
         }
-    });
+    };
+    fetchProfile();
   }, [token]);
 
   const handleLogout = () => {
@@ -42,17 +47,20 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
   };
 
   const saveBankAccount = async () => {
-      await fetch('http://localhost:3000/user/bank-account', {
-          method: 'PATCH',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ bankAccountNumber: bankAccountInput })
-      });
-      setUserData({...userData, bankAccountNumber: bankAccountInput});
-      setIsEditingBank(false);
-      if (onProfileUpdate) onProfileUpdate();
+      try {
+          await apiFetch('/user/bank-account', {
+              method: 'PATCH',
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              },
+              body: { bankAccountNumber: bankAccountInput }
+          });
+          setUserData({...userData, bankAccountNumber: bankAccountInput});
+          setIsEditingBank(false);
+          if (onProfileUpdate) onProfileUpdate();
+      } catch (err) {
+          console.error(err);
+      }
   }
 
   return (

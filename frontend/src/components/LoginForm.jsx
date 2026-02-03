@@ -1,25 +1,7 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { apiFetch } from '../assets/util/fetch';
 import './LoginForm.css';
 import PasswordReset from './passwordReset';
-
-const postMethodFetch = async (url, data) => {
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error(`POST hiba: ${response.status} ${response.statusText}`);
-    }
-    return await response.json();
-  } catch (error) {
-    throw new Error(`Hiba történt: ${error.message}`);
-  }
-};
 
 export default function LoginForm({ onClose }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -63,7 +45,11 @@ export default function LoginForm({ onClose }) {
     };
 
     try {
-      const response = await postMethodFetch(url, dataValues);
+      const response = await apiFetch(url, {
+        method: 'POST',
+        credentials: 'include', 
+        body: dataValues
+      });
 
       if (isLogin) {
         localStorage.setItem('token', response.message.token);
@@ -106,7 +92,7 @@ export default function LoginForm({ onClose }) {
             <form onSubmit={submit}>
               {!isLogin && (
                 <div className="formItems">
-                  <label for="userNameInput">Felhasználónév</label>
+                  <label htmlFor="userNameInput">Felhasználónév</label>
                   <input
                     type="text"
                     name="userName"
@@ -116,7 +102,7 @@ export default function LoginForm({ onClose }) {
                 </div>
               )}
               <div className="formItems">
-                <label for="userEmailInput">E-mail cím</label>
+                <label htmlFor="userEmailInput">E-mail cím</label>
                 <input
                   type="email"
                   name="email"
@@ -126,7 +112,7 @@ export default function LoginForm({ onClose }) {
                 />
               </div>
               <div className="formItems">
-                <label for="userPassword">Jelszó</label>
+                <label htmlFor="userPassword">Jelszó</label>
                 <input
                   type="password"
                   name="password"
@@ -136,7 +122,7 @@ export default function LoginForm({ onClose }) {
               </div>
               {!isLogin && (
                 <div className="formItems">
-                  <label for="userPassword2">Jelszó megerősítése</label>
+                  <label htmlFor="userPassword2">Jelszó megerősítése</label>
                   <input
                     type="password"
                     name="password2"

@@ -1,7 +1,7 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import ReviewModal from './ReviewModal';
+import { apiFetch } from '../assets/util/fetch';
 import './ProductList.css';
 
 function ProductCard({ product, onOpenReviews }) {
@@ -16,8 +16,7 @@ function ProductCard({ product, onOpenReviews }) {
     useEffect(() => {
         const fetchReviews = async () => {
             try {
-                const response = await fetch(`/reviews/${product.prodId}`);
-                const data = await response.json();
+                const data = await apiFetch(`/reviews/${product.prodId}`);
                 if (data.result === 'success' && data.data.length > 0) {
                     const total = data.data.reduce((acc, curr) => acc + curr.rating, 0);
                     setAvgRating(total / data.data.length);
@@ -33,24 +32,6 @@ function ProductCard({ product, onOpenReviews }) {
         fetchReviews();
     }, [product.prodId]);
 
-    const sendCartRequest = (requestUrl, userToken) => {
-        return fetch(requestUrl, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${userToken}`
-            }
-        })
-        .then((response) => {
-            if(!response.ok){
-                throw new Error(`POST hiba: ${response.status} ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .catch((error) => {
-            throw new Error(`Hiba történt: ${error.message}`);
-        });
-    };
-
     const addToCart = async () => {
         const userToken = localStorage.getItem('token');
 
@@ -62,10 +43,13 @@ function ProductCard({ product, onOpenReviews }) {
             return;
         }
 
-        const requestUrl = `/cart/add/${product.prodId}/1`;
-
         try{
-            await sendCartRequest(requestUrl, userToken);
+            await apiFetch(`/cart/add/${product.prodId}/1`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            });
         } catch(error){
             console.error("Hiba: ", error);
             setLoginMessage("Hiba történt!");
@@ -131,28 +115,18 @@ export default function ProductList() {
     const searchText = queryParams.get('q');
 
     useEffect(() => {
-        fetch('http://localhost:3000/category')
-            .then(res => res.json())
-            .then(data => {
+        const fetchCategories = async () => {
+            try {
+                const data = await apiFetch('/category');
                 if(data.data) setAllCategories(data.data);
-            })
-            .catch(err => console.error(err));
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchCategories();
     }, []);
 
     useEffect(() => {
-        const getRequest = (fetchUrl) => {
-            return fetch(fetchUrl)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`GET hiba: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .catch((error) => {
-                    throw new Error(`Hiba történt: ${error.message}`);
-                });
-        }
-
         const fetchProducts = async () => {
             try{
                 let fetchUrl = '/products';
@@ -161,7 +135,7 @@ export default function ProductList() {
                     fetchUrl = `/products/search/${searchText}`;
                 }
 
-                const productsResult = await getRequest(fetchUrl);
+                const productsResult = await apiFetch(fetchUrl);
                 let allProducts = productsResult.data || [];
 
                 if(searchText){

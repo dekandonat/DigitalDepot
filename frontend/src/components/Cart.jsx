@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from '../assets/util/fetch';
 import './Cart.css';
 
 export default function Cart({ onClose }){
@@ -7,44 +8,6 @@ export default function Cart({ onClose }){
     const [cartTotal, setCartTotal] = useState(0);
 
     const navigate = useNavigate();
-
-    const getCartFetch = (url, token) => {
-        return fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        .then((response) => {
-            if(!response.ok) {
-                throw new Error(`GET hiba: ${response.status} ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .catch((error) => {
-            throw new Error(`Hiba történ: ${error.message}`);
-        });
-    };
-
-    const patchCartFetch = (url, token, amount) => {
-        return fetch(url, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ amount: amount})
-        })
-        .then((response) => {
-            if(!response.ok) {
-                throw new Error(`PATCH hiba: ${response.status} ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .catch((error) => {
-            throw new Error(`Hiba történ: ${error.message}`);
-        });
-    };
 
     const fetchCartData = async () => {
         const token = localStorage.getItem('token');
@@ -54,7 +17,11 @@ export default function Cart({ onClose }){
         }
 
         try{
-            const response = await getCartFetch('/cart', token);
+            const response = await apiFetch('/cart', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
 
             if(response.result === 'success'){
                 setCartItems(response.data.items);
@@ -80,7 +47,13 @@ export default function Cart({ onClose }){
 
         try{
             const url = `/cart/${productId}`;
-            await patchCartFetch(url, token, amount);
+            await apiFetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: { amount: amount }
+            });
             fetchCartData();
         } catch (error){
             console.error("Hiba: ", error)

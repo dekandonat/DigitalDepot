@@ -1,53 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { apiFetch } from '../assets/util/fetch';
 import './AdminUsedProducts.css';
-
-const getMethodFetch = async (url, token) => {
-    try {
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        if (!response.ok) throw new Error(response);
-        return await response.json();
-    } catch (err) {
-        throw new Error(err);
-    }
-};
-
-const patchMethodFetch = async (url, body, token) => {
-    try {
-        const response = await fetch(url, {
-            method: 'PATCH',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        });
-        if (!response.ok) throw new Error(response);
-        return await response.json();
-    } catch (err) {
-        throw new Error(err);
-    }
-};
-
-const postMethodFetch = async (url, body, token) => {
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        });
-        if (!response.ok) throw new Error(response);
-        return await response.json();
-    } catch (err) {
-        throw new Error(err);
-    }
-};
 
 const formatPrice = (price) => {
     if (price === undefined || price === null || price === '') return '';
@@ -56,7 +9,7 @@ const formatPrice = (price) => {
 
 const parsePrice = (formattedPrice) => {
     if (!formattedPrice) return 0;
-    return parseInt(formattedPrice.toString().replace(/[^0-9]/g, '')) || 0;
+    return parseInt(formattedPrice.toString().replace(/[^0-9]/g, '')) || 0; // "/[^0-9]/g" - kicseréli minden karaktert ami nem szamjegy 0-9-ig egy üres stringre, a g pedig az összes karaktert nézi, nem csak az elsőt
 };
 
 export default function AdminUsedProducts() {
@@ -102,7 +55,9 @@ export default function AdminUsedProducts() {
 
     async function fetchData() {
         try {
-            const data = await getMethodFetch('http://localhost:3000/used-products/admin/all', token);
+            const data = await apiFetch('/used-products/admin/all', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             if(data.result == 'success') setSubmissions(data.data);
         } catch (err) {
             console.log(err.message);
@@ -111,8 +66,7 @@ export default function AdminUsedProducts() {
 
     async function fetchCategories() {
         try {
-            const response = await fetch('http://localhost:3000/category');
-            const data = await response.json();
+            const data = await apiFetch('/category');
             if(data.data) {
                 setAllCategories(data.data);
                 setMainCategories(data.data.filter(c => c.parentId === null));
@@ -139,11 +93,15 @@ export default function AdminUsedProducts() {
         }
 
         try {
-            const data = await patchMethodFetch('http://localhost:3000/used-products/admin/status', {
-                submissionId: id,
-                status: status,
-                offerPrice: price
-            }, token);
+            const data = await apiFetch('/used-products/admin/status', {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: {
+                    submissionId: id,
+                    status: status,
+                    offerPrice: price
+                }
+            });
 
             if (data.result == 'success') {
                 fetchData();
@@ -174,10 +132,14 @@ export default function AdminUsedProducts() {
 
     async function createCategory(name, parentId) {
         try {
-            const result = await postMethodFetch('http://localhost:3000/category', {
-                categoryName: name,
-                parentId: parentId
-            }, token);
+            const result = await apiFetch('/category', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: {
+                    categoryName: name,
+                    parentId: parentId
+                }
+            });
             return result.insertId;
         } catch (err) {
             console.error(err);
@@ -260,7 +222,7 @@ export default function AdminUsedProducts() {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/used-products/admin/list-product', {
+            const response = await fetch('/used-products/admin/list-product', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -340,7 +302,7 @@ export default function AdminUsedProducts() {
                         {editingProduct.productImage && !listingImage && (
                             <div style={{marginBottom: '10px'}}>
                                 <small>Jelenlegi kép: </small>
-                                <img src={`http://localhost:3000/${editingProduct.productImage}`} alt="Jelenlegi" style={{height: '50px', verticalAlign: 'middle'}}/>
+                                <img src={`/${editingProduct.productImage}`} alt="Jelenlegi" style={{height: '50px', verticalAlign: 'middle'}}/>
                             </div>
                         )}
                         <input type="file" onChange={(e) => setListingImage(e.target.files[0])} accept="image/*" />
@@ -444,7 +406,7 @@ export default function AdminUsedProducts() {
                         <pre className="subDesc">{sub.productDescription}</pre>
                         
                         {sub.productImage && (
-                            <img src={`http://localhost:3000/${sub.productImage}`} alt="Termék" className="subImg" />
+                            <img src={`/${sub.productImage}`} alt="Termék" className="subImg" />
                         )}
 
                         <p className={`subStatus ${sub.status}`}>
@@ -495,7 +457,7 @@ export default function AdminUsedProducts() {
                             <span className="offerPrice">{formatPrice(sub.adminOfferPrice)} Ft</span>
                         </div>
                         {sub.productImage && (
-                            <img src={`http://localhost:3000/${sub.productImage}`} alt="Termék" className="subImg" />
+                            <img src={`/${sub.productImage}`} alt="Termék" className="subImg" />
                         )}
                         <div className="subActions">
                             <button className="acceptBtn" onClick={() => startListing(sub)}>

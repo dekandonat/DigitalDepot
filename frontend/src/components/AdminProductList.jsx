@@ -1,34 +1,22 @@
 import { useState, useEffect } from 'react';
 import AdminProductCard from './AdminProductCard';
+import { apiFetch } from '../assets/util/fetch';
 import './AdminProductList.css';
 
 export default function AdminProductList() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const getMethodFetch = (url) => {
-      return fetch(url)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(response.status);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          return data;
-        })
-        .catch((err) => {
-          throw new Error(err.message);
-        });
+    const fetchProducts = async () => {
+        try {
+            const data = await apiFetch('/products');
+            setProducts(data.data);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
-    getMethodFetch('/products')
-      .then((data) => {
-        setProducts(data.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    fetchProducts();
   }, []);
 
   return (

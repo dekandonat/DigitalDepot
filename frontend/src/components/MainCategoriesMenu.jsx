@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../assets/util/fetch';
 import "./MainCategoriesMenu.css";
 
 export default function MainCategoriesMenu({ onCategorySelect }) {
@@ -6,23 +7,11 @@ export default function MainCategoriesMenu({ onCategorySelect }) {
     const [menuItems, setMenuItems] = useState({});
 
     useEffect(() => {
-        const getRequest = async (fetchUrl) => {
-            try {
-                const response = await fetch(fetchUrl);
-                if (!response.ok) {
-                    throw new Error(`GET hiba: ${response.status} ${response.statusText}`);
-                }
-                return await response.json();
-            } catch (error) {
-                throw new Error(`Hiba történt: ${error.message}`);
-            }
-        }
-
         const fetchCategories = async() => {
             const categoryApiUrl = '/category';
 
             try{
-                const result = await getRequest(categoryApiUrl);
+                const result = await apiFetch(categoryApiUrl);
                 if(result.data){
                     processCategories(result.data);
                 }

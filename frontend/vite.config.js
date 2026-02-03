@@ -13,6 +13,8 @@ export default defineConfig({
       '/adminRoute': 'http://localhost:3000',
       '/uploads': 'http://localhost:3000',
       '/reviews': 'http://localhost:3000',
+      '/order': 'http://localhost:3000',
+      '/used-products': 'http://localhost:3000'
     },
   },
 });

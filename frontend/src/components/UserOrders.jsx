@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../assets/util/fetch';
 import './UserOrders.css';
 
 export default function UserOrders() {
@@ -19,16 +20,13 @@ export default function UserOrders() {
             }
 
             try {
-                const response = await fetch('http://localhost:3000/order/my-orders', {
+                const data = await apiFetch('/order/my-orders', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
                 
-                if(response.ok){
-                    const data = await response.json();
-                    setOrders(data.data || []); 
-                }
+                setOrders(data.data || []); 
             } catch (error) {
                 console.error(error);
             } finally {
@@ -49,14 +47,11 @@ export default function UserOrders() {
 
         if (!orderDetails[orderId]) {
             try {
-                const response = await fetch(`http://localhost:3000/order/items/${orderId}`);
-                if (response.ok) {
-                    const result = await response.json();
-                    
-                    const details = { ...orderDetails };
-                    details[orderId] = result.data;
-                    setOrderDetails(details);
-                }
+                const result = await apiFetch(`/order/items/${orderId}`);
+                
+                const details = { ...orderDetails };
+                details[orderId] = result.data;
+                setOrderDetails(details);
             } catch (error) {
                 console.error(error);
             }

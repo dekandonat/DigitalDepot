@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../assets/util/fetch';
 import './Checkout.css';
 
 export default function Checkout() {
@@ -41,26 +42,20 @@ export default function Checkout() {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/order/place-order', {
+            await apiFetch('/order/place-order', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(orderInfo)
+                body: orderInfo
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                alert("Sikeres rendelés! Köszönjük a vásárlást.");
-                navigate('/');
-            } else {
-                alert(data.message || "Hiba történt a rendeléskor.");
-            }
+            alert("Sikeres rendelés! Köszönjük a vásárlást.");
+            navigate('/');
+            
         } catch (error) {
             console.error(error);
-            alert("Hálózati hiba történt!");
+            alert(error.message || "Hiba történt a rendeléskor.");
         }
     };
 

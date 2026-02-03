@@ -1,37 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../assets/util/fetch';
 import './UsedProductPage.css';
-
-const getMethodFetch = async (url, token) => {
-    try {
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        if (!response.ok) throw new Error(response);
-        return await response.json();
-    } catch (err) {
-        throw new Error(err);
-    }
-};
-
-const patchMethodFetch = async (url, body, token) => {
-    try {
-        const response = await fetch(url, {
-            method: 'PATCH',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        });
-        if (!response.ok) throw new Error(response);
-        return await response.json();
-    } catch (err) {
-        throw new Error(err);
-    }
-};
 
 const formatPrice = (price) => {
     return parseInt(price).toLocaleString('hu-HU').replaceAll(',', ' ');
@@ -79,7 +48,9 @@ export default function UsedProductPage(props) {
 
     async function checkUserProfile() {
         try {
-            const data = await getMethodFetch('http://localhost:3000/user/profile', token);
+            const data = await apiFetch('/user/profile', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             if (data.result == 'success') {
                 if (data.data.bankAccountNumber && data.data.bankAccountNumber.trim() != '') {
                     setHasBankAccount(true);
@@ -94,7 +65,9 @@ export default function UsedProductPage(props) {
 
     async function fetchMySubmissions() {
         try {
-            const data = await getMethodFetch('http://localhost:3000/used-products/my-submissions', token);
+            const data = await apiFetch('/used-products/my-submissions', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             if(data.result == 'success'){
                 setMySubmissions(data.data);
             }
@@ -119,7 +92,7 @@ export default function UsedProductPage(props) {
         formData.append('file', image);
 
         try {
-            const response = await fetch('http://localhost:3000/used-products/submit', {
+            const response = await fetch('/used-products/submit', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -149,10 +122,14 @@ export default function UsedProductPage(props) {
         }
 
         try {
-            const data = await patchMethodFetch('http://localhost:3000/used-products/user-response', { 
-                submissionId: id, 
-                decision: decision 
-            }, token);
+            const data = await apiFetch('/used-products/user-response', {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: { 
+                    submissionId: id, 
+                    decision: decision 
+                }
+            });
 
             if(data.result == 'success') {
                 fetchMySubmissions();
