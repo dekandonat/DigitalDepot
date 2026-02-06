@@ -90,6 +90,8 @@ router.get('/refresh', async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
       res.status(200).json({ result: result.result, data: result.data });
+    } else {
+      res.status(500).json({ result: 'fail', message: 'token error' });
     }
   } catch (err) {
     res.status(500).json({ result: 'fail', message: 'server error' });

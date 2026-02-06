@@ -229,8 +229,8 @@ module.exports = class User {
         }
       );
 
-      await db.execute('DELETE FROM refreshTokens WHERE userId = ?', [
-        userData[0].userId,
+      await db.execute('DELETE FROM refreshTokens WHERE tokenId = ?', [
+        hashedToken,
       ]);
 
       const refreshtoken = crypto.randomBytes(64).toString('hex');

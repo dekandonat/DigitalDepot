@@ -1,37 +1,49 @@
 export async function apiFetch(url, options = {}) {
   try {
+    const isFormData = options.body instanceof FormData;
+
     let settings = {
       method: options.method || 'GET',
       headers: {
-        'Content-Type': 'application/json',
         ...options.headers,
       },
     };
 
+    if (!isFormData) {
+      settings.headers['Content-Type'] = 'application/json';
+    }
+
     if (options.body !== undefined) {
-      settings.body = JSON.stringify(options.body);
+      settings.body = isFormData ? options.body : JSON.stringify(options.body);
     }
 
     let response = await fetch(url, settings);
 
     if (response.status == 401) {
-      const rawRefreshData = await fetch('/user/refresh');
+      const rawRefreshData = await fetch('/user/refresh', {
+        credentials: 'include',
+      });
       const refreshData = await rawRefreshData.json();
 
       if (refreshData.result === 'success') {
         localStorage.setItem('token', refreshData.data);
 
+        const newIsFormData = options.body instanceof FormData;
+
         let newOptions = {
           ...options,
           headers: {
             ...options.headers,
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${refreshData.data}`,
           },
         };
-
+        if (!newIsFormData) {
+          newOptions.headers['Content-Type'] = 'application/json';
+        }
         if (options.body !== undefined) {
-          newOptions.body = JSON.stringify(options.body);
+          newOptions.body = newIsFormData
+            ? options.body
+            : JSON.stringify(options.body);
         }
 
         response = await fetch(url, newOptions);

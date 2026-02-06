@@ -1,5 +1,6 @@
 import './AdminAddProduct.css';
 import { useState, useEffect, useRef } from 'react';
+import { apiFetch } from '../assets/util/fetch';
 
 export default function AdminAddProduct() {
   const [categories, setCategories] = useState([]);
@@ -11,23 +12,7 @@ export default function AdminAddProduct() {
   const selectRef = useRef();
 
   useEffect(() => {
-    const getMethodFetch = (url) => {
-      return fetch(url)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(response.status);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          return data;
-        })
-        .catch((err) => {
-          throw new Error(err.message);
-        });
-    };
-
-    getMethodFetch('/category')
+    apiFetch('/category')
       .then((data) => {
         setCategories(data.data);
       })
@@ -35,25 +20,6 @@ export default function AdminAddProduct() {
         console.error(err);
       });
   }, []);
-
-  const postMethodFetch = (url, body) => {
-    return fetch(url, {
-      method: 'POST',
-      body: body,
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        return data;
-      })
-      .catch((err) => {
-        throw new Error(err.message);
-      });
-  };
 
   function handleNameChange(event) {
     setName(event.target.value);
@@ -119,7 +85,13 @@ export default function AdminAddProduct() {
               formData.append('categoryId', selectRef.current.value);
               formData.append('file', img);
 
-              postMethodFetch('/products', formData)
+              apiFetch('/products', {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: formData,
+              })
                 .then((data) => {
                   alert(data.result);
                 })
