@@ -79,7 +79,7 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
         <div className="profileDataSection">
           <div className="profileDataRow">
             <span className="profileLabel">Felhasználónév:</span>
-            <span className="profileData">{userData.name}</span>
+            <span className="profileData">{userData.userName}</span>
           </div>
 
           <div className="profileDataRow">
