@@ -74,6 +74,7 @@
     justify-content: center;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .productCard img {
@@ -128,6 +129,11 @@
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    cursor: pointer;
+}
+
+.productCard h3:hover {
+    color: #007bff;
 }
 
 .productDescription {

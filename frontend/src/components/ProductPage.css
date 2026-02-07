@@ -1,0 +1,547 @@
+.pageWrapper {
+    background-color: #f4f5f7;
+    min-height: 100vh;
+    padding: 15px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.productPageContainer {
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+.backButton {
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    color: #555;
+    cursor: pointer;
+    padding: 10px 0;
+    margin-bottom: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+    width: fit-content;
+}
+
+.backButton:hover {
+    color: #007bff;
+    text-decoration: none;
+    background: transparent;
+    transform: translateX(-3px);
+}
+
+.productMainLayout {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.leftColumn {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.imageWrapper {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    justify-content: center;
+}
+
+.mainProductImage {
+    width: 100%;
+    height: auto;
+    max-height: 280px;
+    object-fit: contain;
+}
+
+.conditionBadgeLarge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.conditionBadgeLarge.bontatlan { background-color: #2ecc71; }
+.conditionBadgeLarge.felbontott { background-color: #f1c40f; color: #333; }
+.conditionBadgeLarge.használt { background-color: #e74c3c; }
+
+.rightColumn {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.productTitleMain {
+    font-size: 1.4rem;
+    color: #1a1a1a;
+    margin: 0 0 10px 0;
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.ratingBlock {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.stars {
+    color: #ffc107;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.ratingLink {
+    color: #007bff;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.ratingLink:hover {
+    text-decoration: underline;
+}
+
+.priceBlock {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.currentPrice {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #222;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.vatInfo {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.availabilityBlock {
+    margin-bottom: 20px;
+}
+
+.availabilityItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.checkIcon {
+    font-weight: 900;
+    font-size: 1rem;
+}
+
+.actionBlock {
+    margin-bottom: 25px;
+}
+
+.addToCartBtnBig {
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+}
+
+.addToCartBtnBig:hover {
+    background-color: #0056b3;
+}
+
+.addToCartBtnBig:active {
+    transform: scale(0.98);
+}
+
+.descriptionContainer h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #333;
+    font-weight: 700;
+}
+
+.descriptionContainer p {
+    line-height: 1.5;
+    color: #4a4a4a;
+    font-size: 0.95rem;
+}
+
+.additionalInfoSection {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.infoBox {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.infoBox h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #222;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.infoBox ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.infoBox li {
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+.infoBox li::before {
+    content: "•";
+    color: #007bff;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+.reviewsSection {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.reviewsTitle {
+    font-size: 1.3rem;
+    color: #222;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.noReviews {
+    color: #777;
+    font-style: italic;
+    padding: 10px 0;
+    font-size: 0.9rem;
+}
+
+.reviewsList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.reviewCard {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.reviewUser {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.userAvatarPlaceholder {
+    width: 32px;
+    height: 32px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.userName {
+    font-weight: 700;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.reviewStars {
+    color: #ffc107;
+    font-size: 1rem;
+}
+
+.reviewContent p {
+    margin: 0;
+    color: #555;
+    line-height: 1.4;
+    font-size: 0.95rem;
+}
+
+.messageToast {
+    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.messageToast.success {
+    background-color: #e6fffa;
+    color: #2c7a7b;
+    border: 1px solid #b2f5ea;
+}
+
+.messageToast.error {
+    background-color: #fff5f5;
+    color: #c53030;
+    border: 1px solid #fed7d7;
+}
+
+.loadingContainer, .errorContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60vh;
+    font-size: 1.1rem;
+    color: #666;
+    background-color: #f4f5f7;
+}
+
+.loader {
+    border: 3px solid #e0e0e0;
+    border-top: 3px solid #007bff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@media (min-width: 768px) {
+    .pageWrapper {
+        padding: 30px 0;
+    }
+
+    .productPageContainer {
+        padding: 0 20px;
+    }
+
+    .backButton {
+        font-size: 1rem;
+    }
+
+    .productMainLayout {
+        flex-direction: row;
+        align-items: stretch;
+        margin-bottom: 30px;
+    }
+
+    .leftColumn {
+        width: 55%;
+        border-bottom: none;
+        border-right: 1px solid #f0f0f0;
+        padding: 50px;
+    }
+
+    .mainProductImage {
+        max-height: 450px;
+    }
+    
+    .conditionBadgeLarge {
+        padding: 6px 14px;
+        font-size: 0.85rem;
+    }
+
+    .rightColumn {
+        width: 45%;
+        padding: 50px;
+    }
+
+    .productTitleMain {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+
+    .stars {
+        font-size: 1.3rem;
+    }
+
+    .ratingLink {
+        font-size: 0.95rem;
+    }
+
+    .priceBlock {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+    }
+
+    .currentPrice {
+        font-size: 2.4rem;
+        margin-bottom: 8px;
+    }
+
+    .vatInfo {
+        font-size: 0.9rem;
+    }
+
+    .availabilityBlock {
+        margin-bottom: 30px;
+    }
+
+    .availabilityItem {
+        font-size: 1.05rem;
+        margin-bottom: 10px;
+    }
+
+    .actionBlock {
+        margin-bottom: 35px;
+    }
+
+    .addToCartBtnBig {
+        width: auto;
+        min-width: 280px;
+        font-size: 1.2rem;
+        padding: 16px;
+    }
+
+    .descriptionContainer h3 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+
+    .descriptionContainer p {
+        font-size: 1.05rem;
+        line-height: 1.7;
+    }
+
+    .additionalInfoSection {
+        flex-direction: row;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .infoBox {
+        flex: 1;
+        padding: 30px;
+    }
+    
+    .infoBox h3 {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+    
+    .infoBox li {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+
+    .reviewsSection {
+        padding: 30px;
+    }
+    
+    .reviewsTitle {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    .reviewCard {
+        padding: 20px;
+    }
+
+    .reviewHeader {
+        margin-bottom: 15px;
+    }
+    
+    .userAvatarPlaceholder {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .userName {
+        font-size: 1.05rem;
+    }
+    
+    .reviewStars {
+        font-size: 1.1rem;
+    }
+    
+    .reviewContent p {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+}

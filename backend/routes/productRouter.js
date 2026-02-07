@@ -53,7 +53,7 @@ router.get('/:prodId', async (req, res) => {
   try {
     const data = await Products.fetch(id);
     if (data.length > 0) {
-      res.status(200).json({ result: 'success', data: data });
+      res.status(200).json({ result: 'success', data: data[0] });
     } else {
       res
         .status(404)
