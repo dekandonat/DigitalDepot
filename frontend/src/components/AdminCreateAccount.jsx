@@ -1,5 +1,6 @@
 import './AdminCreateAccount.css';
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../assets/util/fetch';
 
 export default function AdminCreateAccount() {
   const [name, setName] = useState('');
@@ -18,29 +19,6 @@ export default function AdminCreateAccount() {
   function handlePasswordChange(event) {
     setPassword(event.target.value);
   }
-
-  const postMethodFetch = (url, body) => {
-    return fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        return data;
-      })
-      .catch((err) => {
-        throw new Error(err.message);
-      });
-  };
 
   return (
     <div className="adminCreationDiv">
@@ -70,10 +48,16 @@ export default function AdminCreateAccount() {
         <button
           type="button"
           onClick={() => {
-            postMethodFetch('adminRoute/register', {
-              userName: name,
-              password: password,
-              email: email,
+            apiFetch('adminRoute/register', {
+              body: {
+                userName: name,
+                password: password,
+                email: email,
+              },
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
             })
               .then((data) => {
                 if (data.result == 'success') {

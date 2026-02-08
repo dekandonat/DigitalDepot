@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './AdminInventory.css';
+import { apiFetch } from '../assets/util/fetch';
 
 export default function AdminInventory() {
   const [products, setProducts] = useState([]);
@@ -40,28 +41,6 @@ export default function AdminInventory() {
       });
   };
 
-  const patchMethodFetch = (url, body) => {
-    return fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        return data;
-      })
-      .catch((err) => {
-        throw new Error(err.message);
-      });
-  };
-
   return (
     <div>
       <h1>Leltár</h1>
@@ -86,9 +65,12 @@ export default function AdminInventory() {
           <button
             type="button"
             onClick={() => {
-              patchMethodFetch('/products/addInventory', {
-                id: parseInt(id),
-                quantity: parseInt(quantity),
+              apiFetch('/products/addInventory', {
+                body: { id: parseInt(id), quantity: parseInt(quantity) },
+                method: 'PATCH',
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
               })
                 .then((data) => {
                   alert(data.result);

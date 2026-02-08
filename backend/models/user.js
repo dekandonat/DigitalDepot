@@ -161,7 +161,7 @@ module.exports = class User {
           },
           process.env.SECRET,
           {
-            expiresIn: '1m',
+            expiresIn: '15m',
           }
         );
         //refresh token generálás
@@ -225,7 +225,7 @@ module.exports = class User {
         },
         process.env.SECRET,
         {
-          expiresIn: '1m',
+          expiresIn: '15m',
         }
       );
 
