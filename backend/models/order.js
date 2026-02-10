@@ -25,7 +25,8 @@ module.exports = class Order {
         `SELECT products.prodId, products.productPrice, carts.quantity 
          FROM products 
          INNER JOIN carts ON products.prodId = carts.productId 
-         WHERE carts.userId = ${this.userId};`
+         WHERE carts.userId = ?;`,
+        [this.userId]
       );
 
       if (cartItems.length === 0) {
@@ -39,7 +40,14 @@ module.exports = class Order {
 
       const [orderResult] = await db.execute(
         `INSERT INTO orders (userId, totalAmount, shippingAddress, paymentMethod, couponCode, orderDate) 
-         VALUES (${this.userId}, ${totalAmount}, '${this.shippingAddress}', '${this.paymentMethod}', '${this.couponCode}', NOW())`
+         VALUES (?, ?, ?, ?, ?, NOW())`,
+        [
+          this.userId,
+          totalAmount,
+          this.shippingAddress,
+          this.paymentMethod,
+          this.couponCode,
+        ]
       );
 
       const orderId = orderResult.insertId;
@@ -47,7 +55,8 @@ module.exports = class Order {
       for (let item of cartItems) {
         await db.execute(
           `INSERT INTO order_items (orderId, productId, quantity, price) 
-           VALUES (${orderId}, ${item.prodId}, ${item.quantity}, ${item.productPrice})`
+           VALUES (?, ?, ?, ?)`,
+          [orderId, item.prodId, item.quantity, item.productPrice]
         );
       }
 
@@ -89,7 +98,7 @@ module.exports = class Order {
         console.log(err.message);
       }
 
-      await db.execute(`DELETE FROM carts WHERE userId = ${this.userId}`);
+      await db.execute(`DELETE FROM carts WHERE userId = ?`, [this.userId]);
 
       return { result: 'success' };
     } catch (err) {
@@ -100,7 +109,8 @@ module.exports = class Order {
   static async fetchByUserId(userId) {
     try {
       const [rows] = await db.execute(
-        `SELECT * FROM orders WHERE userId = ${userId} ORDER BY orderId DESC`
+        `SELECT * FROM orders WHERE userId = ? ORDER BY orderId DESC`,
+        [userId]
       );
       return rows;
     } catch (err) {
@@ -114,7 +124,8 @@ module.exports = class Order {
         `SELECT order_items.quantity, order_items.price, products.productName, products.productImg 
          FROM order_items 
          JOIN products ON order_items.productId = products.prodId 
-         WHERE order_items.orderId = ${orderId}`
+         WHERE order_items.orderId = ?`,
+        [orderId]
       );
       return rows;
     } catch (err) {
@@ -124,8 +135,8 @@ module.exports = class Order {
 
   static async delete(id) {
     try {
-      await db.execute(`DELETE FROM order_items WHERE orderId = ${id}`);
-      await db.execute(`DELETE FROM orders WHERE orderId = ${id}`);
+      await db.execute(`DELETE FROM order_items WHERE orderId = ?`, [id]);
+      await db.execute(`DELETE FROM orders WHERE orderId = ?`, [id]);
       return { result: 'success' };
     } catch (err) {
       return { result: 'fail', message: err.message };

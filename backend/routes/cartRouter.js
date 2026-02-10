@@ -11,10 +11,12 @@ router.get('/', async (req, res) => {
   try {
     const userId = req.user.id;
     const [items] = await db.execute(
-      `SELECT products.*, carts.quantity FROM products INNER JOIN carts ON products.prodId = carts.productId WHERE carts.userId = ${userId};`
+      `SELECT products.*, carts.quantity FROM products INNER JOIN carts ON products.prodId = carts.productId WHERE carts.userId = ?;`,
+      [userId]
     );
     const [total] = await db.execute(
-      `SELECT SUM(products.productPrice * carts.quantity) AS total FROM products INNER JOIN carts ON products.prodId = carts.productId WHERE carts.userId = ${userId};`
+      `SELECT SUM(products.productPrice * carts.quantity) AS total FROM products INNER JOIN carts ON products.prodId = carts.productId WHERE carts.userId = ?;`,
+      [userId]
     );
     res.status(200).json({ result: 'success', data: { items, total } });
   } catch (err) {
@@ -30,7 +32,8 @@ router.post('/add/:id/:quantity', async (req, res) => {
   try {
     const userId = req.user.id;
     await db.execute(
-      `INSERT INTO carts (userId, productId, quantity) VALUES (${userId}, ${productId}, ${quantity}) ON DUPLICATE KEY UPDATE quantity = quantity + 1;`
+      `INSERT INTO carts (userId, productId, quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE quantity = quantity + 1;`,
+      [userId, productId, quantity]
     );
     res.status(201).json({ result: 'success' });
   } catch (err) {
