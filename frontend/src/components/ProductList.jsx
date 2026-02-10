@@ -6,32 +6,14 @@ import './ProductList.css';
 
 function ProductCard({ product, onOpenReviews }) {
     const [loginMessage, setLoginMessage] = useState("");
-    const [averageRating, setAverageRating] = useState(0);
-    const [reviewCount, setReviewCount] = useState(0);
     const navigate = useNavigate();
+
+    const avgRating = parseFloat(product.avgRating) || 0;
+    const reviewCount = product.reviewCount || 0;
 
     const formatPrice = (price) => {
         return parseInt(price).toLocaleString('hu-HU').replaceAll(',', ' ');
     };
-
-    useEffect(() => {
-        const fetchReviews = async () => {
-            try {
-                const data = await apiFetch(`/reviews/${product.prodId}`);
-                if (data.result === 'success' && data.data.length > 0) {
-                    const total = data.data.reduce((acc, curr) => acc + curr.rating, 0);
-                    setAverageRating(total / data.data.length);
-                    setReviewCount(data.data.length);
-                } else {
-                    setAverageRating(0);
-                    setReviewCount(0);
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        };
-        fetchReviews();
-    }, [product.prodId]);
 
     const addToCart = async (e) => {
         e.stopPropagation();
@@ -49,9 +31,11 @@ function ProductCard({ product, onOpenReviews }) {
             await apiFetch(`/cart/add/${product.prodId}/1`, {
                 method: 'POST'
             });
+            setLoginMessage("Kosárba!");
+            setTimeout(() => setLoginMessage(""), 2000);
         } catch(error){
             console.error("Hiba: ", error);
-            setLoginMessage("Hiba történt!");
+            setLoginMessage("Hiba!");
             setTimeout(() => setLoginMessage(""), 3000);
         }
     };
@@ -77,12 +61,12 @@ function ProductCard({ product, onOpenReviews }) {
                 
                 <div className="ratingDisplay" onClick={(e) => { e.stopPropagation(); onOpenReviews(product); }}>
                     <div className="starsContainer">
-                        <span className="starFilled">{'★'.repeat(Math.round(averageRating))}</span>
-                        <span className="starEmpty">{'★'.repeat(5 - Math.round(averageRating))}</span>
+                        <span className="starFilled">{'★'.repeat(Math.round(avgRating))}</span>
+                        <span className="starEmpty">{'★'.repeat(5 - Math.round(avgRating))}</span>
                     </div>
                     <div className="ratingInfoRow">
                         <span className="ratingText">
-                            ({averageRating.toFixed(1)}) - {reviewCount} értékelés
+                            ({avgRating.toFixed(1)}) - {reviewCount} értékelés
                         </span>
                     </div>
                 </div>
