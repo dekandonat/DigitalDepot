@@ -4,6 +4,7 @@ const db = require('../util/database');
 
 const User = require('../models/user');
 const Order = require('../models/order');
+const Products = require('../models/products');
 
 router.post('/register', async (req, res) => {
   try {
@@ -49,6 +50,44 @@ router.delete('/orders/:orderId', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
+
+router.patch('/products/addInventory', async (req, res) => {
+  try {
+    const { id, quantity } = req.body;
+    const result = await Products.addInventory(id, quantity);
+
+    if (result.result == 'success') {
+      res.status(200).json(result);
+    } else {
+      console.log(result);
+      res.status(500).json(result);
+    }
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
+
+router.patch('/products/:prodId', async (req, res) => {
+  const id = req.params.prodId;
+  const { prodName, prodDescription, prodPrice, conditionState } = req.body;
+
+  try {
+    const result = await Products.update(
+      id,
+      prodName,
+      prodDescription,
+      prodPrice,
+      conditionState
+    );
+    if (result.result === 'success') {
+      res.status(200).json(result);
+    } else {
+      res.status(500).json(result);
+    }
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: err.message });
   }
 });
 

@@ -32,22 +32,6 @@ router.get('/search/:string', async (req, res) => {
   }
 });
 
-router.patch('/addInventory', async (req, res) => {
-  try {
-    const { id, quantity } = req.body;
-    const result = await Products.addInventory(id, quantity);
-
-    if (result.result == 'success') {
-      res.status(200).json(result);
-    } else {
-      console.log(result);
-      res.status(500).json(result);
-    }
-  } catch (err) {
-    res.status(500).json({ result: 'fail', message: 'server error' });
-  }
-});
-
 router.get('/:prodId', async (req, res) => {
   const id = req.params.prodId;
   try {
@@ -58,28 +42,6 @@ router.get('/:prodId', async (req, res) => {
       res
         .status(404)
         .json({ result: 'fail', message: 'no product with this id' });
-    }
-  } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
-  }
-});
-
-router.patch('/:prodId', async (req, res) => {
-  const id = req.params.prodId;
-  const { prodName, prodDescription, prodPrice, conditionState } = req.body;
-
-  try {
-    const result = await Products.update(
-      id,
-      prodName,
-      prodDescription,
-      prodPrice,
-      conditionState
-    );
-    if (result.result === 'success') {
-      res.status(200).json(result);
-    } else {
-      res.status(500).json(result);
     }
   } catch (err) {
     res.status(500).json({ result: 'fail', message: err.message });

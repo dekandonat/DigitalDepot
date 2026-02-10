@@ -65,7 +65,7 @@ export default function AdminInventory() {
           <button
             type="button"
             onClick={() => {
-              apiFetch('/products/addInventory', {
+              apiFetch('/adminRoute/products/addInventory', {
                 body: { id: parseInt(id), quantity: parseInt(quantity) },
                 method: 'PATCH',
                 headers: {
