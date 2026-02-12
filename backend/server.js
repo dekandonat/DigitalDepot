@@ -1,8 +1,10 @@
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const cookieparser = require('cookie-parser');
+const socket = require('./util/socket');
 
 const verifyToken = require('./util/tokenVerify');
 const verifyAdmin = require('./util/verifyAdmin');
@@ -10,6 +12,9 @@ const verifyAdmin = require('./util/verifyAdmin');
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+
+const io = socket.init(server);
 
 const productRouter = require('./routes/productRouter');
 const userRouter = require('./routes/userRouter');
@@ -42,6 +47,6 @@ app.use('/adminRoute', verifyAdmin, adminRouter);
 app.use('/used-products', usedProductRouter);
 app.use('/reviews', reviewRouter);
 
-app.listen(PORT, IP, () => {
+server.listen(PORT, IP, () => {
   console.log(`Server running on: ${IP}:${PORT}`);
 });
