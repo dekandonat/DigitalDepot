@@ -1,0 +1,70 @@
+.mainChatDiv {
+  position: fixed;
+  bottom: 5px;
+  right: 20px;
+  border: solid 1px black;
+  background-color: bisque;
+  height: 300px;
+  width: 400px;
+  z-index: 2;
+}
+
+.chatHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: aquamarine;
+  height: 25px;
+  padding: 5px;
+}
+
+.chatHeader button {
+  height: 20px;
+  width: 20px;
+  border: none;
+  border-radius: 25%;
+  background-color: red;
+  color: white;
+}
+
+.chatInputArea {
+  position: absolute;
+  bottom: 1px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.chatInputArea input {
+  width: 80%;
+}
+
+.chatBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+}
+
+.sentMessage {
+  align-self: flex-start;
+}
+
+.receivedMessage {
+  align-self: flex-end;
+}
+
+@media (max-width: 600px) {
+  .mainChatDiv {
+    position: fixed;
+    bottom: 5px;
+    right: 20px;
+    border: solid 1px black;
+    background-color: bisque;
+    height: 300px;
+    width: 300px;
+    z-index: 2;
+  }
+}
