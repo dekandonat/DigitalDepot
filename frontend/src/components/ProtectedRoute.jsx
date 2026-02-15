@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
-export default function ProtectedRoute({ children, requireAdmin = false }){
+export default function ProtectedRoute({ children, requireAdmin = false, requireOwner = false }){
     const token = localStorage.getItem('token');
 
     if(!token){
@@ -19,7 +19,11 @@ export default function ProtectedRoute({ children, requireAdmin = false }){
             return <Navigate to = "/" replace />
         }
 
-        if(requireAdmin && decodedToken.role !== 'admin'){
+        if(requireOwner && decodedToken.role !== 'owner'){
+            return <Navigate to = "/" replace />
+        }
+
+        if(requireAdmin && decodedToken.role !== 'admin' && decodedToken.role !== 'owner'){
             return <Navigate to = "/" replace />
         }
     }

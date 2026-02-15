@@ -16,9 +16,13 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
   const [isEditingBank, setIsEditingBank] = useState(false);
   const navigate = useNavigate();
   let role;
+  
   try {
-    role = jwtDecode(localStorage.getItem('token'));
-    role = role.role;
+    const token = localStorage.getItem('token');
+    if (token) {
+        const decoded = jwtDecode(token);
+        role = decoded.role;
+    }
   } catch (err) {
     console.log('Hiba: ' + err.message);
   }
@@ -117,7 +121,7 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
           </div>
         </div>
 
-        {role === 'admin' ? (
+        {(role === 'admin' || role === 'owner') && (
           <button
             onClick={() => {
               onClose();
@@ -127,7 +131,7 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
           >
             Adminisztrátor
           </button>
-        ) : null}
+        )}
 
         <button
           onClick={() => {

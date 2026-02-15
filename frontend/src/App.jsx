@@ -35,26 +35,21 @@ export default function App() {
   }
 
   const handleCategorySelect = (categoryId) => {
-    if(categoryId){
-      navigate(`/category/${categoryId}`);
-    }
-    else{
-      navigate('/');
-    }
+    navigate(`/category/${categoryId}`);
   }
 
   const handleProfileUpdate = () => {
     setRefreshTrigger(prev => prev + 1);
   }
 
-  return ( 
-    <> 
+  return (
+    <div className="appContainer">
       <Navbar 
-        onLoginClick={() => setIsLoginOpen(true)}
+        onLoginClick={() => setIsLoginOpen(true)} 
         onCartClick={() => setIsCartOpen(true)}
         onProfileClick={openProfile}
         onSearch={handleSearch}
-      /> 
+      />
 
       {location.pathname === "/" && (
         <MainPageGallery data={slides} />
@@ -90,7 +85,7 @@ export default function App() {
         } />
 
         <Route path="/admin" element={
-          <ProtectedRoute>
+          <ProtectedRoute requireAdmin={true}>
             <AdminPage />
           </ProtectedRoute>
         } />
@@ -100,6 +95,6 @@ export default function App() {
       {isLoginOpen && <LoginForm onClose={() => setIsLoginOpen(false)} />}
       {isCartOpen && <Cart onClose={() => setIsCartOpen(false)} />}
       {isProfileOpen && <ProfilePopup onClose={() => setIsProfileOpen(false)} onProfileUpdate={handleProfileUpdate} />}
-    </> 
-  ) 
+    </div>
+  );
 }
