@@ -23,7 +23,15 @@ module.exports = class Products {
 
   static async fetchAll() {
     try {
-      const [rows] = await db.execute('SELECT * FROM products');
+      const sql = `
+        SELECT p.*, 
+        COALESCE(AVG(r.rating), 0) as avgRating, 
+        COUNT(r.reviewId) as reviewCount 
+        FROM products p 
+        LEFT JOIN reviews r ON p.prodId = r.productId 
+        GROUP BY p.prodId
+      `;
+      const [rows] = await db.execute(sql);
       return rows;
     } catch (err) {
       throw err;
@@ -32,10 +40,16 @@ module.exports = class Products {
 
   static async fetch(id) {
     try {
-      const [rows] = await db.execute(
-        `SELECT * FROM products WHERE prodId = ?`,
-        [id]
-      );
+      const sql = `
+        SELECT p.*, 
+        COALESCE(AVG(r.rating), 0) as avgRating, 
+        COUNT(r.reviewId) as reviewCount 
+        FROM products p 
+        LEFT JOIN reviews r ON p.prodId = r.productId 
+        WHERE p.prodId = ?
+        GROUP BY p.prodId
+      `;
+      const [rows] = await db.execute(sql, [id]);
       return rows;
     } catch (err) {
       throw err;
@@ -44,10 +58,16 @@ module.exports = class Products {
 
   static async find(string) {
     try {
-      const [rows] = await db.execute(
-        `SELECT * FROM products WHERE products.productName LIKE ? OR products.productDescription LIKE ?`,
-        [`%${string}%`, `%${string}%`]
-      );
+      const sql = `
+        SELECT p.*, 
+        COALESCE(AVG(r.rating), 0) as avgRating, 
+        COUNT(r.reviewId) as reviewCount 
+        FROM products p 
+        LEFT JOIN reviews r ON p.prodId = r.productId 
+        WHERE p.productName LIKE ? OR p.productDescription LIKE ?
+        GROUP BY p.prodId
+      `;
+      const [rows] = await db.execute(sql, [`%${string}%`, `%${string}%`]);
       return rows;
     } catch (err) {
       throw err;
@@ -86,7 +106,6 @@ module.exports = class Products {
         return { result: 'success', message: 'quantity updated' };
       }
     } catch (err) {
-      console.log(err.message);
       return { result: 'fail', message: 'server error' };
     }
   }

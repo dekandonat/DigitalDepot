@@ -12,6 +12,7 @@ import AdminPage from './components/AdminPage';
 import Checkout from './components/Checkout';
 import UserOrders from './components/UserOrders';
 import UsedProductPage from './components/UsedProductPage';
+import ProductPage from './components/ProductPage';
 import { slides } from "./data/MainPageGalleryData.json";
 import "./main.css";
 
@@ -59,7 +60,11 @@ export default function App() {
         <MainPageGallery data={slides} />
       )}
 
-      {!location.pathname.startsWith('/admin') && location.pathname !== '/checkout' && location.pathname !== '/my-orders' && location.pathname !== '/used-products' && (
+      {!location.pathname.startsWith('/admin') && 
+       location.pathname !== '/checkout' && 
+       location.pathname !== '/my-orders' && 
+       location.pathname !== '/used-products' &&
+       !location.pathname.startsWith('/product/') && (
         <MainCategoriesMenu onCategorySelect={handleCategorySelect}/>
       )}
 
@@ -68,6 +73,8 @@ export default function App() {
         <Route path="/category/:categoryId" element={<ProductList />} />
         <Route path="/search" element={<ProductList />} />
         
+        <Route path="/product/:productId" element={<ProductPage />} />
+
         <Route path="/checkout" element={<Checkout />} />
 
         <Route path="/my-orders" element={

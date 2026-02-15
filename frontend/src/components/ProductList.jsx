@@ -6,33 +6,17 @@ import './ProductList.css';
 
 function ProductCard({ product, onOpenReviews }) {
     const [loginMessage, setLoginMessage] = useState("");
-    const [avgRating, setAvgRating] = useState(0);
-    const [reviewCount, setReviewCount] = useState(0);
+    const navigate = useNavigate();
+
+    const avgRating = parseFloat(product.avgRating) || 0;
+    const reviewCount = product.reviewCount || 0;
 
     const formatPrice = (price) => {
         return parseInt(price).toLocaleString('hu-HU').replaceAll(',', ' ');
     };
 
-    useEffect(() => {
-        const fetchReviews = async () => {
-            try {
-                const data = await apiFetch(`/reviews/${product.prodId}`);
-                if (data.result === 'success' && data.data.length > 0) {
-                    const total = data.data.reduce((acc, curr) => acc + curr.rating, 0);
-                    setAvgRating(total / data.data.length);
-                    setReviewCount(data.data.length);
-                } else {
-                    setAvgRating(0);
-                    setReviewCount(0);
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        };
-        fetchReviews();
-    }, [product.prodId]);
-
-    const addToCart = async () => {
+    const addToCart = async (e) => {
+        e.stopPropagation();
         const userToken = localStorage.getItem('token');
 
         if(!userToken){
@@ -45,17 +29,20 @@ function ProductCard({ product, onOpenReviews }) {
 
         try{
             await apiFetch(`/cart/add/${product.prodId}/1`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
-                }
+                method: 'POST'
             });
+            setLoginMessage("Kosárba!");
+            setTimeout(() => setLoginMessage(""), 2000);
         } catch(error){
             console.error("Hiba: ", error);
-            setLoginMessage("Hiba történt!");
+            setLoginMessage("Hiba!");
             setTimeout(() => setLoginMessage(""), 3000);
         }
     };
+
+    const navigateToProduct = () => {
+        navigate(`/product/${product.prodId}`);
+    }
 
     return (
         <div className="productCard">
@@ -65,14 +52,14 @@ function ProductCard({ product, onOpenReviews }) {
                 </div>
             )}
             
-            <div className="imageContainer">
+            <div className="imageContainer" onClick={navigateToProduct}>
                 <img src={product.productImg} alt={product.productName} loading="lazy" />
             </div>
 
             <div className="cardContent">
-                <h3>{product.productName}</h3>
+                <h3 onClick={navigateToProduct}>{product.productName}</h3>
                 
-                <div className="ratingDisplay" onClick={() => onOpenReviews(product)}>
+                <div className="ratingDisplay" onClick={(e) => { e.stopPropagation(); onOpenReviews(product); }}>
                     <div className="starsContainer">
                         <span className="starFilled">{'★'.repeat(Math.round(avgRating))}</span>
                         <span className="starEmpty">{'★'.repeat(5 - Math.round(avgRating))}</span>
