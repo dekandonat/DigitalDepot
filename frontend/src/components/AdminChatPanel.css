@@ -1,0 +1,9 @@
+.adminChatPanelH1 {
+  text-align: center;
+}
+
+.adminChatPanelFlexbox {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}

@@ -22,6 +22,9 @@ export default function ChatPanel({ changeIsOpen }) {
   };
 
   useEffect(() => {
+    socket.auth = {
+      token: localStorage.getItem('token'),
+    };
     socket.connect();
     socket.on('connect', () => {
       setMyId(socket.id);

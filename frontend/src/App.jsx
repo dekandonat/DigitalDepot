@@ -13,6 +13,7 @@ import Checkout from './components/Checkout';
 import UserOrders from './components/UserOrders';
 import UsedProductPage from './components/UsedProductPage';
 import ChatPanel from './components/ChatPanel';
+import AdminChatPanel from './components/AdminChatPanel';
 import { slides } from './data/MainPageGalleryData.json';
 import './main.css';
 
@@ -105,6 +106,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <AdminPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/adminChat"
+          element={
+            <ProtectedRoute>
+              <AdminChatPanel />
             </ProtectedRoute>
           }
         />
