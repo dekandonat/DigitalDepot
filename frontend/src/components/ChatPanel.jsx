@@ -1,5 +1,6 @@
 import { socket } from '../assets/util/socket';
 import { useEffect, useState } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import './ChatPanel.css';
 
 export default function ChatPanel({ changeIsOpen }) {
@@ -22,17 +23,20 @@ export default function ChatPanel({ changeIsOpen }) {
   };
 
   useEffect(() => {
+    const decodedToken = jwtDecode(localStorage.getItem('token'));
+    setMyId(decodedToken.id);
+
     socket.auth = {
       token: localStorage.getItem('token'),
     };
     socket.connect();
-    socket.on('connect', () => {
-      setMyId(socket.id);
-      console.log(socket.id);
-    });
-    socket.on('receiveMessage', (message) => {
+    socket.on('receive_message', (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
     });
+
+    return () => {
+      socket.off('receive_message');
+    };
   }, []);
 
   return (

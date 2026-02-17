@@ -62,6 +62,20 @@ module.exports = {
           sender: id,
           date: Date.now(),
         };
+
+        if (role == 'user') {
+          io.to('room_admin').emit('receive_message', message);
+          socket.emit('receive_message', message);
+          console.log('Üzenet elküldve: ' + message);
+        } else {
+          if (data.recipientId) {
+            io.to(`room_${data.recipientId}`).emit('receive_message', message);
+            socket.emit('receive_message', message);
+            console.log('Üzenet elküldve: ' + message);
+          } else {
+            console.log('Nem volt megadva a fogadó');
+          }
+        }
       });
     });
 
