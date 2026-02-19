@@ -7,3 +7,34 @@
   flex-direction: row;
   height: 100%;
 }
+
+.adminChatUser{
+  border: 1px solid black;
+}
+
+.adminChatList{
+  width: 20%;
+}
+
+.adminChatText{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.adminChatInput{
+  border: 1px solid black;
+  position: fixed;
+  right: 1px;
+  bottom: 1px;
+  width: 75%;
+  height: 75px;
+}
+
+.adminChatInput input{
+  width: 70%;
+}
+
+.adminChatInput button{
+  width: 29%;
+}

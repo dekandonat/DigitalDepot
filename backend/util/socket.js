@@ -57,18 +57,24 @@ module.exports = {
         const isObject = typeof data === 'object';
         const messageText = isObject ? data.text : data;
 
-        const message = {
-          text: messageText,
-          sender: id,
-          date: Date.now(),
-        };
-
+        
         if (role == 'user') {
+          const message = {
+            text: messageText,
+            sender: id,
+            date: Date.now(),
+          };
           io.to('room_admin').emit('receive_message', message);
           socket.emit('receive_message', message);
           console.log('Üzenet elküldve: ' + message);
         } else {
           if (data.recipientId) {
+            const message = {
+              text: messageText,
+              sender: id,
+              date: Date.now(),
+              recipientId: data.recipientId
+            };
             io.to(`room_${data.recipientId}`).emit('receive_message', message);
             socket.emit('receive_message', message);
             console.log('Üzenet elküldve: ' + message);
