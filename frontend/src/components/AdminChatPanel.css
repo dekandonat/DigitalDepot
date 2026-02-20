@@ -8,33 +8,84 @@
   height: 100%;
 }
 
-.adminChatUser{
-  border: 1px solid black;
+.adminChatUser {
+  margin-left: 5px;
+  border-radius: 15px;
+  padding-left: 10px;
+  padding-right: 10px;
+  overflow-x: hidden;
+  background-color: rgb(217, 234, 250);
+  box-shadow: 4px 4px rgba(128, 128, 128, 0.61);
 }
 
-.adminChatList{
+.adminChatUser h3 {
+  text-align: center;
+  width: 95%;
+  overflow-x: hidden;
+}
+
+.adminChatList {
   width: 20%;
 }
 
-.adminChatText{
+.adminChatText {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  align-content: center;
 }
 
-.adminChatInput{
-  border: 1px solid black;
+.adminChatInput {
   position: fixed;
-  right: 1px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  right: 20px;
   bottom: 1px;
-  width: 75%;
+  width: 80%;
   height: 75px;
 }
 
-.adminChatInput input{
+.adminChatInput input {
   width: 70%;
+  height: 75%;
 }
 
-.adminChatInput button{
+.adminChatInput button {
   width: 29%;
+  height: 80%;
+}
+
+.adminChatMessageField {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  height: 63vh;
+  max-height: 63vh;
+  padding: 15px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.sentMessageAdmin {
+  text-align: right;
+  align-self: flex-end;
+  background-color: aquamarine;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.receivedMessageAdmin {
+  text-align: left;
+  background-color: grey;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: wrap;
 }

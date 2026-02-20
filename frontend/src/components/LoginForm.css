@@ -111,7 +111,9 @@ h2 {
   cursor: pointer;
   margin-top: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
 }
 
 .submitBtn:active {
@@ -227,7 +229,10 @@ h2 {
   margin-top: 10px;
   margin-bottom: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s,
+    background-color 0.2s;
 }
 
 .myOrdersBtn:hover {
@@ -251,7 +256,37 @@ h2 {
   margin-top: 10px;
   margin-bottom: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s,
+    background-color 0.2s;
+}
+
+.adminChatBtn {
+  width: 100%;
+  padding: 14px;
+  background-color: #ff5100;
+  color: rgb(0, 0, 0);
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s,
+    background-color 0.2s;
+}
+
+.adminChatBtn:hover {
+  background-color: #ec6c31;
+}
+
+.adminChatBtn:active {
+  transform: scale(0.95);
 }
 
 .adminPageBtn:hover {
@@ -283,7 +318,10 @@ h2 {
   cursor: pointer;
   margin-bottom: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s,
+    background-color 0.2s;
 }
 
 .usedProductBtn:hover {
@@ -302,7 +340,8 @@ h2 {
   font-size: 1rem;
 }
 
-.saveBankBtn, .editBankBtn {
+.saveBankBtn,
+.editBankBtn {
   padding: 5px 10px;
   border: none;
   border-radius: 4px;

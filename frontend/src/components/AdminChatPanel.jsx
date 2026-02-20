@@ -38,24 +38,38 @@ export default function AdminChatPanel() {
         }
       });
     });
+
+    return () => {
+      socket.off('receive_message');
+    };
   }, []);
+
+  useEffect(() => {
+    if (currentUser) {
+      let currentUsersMessages = userMessages.find(
+        (message) => message.id == currentUser.id
+      );
+      setCurrentUser(currentUsersMessages);
+    }
+  }, [userMessages]);
 
   const handleMessageChange = (event) => {
     setTypedMessage(event.target.value);
   };
 
   const handleUserChange = (id) => {
-      let currentUsersMessages = userMessages.find(message => message.id == id);
-      setCurrentUser(currentUsersMessages);
-  }
+    let currentUsersMessages = userMessages.find((message) => message.id == id);
+    setCurrentUser(currentUsersMessages);
+  };
 
   const handleMessageSend = () => {
     if (typedMessage.trim() === '') return;
     socket.emit('send_message', {
       text: typedMessage,
-      recipientId: currentUser.id
+      recipientId: currentUser.id,
     });
-  }
+    setTypedMessage('');
+  };
 
   return (
     <>
@@ -64,36 +78,50 @@ export default function AdminChatPanel() {
         <div className="adminChatList">
           {userMessages.length > 0 ? (
             userMessages.map((user) => {
-              return(
-                <div key={user.id} className="adminChatUser" onClick={() => {handleUserChange(user.id)}}>
+              return (
+                <div
+                  key={user.id}
+                  className="adminChatUser"
+                  onClick={() => {
+                    handleUserChange(user.id);
+                  }}
+                >
                   <h3>#{user.id} Felhasználó</h3>
-                  <p>{user.messages[user.messages.length-1].text}</p>
+                  <p>{user.messages[user.messages.length - 1].text}</p>
                 </div>
-              )
+              );
             })
           ) : (
             <h4>Itt fognak megjelenni az üzenetek</h4>
           )}
         </div>
-        <div className="adminChatText">
-          <div className="adminChatMessageField">
-            {
-              currentUser?.messages?.map((message) => {
+        {currentUser ? (
+          <div className="adminChatText">
+            <div className="adminChatMessageField">
+              {currentUser?.messages?.map((message) => {
                 return (
-                  <h3>{message.text}</h3>
-                )
-              })
-            }
+                  <h3
+                    className={
+                      message.recipientId
+                        ? 'sentMessageAdmin'
+                        : 'receivedMessageAdmin'
+                    }
+                  >
+                    {message.text}
+                  </h3>
+                );
+              })}
+            </div>
+            <div className="adminChatInput">
+              <input
+                type="text"
+                value={typedMessage}
+                onChange={handleMessageChange}
+              ></input>
+              <button onClick={handleMessageSend}>Küldés</button>
+            </div>
           </div>
-          <div className="adminChatInput">
-            <input
-              type="text"
-              value={typedMessage}
-              onChange={handleMessageChange}
-            ></input>
-            <button onClick={handleMessageSend}>Küldés</button>
-          </div>
-        </div>
+        ) : null}
       </div>
     </>
   );

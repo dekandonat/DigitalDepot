@@ -23,14 +23,14 @@ module.exports = {
         const decodedToken = await verifyAsync(token, process.env.SECRET);
         socket.user = decodedToken;
 
-        socket.join(`room_${socket.user.id}`);
-        console.log(
-          `User ${socket.user.id} belépett a saját szobájába: room_${socket.user.id}`
-        );
-
         if (socket.user.role === 'admin') {
           socket.join('room_admin');
           console.log(`Admin ${socket.user.id} belépett az adminszobába`);
+        } else {
+          socket.join(`room_${socket.user.id}`);
+          console.log(
+            `User ${socket.user.id} belépett a saját szobájába: room_${socket.user.id}`
+          );
         }
 
         next();
@@ -57,7 +57,6 @@ module.exports = {
         const isObject = typeof data === 'object';
         const messageText = isObject ? data.text : data;
 
-        
         if (role == 'user') {
           const message = {
             text: messageText,
@@ -73,7 +72,7 @@ module.exports = {
               text: messageText,
               sender: id,
               date: Date.now(),
-              recipientId: data.recipientId
+              recipientId: data.recipientId,
             };
             io.to(`room_${data.recipientId}`).emit('receive_message', message);
             socket.emit('receive_message', message);

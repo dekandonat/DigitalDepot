@@ -118,15 +118,26 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
         </div>
 
         {role === 'admin' ? (
-          <button
-            onClick={() => {
-              onClose();
-              navigate('/admin');
-            }}
-            className="adminPageBtn"
-          >
-            Adminisztrátor
-          </button>
+          <>
+            <button
+              onClick={() => {
+                onClose();
+                navigate('/admin');
+              }}
+              className="adminPageBtn"
+            >
+              Adminisztrátor
+            </button>
+            <button
+              onClick={() => {
+                onClose();
+                navigate('/adminChat');
+              }}
+              className="adminChatBtn"
+            >
+              Chatpanel
+            </button>
+          </>
         ) : null}
 
         <button
