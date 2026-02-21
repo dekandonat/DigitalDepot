@@ -2,6 +2,7 @@ const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const verifyAsync = promisify(jwt.verify);
+const db = require('./database');
 let io;
 
 module.exports = {
@@ -43,7 +44,7 @@ module.exports = {
     io.on('connection', (socket) => {
       console.log('Új kliens csatlakozott:', socket.id);
 
-      socket.on('send_message', (data) => {
+      socket.on('send_message', async (data) => {
         /*
         console.log('Új üzenet: ' + message);
         io.emit('receiveMessage', {
@@ -66,6 +67,14 @@ module.exports = {
           io.to('room_admin').emit('receive_message', message);
           socket.emit('receive_message', message);
           console.log('Üzenet elküldve: ' + message);
+          try {
+            await db.execute(
+              'INSERT INTO messages(sender, message, sentAt, recipientId) VALUES (?, ?, NOW(), NULL);',
+              [message.sender, message.text]
+            );
+          } catch (err) {
+            console.log('Nem sikerült menteni egy üzenetet');
+          }
         } else {
           if (data.recipientId) {
             const message = {
@@ -77,6 +86,14 @@ module.exports = {
             io.to(`room_${data.recipientId}`).emit('receive_message', message);
             socket.emit('receive_message', message);
             console.log('Üzenet elküldve: ' + message);
+            try {
+              await db.execute(
+                'INSERT INTO messages(sender, message, sentAt, recipientId) VALUES (?, ?, NOW(), ?);',
+                [message.sender, message.text, message.recipientId]
+              );
+            } catch (err) {
+              console.log('Nem sikerült menteni egy üzenetet');
+            }
           } else {
             console.log('Nem volt megadva a fogadó');
           }

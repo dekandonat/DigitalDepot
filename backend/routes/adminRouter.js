@@ -91,4 +91,16 @@ router.patch('/products/:prodId', async (req, res) => {
   }
 });
 
+router.get('/messages', async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      'SELECT * FROM messages ORDER BY messages.id'
+    );
+    res.status(200).json({ result: 'success', data: rows });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ result: 'fail', message: err.message });
+  }
+});
+
 module.exports = router;

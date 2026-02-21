@@ -1,6 +1,7 @@
 import './AdminChatPanel.css';
 import { useState, useEffect } from 'react';
 import { socket } from '../assets/util/socket';
+import { apiFetch } from '../assets/util/fetch';
 
 export default function AdminChatPanel() {
   const [userMessages, setUserMessages] = useState([]);
@@ -8,6 +9,17 @@ export default function AdminChatPanel() {
   const [typedMessage, setTypedMessage] = useState('');
 
   useEffect(() => {
+    apiFetch('/adminRoute/messages', {
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
+    })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.error('Hiba az üzenetek lekérése során: ' + err.message);
+      });
+
     socket.auth = {
       token: localStorage.getItem('token'),
     };
@@ -73,7 +85,6 @@ export default function AdminChatPanel() {
 
   return (
     <>
-      <h1 className="adminChatPanelH1">Chat panel</h1>
       <div className="adminChatPanelFlexbox">
         <div className="adminChatList">
           {userMessages.length > 0 ? (
@@ -81,7 +92,7 @@ export default function AdminChatPanel() {
               return (
                 <div
                   key={user.id}
-                  className="adminChatUser"
+                  className={`adminChatUser ${currentUser.id == user.id ? 'active' : null}`}
                   onClick={() => {
                     handleUserChange(user.id);
                   }}
