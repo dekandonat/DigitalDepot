@@ -14,6 +14,8 @@ import UserOrders from './components/UserOrders';
 import UsedProductPage from './components/UsedProductPage';
 import ChatPanel from './components/ChatPanel';
 import AdminChatPanel from './components/AdminChatPanel';
+import MobileBottomNav from './components/MobileBottomNav';
+import MobileCategoryMenu from './components/MobileCategoryMenu';
 import { slides } from './data/MainPageGalleryData.json';
 import './main.css';
 
@@ -21,6 +23,7 @@ export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
@@ -42,6 +45,7 @@ export default function App() {
     } else {
       navigate('/');
     }
+    setIsMobileMenuOpen(false);
   };
 
   const handleProfileUpdate = () => {
@@ -53,6 +57,16 @@ export default function App() {
     if (token) {
       setIsChatOpen((prev) => !prev);
     }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsCartOpen(false);
+    setIsMobileMenuOpen((prev) => !prev);
+  };
+
+  const toggleCart = () => {
+    setIsMobileMenuOpen(false);
+    setIsCartOpen((prev) => !prev);
   };
 
   return (
@@ -119,6 +133,18 @@ export default function App() {
           }
         />
       </Routes>
+
+      <MobileBottomNav 
+        onOpenCategories={toggleMobileMenu} 
+        onOpenCart={toggleCart} 
+      />
+
+      {isMobileMenuOpen && (
+        <MobileCategoryMenu 
+            onClose={() => setIsMobileMenuOpen(false)} 
+            onCategorySelect={handleCategorySelect}
+        />
+      )}
 
       {isLoginOpen && <LoginForm onClose={() => setIsLoginOpen(false)} />}
       {isCartOpen && <Cart onClose={() => setIsCartOpen(false)} />}

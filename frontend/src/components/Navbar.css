@@ -60,8 +60,9 @@
     align-items: center;
     border-radius: 20px;
     background-color: #f1f3f5;
-    transition: width 0.3s;
+    transition: all 0.3s ease;
     border: 1px solid transparent;
+    position: relative;
 }
 
 .searchBar:focus-within {
@@ -72,6 +73,26 @@
 
 #navSearchText {
     display: none;
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 8px;
+    width: 100%;
+    font-size: 16px;
+}
+
+.searchBar.active #navSearchText {
+    display: block;
+    width: 150px;
+    padding-left: 15px;
+}
+
+.searchBar.active {
+    background-color: white;
+    border-color: #ddd;
+    position: absolute;
+    right: 50px; 
+    z-index: 10;
 }
 
 #navSearchButton {
@@ -93,6 +114,12 @@
     opacity: 0.6;
 }
 
+@media(max-width: 768px) {
+  #navbarCartBtn {
+    display: none;
+  }
+}
+
 @media(min-width: 768px) {
     #navbar {
         height: 70px;
@@ -112,6 +139,11 @@
         background-color: white;
         border: 1px solid #ced4da;
         overflow: hidden;
+    }
+
+    .searchBar.active {
+        position: static;
+        width: 300px;
     }
 
     #navSearchText {

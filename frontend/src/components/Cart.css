@@ -3,7 +3,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    bottom: 50px;
     background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: flex-end;
@@ -13,7 +13,7 @@
 
 #cartContent{
     background-color: white;
-    width: 100%;
+    width: 85%;
     max-width: 450px;
     height: 100%;
     padding: 20px;
@@ -30,6 +30,13 @@
     to {transform: translateX(0);}
 }
 
+#cartHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
 #cartHeader h2{
     margin: 0;
     color: #333;
@@ -42,6 +49,9 @@
     cursor: pointer;
     color: #666;
     padding: 0 10px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
 
 #cartCloseBtn:hover{
@@ -121,4 +131,10 @@
 
 #checkoutBtn:active{
     transform: scale(0.98);
+}
+
+@media(min-width: 768px) {
+    #cartBackground {
+        bottom: 0;
+    }
 }
