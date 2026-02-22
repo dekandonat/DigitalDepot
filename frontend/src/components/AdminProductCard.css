@@ -1,191 +1,197 @@
 .adminProductCardDiv {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
+  flex-direction: column;
+  gap: 15px;
   padding: 20px;
-  margin: 15px auto;
-  width: 90%;
-  max-width: 1000px;
-  
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
+  background-color: white;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .adminProductCardDiv:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.adminProductCardDiv img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
+.productCardImg {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
   border-radius: 8px;
-  border: 1px solid #f0f0f0;
+  background-color: #f8fafc;
 }
 
-.NamePriceBox {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  min-width: 200px;
-}
-
-.NamePriceBox h2 {
-  margin: 0 0 5px 0;
-  font-size: 1.2rem;
-  color: #333;
-}
-
-.price {
-  color: #2c3e50;
-  font-weight: bold;
-  font-size: 1.1rem;
-  margin: 0;
-}
-
-.adminProductCardDiv p {
-  flex: 1;
-  color: #666;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin: 0;
-  padding: 0 15px;
-}
-
-.editInput {
-  font-family: inherit;
-  font-size: 1rem;
-  padding: 8px 12px;
-  margin-bottom: 8px;
-  width: 100%;
-  box-sizing: border-box;
-  
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #f9f9f9;
-  transition: border-color 0.2s;
-}
-
-.editInput:focus, .editTextarea:focus {
-  outline: none;
-  border-color: #007bff;
-  background-color: #fff;
-}
-
-.priceInputContainer {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.priceInput {
-  width: 100px;
-  font-weight: bold;
-}
-
-.editTextarea {
-  flex: 1;
-  font-family: inherit;
-  font-size: 0.95rem;
-  padding: 10px;
-  min-height: 80px;
-  width: 100%;
-  box-sizing: border-box;
-  resize: vertical;
-  
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #f9f9f9;
-  margin: 0 15px;
-}
-
-.cardButtons {
+.productCardContent {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-width: 100px;
-  justify-content: center;
+  flex: 1;
+  min-width: 0;
 }
 
-.saveBtn, .cancelBtn, .editBtn {
-  font-family: inherit;
-  font-weight: 500;
+.productCardHeader h2 {
+  margin: 0 0 5px 0;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.productCardPrice {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin: 0;
+}
+
+.productCardCondition {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #f59e0b;
+  background-color: #fef3c7;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 5px;
+  width: fit-content;
+}
+
+.productCardDesc {
+  color: #64748b;
   font-size: 0.9rem;
-  padding: 8px 16px;
+  line-height: 1.5;
+  margin: 5px 0 0 0;
+}
+
+.editInput {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.editInput:focus {
+  border-color: #3b82f6;
+}
+
+.priceInputGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.priceInputGroup .editInput {
+  width: 120px;
+}
+
+.editTextarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.editTextarea:focus {
+  border-color: #3b82f6;
+}
+
+.productCardActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.editBtn, .saveBtn, .cancelBtn {
+  width: 100%;
+  padding: 10px 15px;
   border: none;
   border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-  text-align: center;
+  transition: all 0.2s;
 }
 
-.saveBtn:active, .cancelBtn:active, .editBtn:active {
-  transform: scale(0.98);
+.editBtn {
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+
+.editBtn:hover {
+  background-color: #dbeafe;
 }
 
 .saveBtn {
   background-color: #10b981;
   color: white;
 }
+
 .saveBtn:hover {
   background-color: #059669;
 }
 
 .cancelBtn {
-  background-color: #ef4444;
-  color: white;
+  background-color: #f1f5f9;
+  color: #475569;
 }
+
 .cancelBtn:hover {
-  background-color: #dc2626;
+  background-color: #e2e8f0;
 }
 
-.editBtn {
-  background-color: #3b82f6;
+.toastMessage {
+  position: fixed;
+  top: 80px;
+  right: 25px;
+  background-color: rgba(16, 185, 129, 0.9);
   color: white;
-}
-.editBtn:hover {
-  background-color: #2563eb;
+  padding: 12px 24px;
+  border-radius: 30px;
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+  z-index: 3000;
+  font-weight: 600;
+  font-size: 0.95rem;
+  animation: slideInRight 0.3s ease-out forwards, fadeOut 0.3s ease-in 2.7s forwards;
 }
 
-@media (max-width: 768px) {
+@keyframes slideInRight {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; visibility: hidden; }
+}
+
+@media (min-width: 768px) {
   .adminProductCardDiv {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
-  }
-
-  .adminProductCardDiv img {
-    width: 100%;
-    height: 200px;
-    margin-bottom: 10px;
-  }
-  
-  .NamePriceBox {
-    width: 100%;
-    align-items: center;
-    text-align: center;
-  }
-
-  .adminProductCardDiv p, .editTextarea {
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    text-align: justify;
-  }
-
-  .cardButtons {
     flex-direction: row;
-    width: 100%;
+    align-items: flex-start;
+    padding: 20px;
   }
-  
-  .saveBtn, .cancelBtn, .editBtn {
-    flex: 1;
+
+  .productCardImg {
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+  }
+
+  .productCardActions {
+    width: 130px;
+    flex-shrink: 0;
+    margin-left: 10px;
   }
 }

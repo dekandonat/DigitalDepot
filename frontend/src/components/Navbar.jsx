@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import "./Navbar.css";
 import { useNavigate } from 'react-router-dom';
 
-export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSearch }){ 
+export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSearch, isAdminRoute }){ 
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
 
@@ -25,12 +25,14 @@ export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSe
         ></img> 
     
         <div id="navbarActions">
-            <NavSearchBar onSearch={onSearch} />
+            {!isAdminRoute && <NavSearchBar onSearch={onSearch} />}
 
-            <button 
-                id = "navbarCartBtn"
-                onClick={onCartClick}
-            ></button>
+            {!isAdminRoute && (
+                <button 
+                    id = "navbarCartBtn"
+                    onClick={onCartClick}
+                ></button>
+            )}
 
             {user ? (
                 <button

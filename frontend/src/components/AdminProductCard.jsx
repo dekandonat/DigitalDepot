@@ -8,6 +8,14 @@ export default function AdminProductCard(props) {
   const [price, setPrice] = useState(props.price);
   const [description, setDescription] = useState(props.description);
   const [condition, setCondition] = useState(props.condition || '');
+  const [toast, setToast] = useState('');
+
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => {
+      setToast('');
+    }, 3000);
+  };
 
   const handleSave = async () => {
     const token = localStorage.getItem('token');
@@ -29,6 +37,7 @@ export default function AdminProductCard(props) {
 
       if (response.result == 'success') {
         setIsEditing(false);
+        showToast('Sikeresen frissítve!');
       } else {
         alert('Hiba történt: ' + (response.message || 'Ismeretlen hiba'));
       }
@@ -48,9 +57,11 @@ export default function AdminProductCard(props) {
 
   return (
     <div className="adminProductCardDiv">
-      <img src={props.img} alt={name}></img>
+      {toast && <div className="toastMessage">{toast}</div>}
+      
+      <img src={props.img} alt={name} className="productCardImg" />
 
-      <div className="NamePriceBox">
+      <div className="productCardContent">
         {isEditing ? (
           <>
             <input
@@ -60,14 +71,14 @@ export default function AdminProductCard(props) {
               className="editInput"
               placeholder="Termék neve"
             />
-            <div className="priceInputContainer">
+            <div className="priceInputGroup">
               <input
                 type="number"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="editInput priceInput"
+                className="editInput"
               />
-              <span className="price"> Ft</span>
+              <span>Ft</span>
             </div>
             <select
               value={condition}
@@ -79,38 +90,29 @@ export default function AdminProductCard(props) {
               <option value="felbontott">Felbontott</option>
               <option value="használt">Használt</option>
             </select>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="editTextarea"
+              rows="3"
+              placeholder="Termék leírása"
+            />
           </>
         ) : (
           <>
-            <h2>{name}</h2>
-            <h2 className="price">{price} Ft</h2>
-            {condition && (
-              <span
-                style={{
-                  fontSize: '0.9rem',
-                  color: 'orange',
-                  fontWeight: 'bold',
-                }}
-              >
-                {condition}
-              </span>
-            )}
+            <div className="productCardHeader">
+              <h2>{name}</h2>
+              <p className="productCardPrice">{price} Ft</p>
+              {condition && (
+                <span className="productCardCondition">{condition}</span>
+              )}
+            </div>
+            <p className="productCardDesc">{description}</p>
           </>
         )}
       </div>
 
-      {isEditing ? (
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="editTextarea"
-          rows="4"
-        />
-      ) : (
-        <p>{description}</p>
-      )}
-
-      <div className="cardButtons">
+      <div className="productCardActions">
         {isEditing ? (
           <>
             <button onClick={handleSave} className="saveBtn">

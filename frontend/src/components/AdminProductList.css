@@ -1,13 +1,31 @@
-.productListDiv {
+.adminProductListWrapper {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  width: 50%;
-  align-content: center;
+  gap: 20px;
+  width: 100%;
 }
 
-.flexBox {
+.adminProductListHeader {
+  margin-bottom: 10px;
+}
+
+.adminProductListHeader h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.productListGrid {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .productListGrid {
+    gap: 20px;
+  }
 }

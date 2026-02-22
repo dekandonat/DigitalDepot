@@ -20,9 +20,12 @@ export default function AdminProductList() {
   }, []);
 
   return (
-    <div className="flexBox">
-      <h1>Termékek Listája</h1>
-      <div className="productListDiv">
+    <div className="adminProductListWrapper">
+      <div className="adminProductListHeader">
+        <h2>Termékek Listája</h2>
+      </div>
+      
+      <div className="productListGrid">
         {products.map((product) => {
           return (
             <AdminProductCard

@@ -4,377 +4,245 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2000;
-  backdrop-filter: blur(3px);
-  padding: 15px;
-  box-sizing: border-box;
+  z-index: 3000;
+  backdrop-filter: blur(5px);
 }
 
 .formContent {
   background-color: white;
-  width: 100%;
-  max-width: 400px;
-  padding: 25px 20px;
-  border-radius: 16px;
+  padding: 30px 30px 20px 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   position: relative;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  animation: fadeIn 0.3s ease-out;
+  width: 90%;
+  max-width: 400px;
+  animation: scaleIn 0.3s ease-out;
   box-sizing: border-box;
-  max-height: 90vh;
-  overflow-y: auto;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes scaleIn {
+  from {transform: scale(0.9); opacity: 0;}
+  to {transform: scale(1); opacity: 1;}
 }
 
 .formCloseBtn {
   position: absolute;
-  top: 12px;
+  top: 10px;
   right: 15px;
-  background: #f0f0f0;
+  background: none;
   border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
   font-size: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: gray;
-  transition: background-color 0.2s;
-  cursor: pointer;
+  cursor: pointer !important;
+  color: #888;
 }
 
-.formCloseBtn:hover {
-  background-color: #e0e0e0;
-  color: black;
-}
-
-h2 {
+.formContent h2 {
   text-align: center;
-  margin-top: 5px;
   margin-bottom: 25px;
-  font-size: 1.5rem;
   color: #333;
+  user-select: none;
 }
 
-.formItems {
-  margin-bottom: 16px;
+.inputGroup, .formItems {
+  margin-bottom: 15px;
 }
 
-.formItems label {
+.inputGroup label, .formItems label {
   display: block;
-  margin-bottom: 8px;
-  font-size: 0.9rem;
+  margin-bottom: 5px;
+  font-weight: bold;
   color: #555;
-  font-weight: 600;
+  user-select: none;
 }
 
-.formItems input {
+.inputGroup input, .formItems input {
   width: 100%;
-  padding: 12px 15px;
-  border: 2px solid #eee;
-  border-radius: 8px;
-  font-size: 16px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
   box-sizing: border-box;
-  transition: border-color 0.2s;
-  background-color: #fafafa;
-}
-
-.formItems input:focus {
-  outline: none;
-  border-color: lightblue;
-  background-color: white;
 }
 
 .submitBtn {
   width: 100%;
-  padding: 14px;
-  background-color: lightblue;
-  color: black;
-  font-weight: 700;
+  padding: 12px;
+  background-color: #3b82f6;
+  color: white;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
-  cursor: pointer;
-  margin-top: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition:
-    transform 0.1s,
-    box-shadow 0.1s;
-}
-
-.submitBtn:active {
-  transform: scale(0.95);
-}
-
-.switchModeText {
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom: 0;
-  font-size: 0.95rem;
-  color: gray;
-  padding: 10px;
-  font-weight: 500;
-}
-
-.switchModeText:hover {
-  cursor: pointer;
-  color: #0066cc;
-}
-
-.message {
-  text-align: center;
   font-weight: bold;
-  margin: 10px 0;
-  padding: 8px;
-  border-radius: 6px;
+  cursor: pointer !important;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.submitBtn:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+}
+
+.switchText, .switchModeText {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  user-select: none;
+  cursor: pointer !important;
+}
+
+.switchText *, .switchModeText * {
+  cursor: pointer !important;
+}
+
+.switchText span, .switchModeText span {
+  color: #3b82f6;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.switchText span:hover, .switchModeText span:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.forgotPassword {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  user-select: none;
+  display: block;
+  width: 100%;
+  color: #3b82f6;
+  font-weight: bold;
+  cursor: pointer !important;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgotPassword:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.errorMsg, .message#error {
+  color: #ef4444;
+  text-align: center;
+  margin-bottom: 10px;
   font-size: 0.9rem;
 }
 
-#error {
-  color: red;
-  background-color: beige;
-  border: 1px solid lightgoldenrodyellow;
-}
-
-#success {
-  color: green;
-  background-color: beige;
-  border: 1px solid lightgoldenrodyellow;
-}
-
 .profilePicContainer {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  margin: 0 auto 15px auto;
   display: flex;
-  align-items: center;
   justify-content: center;
-  border: 2px solid lightblue;
-  overflow: hidden;
+  margin-bottom: 20px;
 }
 
 #profileImg {
-  width: 100%;
-  height: 100%;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
   object-fit: cover;
+  border: 3px solid #3b82f6;
+  user-select: none;
 }
 
 .profileDataSection {
-  margin-top: 50px;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
 }
 
 .profileDataRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 1.1rem;
-  color: black;
-  margin: 10px 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #eee;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
 }
 
 .profileLabel {
-  font-weight: bold;
-  color: black;
-  margin-right: 8px;
+  font-weight: 600;
+  color: #555;
+  user-select: none;
 }
 
 .profileData {
-  color: black;
+  color: #333;
+  font-weight: 500;
 }
 
-#logoutBtn {
-  background-color: #ffcccc;
-  color: red;
-  border: 1px solid #ffcdd2;
-  margin-top: 15px;
-}
-
-#logoutBtn:hover {
-  background-color: #ffb3b3;
-  box-shadow: 0 4px 6px rgba(211, 47, 47, 0.2);
-}
-
-#logoutBtn:active {
-  transform: scale(0.98);
-}
-
-.myOrdersBtn {
-  width: 100%;
-  padding: 14px;
-  background-color: #007bff;
-  color: white;
-  font-weight: 700;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition:
-    transform 0.1s,
-    box-shadow 0.1s,
-    background-color 0.2s;
-}
-
-.myOrdersBtn:hover {
-  background-color: #0056b3;
-}
-
-.myOrdersBtn:active {
-  transform: scale(0.95);
-}
-
-.adminPageBtn {
-  width: 100%;
-  padding: 14px;
-  background-color: #ff5100;
-  color: rgb(0, 0, 0);
-  font-weight: 700;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition:
-    transform 0.1s,
-    box-shadow 0.1s,
-    background-color 0.2s;
-}
-
-.adminChatBtn {
-  width: 100%;
-  padding: 14px;
-  background-color: #ff5100;
-  color: rgb(0, 0, 0);
-  font-weight: 700;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition:
-    transform 0.1s,
-    box-shadow 0.1s,
-    background-color 0.2s;
-}
-
-.adminChatBtn:hover {
-  background-color: #ec6c31;
-}
-
-.adminChatBtn:active {
-  transform: scale(0.95);
-}
-
-.adminPageBtn:hover {
-  background-color: #ec6c31;
-}
-
-.adminPageBtn:active {
-  transform: scale(0.95);
-}
-
-.forgotPassword {
-  text-align: center;
-}
-
-.forgotPassword:hover {
-  cursor: pointer;
-  color: #0066cc;
-}
-
-.usedProductBtn {
-  width: 100%;
-  padding: 14px;
-  background-color: #6c757d;
-  color: white;
-  font-weight: 700;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition:
-    transform 0.1s,
-    box-shadow 0.1s,
-    background-color 0.2s;
-}
-
-.usedProductBtn:hover {
-  background-color: #5a6268;
-}
-
-.usedProductBtn:active {
-  transform: scale(0.95);
-}
-
-.bankInput {
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 150px;
-  font-size: 1rem;
-}
-
-.saveBankBtn,
 .editBankBtn {
-  padding: 5px 10px;
+  background: transparent;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-left: 5px;
+  font-size: 1.1rem;
+  cursor: pointer !important;
+  padding: 5px;
+  margin-left: 8px;
 }
 
 .saveBankBtn {
-  background-color: #28a745;
+  padding: 6px 12px;
+  background-color: #10b981;
   color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer !important;
 }
 
-.editBankBtn {
-  background: none;
-  font-size: 1.2rem;
-}
-
-.bankEditContainer {
+.adminPageBtn,
+.adminChatBtn,
+.usedProductBtn,
+.myOrdersBtn,
+#logoutBtn {
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
   display: flex;
+  justify-content: center;
   align-items: center;
+  box-sizing: border-box;
+  user-select: none;
 }
 
-.bankDisplayContainer {
-  display: flex;
-  align-items: center;
+.adminPageBtn,
+.adminChatBtn,
+.usedProductBtn,
+.myOrdersBtn {
+  background-color: #3b82f6;
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);
 }
 
-@media (min-width: 768px) {
-  .formContent {
-    padding: 40px;
-  }
+.adminPageBtn:hover,
+.adminChatBtn:hover,
+.usedProductBtn:hover,
+.myOrdersBtn:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+}
 
-  h2 {
-    font-size: 1.8rem;
-  }
+#logoutBtn {
+  margin-top: 20px;
+  margin-bottom: 0;
+  background-color: #f8fafc;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+}
+
+#logoutBtn:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
 }

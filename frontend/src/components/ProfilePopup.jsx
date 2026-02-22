@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { apiFetch } from '../assets/util/fetch';
 import './LoginForm.css';
 import profileIcon from '../assets/NavImages/profile-pic.png';
@@ -15,6 +15,8 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
   const [bankAccountInput, setBankAccountInput] = useState('');
   const [isEditingBank, setIsEditingBank] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  
   let role;
   try {
     role = jwtDecode(localStorage.getItem('token'));
@@ -22,6 +24,8 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
   } catch (err) {
     console.log('Hiba: ' + err.message);
   }
+
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -122,11 +126,11 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
             <button
               onClick={() => {
                 onClose();
-                navigate('/admin');
+                navigate(isAdminPage ? '/' : '/admin');
               }}
               className="adminPageBtn"
             >
-              Adminisztrátor
+              {isAdminPage ? 'Főoldal' : 'Adminisztrátor'}
             </button>
             <button
               onClick={() => {

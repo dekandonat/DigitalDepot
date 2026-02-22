@@ -24,11 +24,17 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const [isMobileMenuClosing, setIsMobileMenuClosing] = useState(false);
+  const [isCartClosing, setIsCartClosing] = useState(false);
+
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   const openProfile = () => {
     setIsLoginOpen(false);
@@ -39,13 +45,29 @@ export default function App() {
     navigate(`/search?q=${searchText}`);
   };
 
+  const handleCloseMobileMenu = () => {
+    setIsMobileMenuClosing(true);
+    setTimeout(() => {
+        setIsMobileMenuOpen(false);
+        setIsMobileMenuClosing(false);
+    }, 300);
+  };
+
+  const handleCloseCart = () => {
+    setIsCartClosing(true);
+    setTimeout(() => {
+        setIsCartOpen(false);
+        setIsCartClosing(false);
+    }, 300);
+  };
+
   const handleCategorySelect = (categoryId) => {
     if (categoryId) {
       navigate(`/category/${categoryId}`);
     } else {
       navigate('/');
     }
-    setIsMobileMenuOpen(false);
+    handleCloseMobileMenu();
   };
 
   const handleProfileUpdate = () => {
@@ -59,14 +81,28 @@ export default function App() {
     }
   };
 
-  const toggleMobileMenu = () => {
-    setIsCartOpen(false);
-    setIsMobileMenuOpen((prev) => !prev);
+  const toggleMobileMenuFromNav = () => {
+    if (isCartOpen) {
+        handleCloseCart();
+    }
+    
+    if (isMobileMenuOpen) {
+        handleCloseMobileMenu();
+    } else {
+        setIsMobileMenuOpen(true);
+    }
   };
 
-  const toggleCart = () => {
-    setIsMobileMenuOpen(false);
-    setIsCartOpen((prev) => !prev);
+  const toggleCartFromNav = () => {
+    if (isMobileMenuOpen) {
+        handleCloseMobileMenu();
+    }
+
+    if (isCartOpen) {
+        handleCloseCart();
+    } else {
+        setIsCartOpen(true);
+    }
   };
 
   return (
@@ -76,11 +112,12 @@ export default function App() {
         onCartClick={() => setIsCartOpen(true)}
         onProfileClick={openProfile}
         onSearch={handleSearch}
+        isAdminRoute={isAdminRoute}
       />
 
       {location.pathname === '/' && <MainPageGallery data={slides} />}
 
-      {!location.pathname.startsWith('/admin') &&
+      {!isAdminRoute &&
         location.pathname !== '/checkout' &&
         location.pathname !== '/my-orders' &&
         location.pathname !== '/used-products' && (
@@ -119,7 +156,7 @@ export default function App() {
           path="/admin"
           element={
             <ProtectedRoute>
-              <AdminPage />
+              <AdminPage toggleChat={handleChatOpen} />
             </ProtectedRoute>
           }
         />
@@ -134,20 +171,30 @@ export default function App() {
         />
       </Routes>
 
-      <MobileBottomNav 
-        onOpenCategories={toggleMobileMenu} 
-        onOpenCart={toggleCart} 
-      />
+      {!isAdminRoute && (
+        <MobileBottomNav 
+          onOpenCategories={toggleMobileMenuFromNav} 
+          onOpenCart={toggleCartFromNav} 
+        />
+      )}
 
       {isMobileMenuOpen && (
         <MobileCategoryMenu 
-            onClose={() => setIsMobileMenuOpen(false)} 
+            onClose={handleCloseMobileMenu}
             onCategorySelect={handleCategorySelect}
+            isClosing={isMobileMenuClosing}
         />
       )}
 
       {isLoginOpen && <LoginForm onClose={() => setIsLoginOpen(false)} />}
-      {isCartOpen && <Cart onClose={() => setIsCartOpen(false)} />}
+      
+      {isCartOpen && (
+        <Cart 
+            onClose={handleCloseCart}
+            isClosing={isCartClosing}
+        />
+      )}
+
       {isProfileOpen && (
         <ProfilePopup
           onClose={() => setIsProfileOpen(false)}
@@ -159,7 +206,10 @@ export default function App() {
         {isChatOpen ? (
           <ChatPanel changeIsOpen={setIsChatOpen} />
         ) : (
-          <div onClick={handleChatOpen} className="chatIcon">
+          <div 
+            onClick={handleChatOpen} 
+            className={`chatIcon ${isAdminRoute ? 'hideChatOnAdminMobile' : ''}`}
+          >
             <svg
               version="1.1"
               id="Layer_1"
