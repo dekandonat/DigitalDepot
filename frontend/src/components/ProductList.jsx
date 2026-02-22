@@ -4,8 +4,7 @@ import ReviewModal from './ReviewModal';
 import { apiFetch } from '../assets/util/fetch';
 import './ProductList.css';
 
-function ProductCard({ product, onOpenReviews }) {
-    const [loginMessage, setLoginMessage] = useState("");
+function ProductCard({ product, onOpenReviews, showToast }) {
     const navigate = useNavigate();
 
     const avgRating = parseFloat(product.avgRating) || 0;
@@ -20,10 +19,7 @@ function ProductCard({ product, onOpenReviews }) {
         const userToken = localStorage.getItem('token');
 
         if(!userToken){
-            setLoginMessage("Jelentkezzen be!");
-            setTimeout(() => {
-                setLoginMessage("");
-            }, 3000);
+            showToast("Jelentkezzen be a vásárláshoz!", "error");
             return;
         }
 
@@ -31,12 +27,10 @@ function ProductCard({ product, onOpenReviews }) {
             await apiFetch(`/cart/add/${product.prodId}/1`, {
                 method: 'POST'
             });
-            setLoginMessage("Kosárba!");
-            setTimeout(() => setLoginMessage(""), 2000);
+            showToast("Sikeresen a kosárba helyezve!", "success");
         } catch(error){
-            console.error("Hiba: ", error);
-            setLoginMessage("Hiba!");
-            setTimeout(() => setLoginMessage(""), 3000);
+            console.error(error);
+            showToast("Hiba történt a művelet során!", "error");
         }
     };
 
@@ -80,12 +74,6 @@ function ProductCard({ product, onOpenReviews }) {
                     </button>
                 </div>
             </div>
-
-            {loginMessage && (
-                <div className="loginErrorMessage">
-                    {loginMessage}
-                </div>
-            )}
         </div>
     );
 }
@@ -95,11 +83,19 @@ export default function ProductList() {
     const [allCategories, setAllCategories] = useState([]);
     const [currentCategoryName, setCurrentCategoryName] = useState("");
     const [selectedProductForReview, setSelectedProductForReview] = useState(null);
+    const [toast, setToast] = useState({ message: '', type: '' });
     const navigate = useNavigate();
 
     const { categoryId } = useParams();
     const [queryParams] = useSearchParams();
     const searchText = queryParams.get('q');
+
+    const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => {
+            setToast({ message: '', type: '' });
+        }, 3000);
+    };
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -156,7 +152,7 @@ export default function ProductList() {
             }
             catch(error) 
             {
-                console.error("Hiba: ", error);
+                console.error(error);
                 setProducts([]);
             }
         }
@@ -170,6 +166,12 @@ export default function ProductList() {
 
     return (
         <div id="productListContainer">
+            {toast.message && (
+                <div className={`toastMessage toast-${toast.type}`}>
+                    {toast.message}
+                </div>
+            )}
+
             {(categoryId || searchText) && (
                 <div id="activeFilterContainer">
                     <span id="activeFilterName">{currentCategoryName}</span>
@@ -188,6 +190,7 @@ export default function ProductList() {
                             key={product.prodId} 
                             product={product} 
                             onOpenReviews={setSelectedProductForReview}
+                            showToast={showToast}
                         />
                     ))}
                 </div>

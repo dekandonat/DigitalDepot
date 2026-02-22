@@ -1,0 +1,175 @@
+.usersTableContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.usersTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.usersTable th,
+.usersTable td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.usersTable th {
+  background-color: rgb(83, 212, 212);
+  color: #333;
+}
+
+.usersTable tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.usersTable tr:hover {
+  background-color: #f1f1f1;
+}
+
+.deleteUserBtn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.deleteUserBtn:hover {
+  background-color: #e60000;
+}
+
+.roleSelect {
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-weight: 600;
+  background-color: white;
+  cursor: pointer;
+}
+
+.roleSelect:focus {
+  outline: none;
+  border-color: rgb(83, 212, 212);
+}
+
+.confirmModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(3px);
+}
+
+.confirmModalContent {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  animation: popIn 0.3s ease-out;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.confirmModalContent h3 {
+  margin-top: 0;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+.confirmModalButtons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.confirmYesBtn {
+  background-color: #f4f5f7;
+  color: #4a4a4a;
+  border: 1px solid #dcdfe6;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.confirmYesBtn:hover {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: #27ae60;
+  border-color: rgba(46, 204, 113, 0.4);
+}
+
+.confirmNoBtn {
+  background-color: #f4f5f7;
+  color: #4a4a4a;
+  border: 1px solid #dcdfe6;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.confirmNoBtn:hover {
+  background-color: rgba(231, 76, 60, 0.15);
+  color: #c0392b;
+  border-color: rgba(231, 76, 60, 0.4);
+}
+
+.toastMessage {
+  position: fixed;
+  top: 90px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  z-index: 3000;
+  font-weight: bold;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: slideInRight 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+}
+
+.toast-success {
+  background-color: rgba(46, 204, 113, 0.15);
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  color: #1e8449;
+}
+
+.toast-error {
+  background-color: rgba(231, 76, 60, 0.15);
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  color: #c0392b;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; visibility: hidden; }
+}

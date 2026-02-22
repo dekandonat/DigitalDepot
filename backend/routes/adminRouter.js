@@ -8,6 +8,10 @@ const Products = require('../models/products');
 
 router.post('/register', async (req, res) => {
   try {
+    if (req.user.role !== 'owner') {
+      return res.status(403).json({ result: 'fail', message: 'only owners can create admins' });
+    }
+
     const user = new User(
       req.body.userName,
       req.body.password,
@@ -22,6 +26,58 @@ router.post('/register', async (req, res) => {
     }
   } catch (err) {
     console.log(err);
+    res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
+
+router.get('/users', async (req, res) => {
+  try {
+    if (req.user.role !== 'owner') {
+      return res.status(403).json({ result: 'fail', message: 'only owners can view users' });
+    }
+    const users = await User.fetchAllUsers();
+    res.status(200).json({ result: 'success', data: users });
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
+
+router.patch('/users/:userId/role', async (req, res) => {
+  try {
+    if (req.user.role !== 'owner') {
+      return res.status(403).json({ result: 'fail', message: 'only owners can change roles' });
+    }
+    const userId = req.params.userId;
+    const { role } = req.body;
+    
+    if (role !== 'user' && role !== 'admin' && role !== 'owner') {
+      return res.status(400).json({ result: 'fail', message: 'invalid role' });
+    }
+
+    const result = await User.updateRole(userId, role);
+    if (result.result === 'success') {
+      res.status(200).json(result);
+    } else {
+      res.status(500).json(result);
+    }
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
+
+router.delete('/users/:userId', async (req, res) => {
+  try {
+    if (req.user.role !== 'owner') {
+      return res.status(403).json({ result: 'fail', message: 'only owners can delete users' });
+    }
+    const userId = req.params.userId;
+    const result = await User.deleteUser(userId);
+    if (result.result === 'success') {
+      res.status(200).json(result);
+    } else {
+      res.status(500).json(result);
+    }
+  } catch (err) {
     res.status(500).json({ result: 'fail', message: 'server error' });
   }
 });

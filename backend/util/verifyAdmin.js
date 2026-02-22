@@ -14,7 +14,7 @@ async function verifyAdmin(req, res, next) {
   try {
     const decodedToken = await verifyAsync(token, process.env.SECRET);
 
-    if (decodedToken.role == 'admin') {
+    if (decodedToken.role == 'admin' || decodedToken.role == 'owner') {
       req.user = decodedToken;
       next();
     } else {
