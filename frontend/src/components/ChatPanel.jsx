@@ -2,6 +2,7 @@ import { socket } from '../assets/util/socket';
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import './ChatPanel.css';
+import { apiFetch } from '../assets/util/fetch';
 
 export default function ChatPanel({ changeIsOpen }) {
   const [messages, setMessages] = useState([]);
@@ -23,6 +24,17 @@ export default function ChatPanel({ changeIsOpen }) {
   };
 
   useEffect(() => {
+    apiFetch('/user/messages', {
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
+    })
+      .then((data) => {
+        setMessages(data.data);
+      })
+      .catch((err) => {
+        console.error('Hiba a kérés során');
+      });
+
     const decodedToken = jwtDecode(localStorage.getItem('token'));
     setMyId(decodedToken.id);
 
@@ -46,7 +58,7 @@ export default function ChatPanel({ changeIsOpen }) {
         <button onClick={handleChatClose}>X</button>
       </div>
       <div className="chatBody">
-        <div>
+        <div className="chatMessages">
           {messages.length > 0 ? (
             messages.map((message) => {
               return (
@@ -55,7 +67,7 @@ export default function ChatPanel({ changeIsOpen }) {
                     message.sender == myId ? 'sentMessage' : 'receivedMessage'
                   }
                 >
-                  {message.text}
+                  {message.message}
                 </p>
               );
             })

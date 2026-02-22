@@ -14,7 +14,8 @@ export default function AdminChatPanel() {
       headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
     })
       .then((data) => {
-        console.log(data);
+        console.log(data.data);
+        setUserMessages(data.data);
       })
       .catch((err) => {
         console.error('Hiba az üzenetek lekérése során: ' + err.message);
@@ -92,7 +93,7 @@ export default function AdminChatPanel() {
               return (
                 <div
                   key={user.id}
-                  className={`adminChatUser ${currentUser.id == user.id ? 'active' : null}`}
+                  className={`adminChatUser ${currentUser?.id == user.id ? 'active' : null}`}
                   onClick={() => {
                     handleUserChange(user.id);
                   }}

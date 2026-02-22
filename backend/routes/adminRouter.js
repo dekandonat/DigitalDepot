@@ -6,6 +6,30 @@ const User = require('../models/user');
 const Order = require('../models/order');
 const Products = require('../models/products');
 
+const groupMessagesByUser = (messages) => {
+  const groupMap = {};
+
+  for (const message of messages) {
+    const userId = message.recipientId ?? message.sender;
+
+    if (!groupMap[userId]) {
+      groupMap[userId] = {
+        id: userId,
+        messages: [],
+      };
+    }
+
+    groupMap[userId].messages.push({
+      text: message.message,
+      sender: message.sender,
+      recipientId: message.recipientId,
+      date: message.sentAt,
+    });
+  }
+
+  return Object.values(groupMap);
+};
+
 router.post('/register', async (req, res) => {
   try {
     const user = new User(
@@ -96,7 +120,8 @@ router.get('/messages', async (req, res) => {
     const [rows] = await db.execute(
       'SELECT * FROM messages ORDER BY messages.id'
     );
-    res.status(200).json({ result: 'success', data: rows });
+    const messageList = groupMessagesByUser(rows);
+    res.status(200).json({ result: 'success', data: messageList });
   } catch (err) {
     console.log(err.message);
     res.status(500).json({ result: 'fail', message: err.message });
