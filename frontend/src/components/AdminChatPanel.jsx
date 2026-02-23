@@ -1,5 +1,5 @@
 import './AdminChatPanel.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { socket } from '../assets/util/socket';
 import { apiFetch } from '../assets/util/fetch';
 
@@ -7,6 +7,11 @@ export default function AdminChatPanel() {
   const [userMessages, setUserMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [typedMessage, setTypedMessage] = useState('');
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [currentUser]);
 
   useEffect(() => {
     apiFetch('/adminRoute/messages', {
@@ -123,6 +128,7 @@ export default function AdminChatPanel() {
                   </h3>
                 );
               })}
+              <div ref={messagesEndRef} />
             </div>
             <div className="adminChatInput">
               <input

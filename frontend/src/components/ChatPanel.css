@@ -40,15 +40,14 @@
   background: rgba(255, 255, 255, 0.35);
 }
 
-/* BODY */
 .chatBody {
+  min-height: 0;
   flex: 1;
   display: flex;
   flex-direction: column;
   background: #f3f4f6;
 }
 
-/* MESSAGE AREA */
 .chatMessages {
   flex: 1;
   overflow-y: auto;
@@ -58,7 +57,6 @@
   gap: 8px;
 }
 
-/* MESSAGE BUBBLES */
 .sentMessage,
 .receivedMessage {
   max-width: 75%;
@@ -82,7 +80,6 @@
   border-bottom-left-radius: 4px;
 }
 
-/* INPUT */
 .chatInputArea {
   display: flex;
   padding: 10px;
@@ -117,7 +114,6 @@
   background: #4338ca;
 }
 
-/* MOBILE */
 @media (max-width: 600px) {
   .mainChatDiv {
     width: 95%;

@@ -26,12 +26,8 @@ module.exports = {
 
         if (socket.user.role === 'admin') {
           socket.join('room_admin');
-          console.log(`Admin ${socket.user.id} belépett az adminszobába`);
         } else {
           socket.join(`room_${socket.user.id}`);
-          console.log(
-            `User ${socket.user.id} belépett a saját szobájába: room_${socket.user.id}`
-          );
         }
 
         next();
@@ -42,8 +38,6 @@ module.exports = {
 
     //ide kerülnek az események
     io.on('connection', (socket) => {
-      console.log('Új kliens csatlakozott:', socket.id);
-
       socket.on('send_message', async (data) => {
         /*
         console.log('Új üzenet: ' + message);
@@ -66,7 +60,6 @@ module.exports = {
           };
           io.to('room_admin').emit('receive_message', message);
           socket.emit('receive_message', message);
-          console.log('Üzenet elküldve: ' + message);
           try {
             await db.execute(
               'INSERT INTO messages(sender, message, sentAt, recipientId) VALUES (?, ?, NOW(), NULL);',
@@ -85,7 +78,6 @@ module.exports = {
             };
             io.to(`room_${data.recipientId}`).emit('receive_message', message);
             socket.emit('receive_message', message);
-            console.log('Üzenet elküldve: ' + message);
             try {
               await db.execute(
                 'INSERT INTO messages(sender, message, sentAt, recipientId) VALUES (?, ?, NOW(), ?);',
