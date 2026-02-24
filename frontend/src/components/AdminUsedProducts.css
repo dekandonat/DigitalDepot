@@ -1,285 +1,374 @@
 .adminUsedContainer {
-    padding: 10px;
-    width: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.adminUsedContainer > h2 {
+  margin: 0 0 25px 0;
+  color: #0f172a;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-align: left;
+  width: fit-content;
 }
 
 .tabHeader {
-    display: flex;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #ddd;
-    width: 100%;
-    max-width: 600px;
-    justify-content: flex-start;
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e2e8f0;
+  width: 100%;
 }
 
 .tabButton {
-    padding: 10px 20px;
-    border: none;
-    background: #f1f1f1;
-    cursor: pointer;
-    font-weight: bold;
-    color: #555;
-    margin-right: 5px;
-    border-radius: 5px 5px 0 0;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  color: #64748b;
+  margin-right: 10px;
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  transition: color 0.2s;
+  font-size: 0.95rem;
+}
+
+.tabButton:hover {
+  color: #0f172a;
+  background-color: #f8fafc;
 }
 
 .tabButton.active {
-    background: #007bff;
-    color: white;
+  color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.tabButton.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #3b82f6;
 }
 
 .adminSubGrid {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
 }
 
 .adminSubCard {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    width: 100%;
-    max-width: 600px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    text-align: left;
-    box-sizing: border-box;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  text-align: left;
+  box-sizing: border-box;
+  width: 100%;
+  transition: box-shadow 0.2s;
+}
+
+.adminSubCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .subHeader {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    gap: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+
+.subDate {
+  font-weight: 500;
+  background-color: #f8fafc;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.adminSubCard h4 {
+  margin: 0 0 10px 0;
+  font-size: 1.15rem;
+  color: #0f172a;
 }
 
 .subUser {
-    font-size: 1rem;
-    margin: 5px 0;
-    color: #333;
-    word-break: break-word;
+  font-size: 0.95rem;
+  margin: 5px 0;
+  color: #475569;
+  word-break: break-word;
 }
 
 .subCond {
-    margin-top: 10px;
-    font-size: 1rem;
+  margin-top: 5px;
+  font-size: 0.95rem;
+  color: #475569;
 }
 
 .subDesc {
-    background-color: #f9f9f9;
-    padding: 10px;
-    border-radius: 4px;
-    margin: 10px 0;
-    color: #555;
-    font-style: italic;
-    white-space: pre-wrap; 
-    font-family: inherit;
+  background-color: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin: 15px 0;
+  color: #334155;
+  font-size: 0.9rem;
+  white-space: pre-wrap; 
+  font-family: inherit;
+  line-height: 1.5;
 }
 
 .subImg {
-    width: 100%;
-    height: auto;
-    max-height: 250px;
-    object-fit: contain;
-    border-radius: 4px;
-    margin: 15px 0;
-    display: block;
-    background-color: #fafafa;
+  width: 100%;
+  height: auto;
+  max-height: 250px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin: 15px 0;
+  background-color: #f8fafc;
 }
 
 .subStatus {
-    font-weight: bold;
-    font-size: 1.1rem;
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 4px;
-    text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-top: 15px;
+  padding: 10px 15px;
+  border-radius: 6px;
+  text-align: center;
 }
 
-.subStatus.pending { color: #856404; background-color: #fff3cd; }
-.subStatus.accepted { color: #004085; background-color: #cce5ff; }
-.subStatus.rejected { color: #721c24; background-color: #f8d7da; }
-.subStatus.offer_accepted { color: #155724; background-color: #d4edda; }
-.subStatus.offer_rejected { color: #721c24; background-color: #f8d7da; }
+.subStatus.pending { color: #d97706; background-color: #fef3c7; }
+.subStatus.accepted { color: #1d4ed8; background-color: #dbeafe; }
+.subStatus.rejected { color: #b91c1c; background-color: #fee2e2; }
+.subStatus.offer_accepted { color: #047857; background-color: #d1fae5; }
+.subStatus.offer_rejected { color: #b91c1c; background-color: #fee2e2; }
 
 .bankProvided {
-    color: #28a745;
-    font-weight: bold;
-    word-break: break-all;
+  color: #10b981;
+  font-weight: 600;
+  word-break: break-all;
 }
 
-.bankMissing {
-    color: #dc3545;
-    font-weight: bold;
+.offerBox {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #eff6ff;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.offerPrice {
+  color: #3b82f6;
+  font-weight: 700;
+  font-size: 1.1rem;
 }
 
 .subActions {
-    margin-top: 20px;
-    border-top: 1px solid #eee;
-    padding-top: 15px;
+  margin-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 15px;
 }
 
 .offerInput input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background-color: #f8fafc;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.offerInput input:focus {
+  border-color: #3b82f6;
+  background-color: white;
 }
 
 .btnGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .acceptBtn, .rejectBtn {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-    font-weight: bold;
-    font-size: 1rem;
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s;
 }
 
 .acceptBtn {
-    background-color: #28a745;
+  background-color: #10b981;
+  color: white;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.15);
 }
 
 .acceptBtn:hover {
-    background-color: #218838;
+  background-color: #059669;
+  transform: translateY(-2px);
 }
 
 .rejectBtn {
-    background-color: #dc3545;
+  background-color: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
 }
 
 .rejectBtn:hover {
-    background-color: #c82333;
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
 }
 
 .listingForm {
-    background: white;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    max-width: 600px;
-    margin: 0 auto;
-    width: 100%;
-    box-sizing: border-box;
+  background: white;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .formGroup {
-    margin-bottom: 15px;
-    width: 100%;
-    box-sizing: border-box;
+  margin-bottom: 15px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .formGroup label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.95rem;
 }
 
 .formGroup input, .formGroup textarea, .formGroup select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 1rem;
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: #f8fafc;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.formGroup input:focus, .formGroup textarea:focus, .formGroup select:focus {
+  border-color: #3b82f6;
+  background-color: white;
 }
 
 .categorySelection {
-    background-color: #f9f9f9;
-    padding: 15px;
-    border-radius: 6px;
-    border: 1px solid #eee;
-    margin-bottom: 20px;
-    box-sizing: border-box;
+  background-color: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+  box-sizing: border-box;
 }
 
 .categorySelection h3 {
-    margin-top: 0;
-    font-size: 1.1rem;
-    margin-bottom: 15px;
+  margin-top: 0;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  color: #0f172a;
 }
 
 .selectWithButton, .inputWithButton {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.selectWithButton select, .inputWithButton input {
-    flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .addCatBtn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 0 15px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    cursor: pointer;
-    white-space: nowrap;
+  background-color: #eff6ff;
+  color: #3b82f6;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 12px 15px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.addCatBtn:hover {
+  background-color: #dbeafe;
 }
 
 .cancelCatBtn {
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    padding: 0 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    white-space: nowrap;
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancelCatBtn:hover {
+  background-color: #e2e8f0;
 }
 
 .listingButtons {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 25px;
 }
 
 @media (min-width: 768px) {
-    .adminUsedContainer {
-        padding: 20px;
-        max-width: 1000px;
-        margin: 0 auto;
-    }
+  .adminSubGrid {
+    gap: 20px;
+  }
 
-    .adminSubCard {
-        padding: 20px;
-    }
+  .adminSubCard {
+    padding: 25px;
+  }
 
-    .subHeader {
-        flex-direction: row;
-    }
+  .btnGroup, .listingButtons {
+    flex-direction: row;
+  }
 
-    .btnGroup, .listingButtons {
-        flex-direction: row;
-    }
+  .acceptBtn, .rejectBtn {
+    flex: 1;
+  }
 
-    .acceptBtn, .rejectBtn {
-        flex: 1;
-        width: auto;
-    }
+  .selectWithButton, .inputWithButton {
+    flex-direction: row;
+  }
+
+  .selectWithButton select, .inputWithButton input {
+    flex-grow: 1;
+  }
+
+  .addCatBtn, .cancelCatBtn {
+    padding: 0 20px;
+    white-space: nowrap;
+  }
 }

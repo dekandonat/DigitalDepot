@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './passwordReset.css';
+import CustomModal from './CustomModal';
 
 const postMethodFetch = (url, body) => {
   return fetch(url, {
@@ -11,7 +12,6 @@ const postMethodFetch = (url, body) => {
       if (!response.ok) {
         throw new Error(response);
       }
-
       return response.json();
     })
     .then((data) => {
@@ -28,6 +28,19 @@ export default function PasswordReset(props) {
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
   const [code, setCode] = useState('');
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+  const [toast, setToast] = useState('');
+
+  const closeModal = () => {
+    setModal({ ...modal, isOpen: false });
+  };
+
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => {
+      setToast('');
+    }, 3000);
+  };
 
   function handleEmailChange(event) {
     setEmail(event.target.value);
@@ -52,25 +65,25 @@ export default function PasswordReset(props) {
           if (data.result == 'success') {
             setIsCode(false);
           } else {
-            alert('Hiba történt! Ellenőrizze a megadott email címet');
+            setModal({ isOpen: true, title: 'Hiba', message: 'Hiba történt! Ellenőrizze a megadott email címet' });
           }
         })
         .catch((err) => {
           console.log(err.message);
         });
     } else {
-      alert('Adja meg email címét!');
+      setModal({ isOpen: true, title: 'Figyelem', message: 'Adja meg email címét!' });
     }
   }
 
   function changePassword() {
     if (password == '' || code == '') {
-      alert('Minden mezőt ki kell tölteni');
+      setModal({ isOpen: true, title: 'Figyelem', message: 'Minden mezőt ki kell tölteni' });
       return;
     }
 
     if (password !== password2) {
-      alert('A jelszavak nem egyeznek');
+      setModal({ isOpen: true, title: 'Figyelem', message: 'A jelszavak nem egyeznek' });
     } else {
       postMethodFetch('/user/reset-password', {
         email: email,
@@ -80,10 +93,10 @@ export default function PasswordReset(props) {
         .then((data) => {
           console.log(data);
           if (data.result == 'success') {
-            alert('Sikeres jelszó visszaállítás!');
+            showToast('Sikeres jelszó visszaállítás!');
             props.resetState(false);
           } else {
-            alert(data.message);
+            setModal({ isOpen: true, title: 'Hiba', message: data.message });
           }
         })
         .catch((err) => {
@@ -94,6 +107,15 @@ export default function PasswordReset(props) {
 
   return (
     <>
+      <CustomModal 
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={closeModal}
+        type="alert"
+      />
+      {toast && <div className="toastMessage">{toast}</div>}
+
       {isCode ? (
         <form className="passwordResetForm">
           <h1>Helyreállító kód kérése</h1>

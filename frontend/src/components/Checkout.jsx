@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../assets/util/fetch';
+import CustomModal from './CustomModal';
 import './Checkout.css';
 
 export default function Checkout() {
     const navigate = useNavigate();
-    const [paymentMethod, setPaymentMethod] = useState('card');
+    const [paymentMethod, setPaymentMethod] = useState('utanvet');
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '', redirect: null });
+
+    const closeModal = () => {
+        const redirectPath = modal.redirect;
+        setModal({ isOpen: false, title: '', message: '', redirect: null });
+        if (redirectPath) {
+            navigate(redirectPath);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,8 +24,7 @@ export default function Checkout() {
         const token = localStorage.getItem('token');
         
         if(!token) {
-            alert("Jelentkezz be a vásárláshoz!");
-            navigate('/');
+            setModal({ isOpen: true, title: 'Figyelem', message: 'Jelentkezz be a vásárláshoz!', redirect: '/' });
             return;
         }
 
@@ -33,14 +42,6 @@ export default function Checkout() {
             couponCode: couponCode
         };
 
-        if (paymentMethod === 'card') {
-            orderInfo.cardDetails = {
-                number: form.cardNumber.value.trim(),
-                expiry: form.expiry.value.trim(),
-                cvc: form.cvc.value.trim()
-            };
-        }
-
         try {
             await apiFetch('/order/place-order', {
                 method: 'POST',
@@ -50,17 +51,22 @@ export default function Checkout() {
                 body: orderInfo
             });
 
-            alert("Sikeres rendelés! Köszönjük a vásárlást.");
-            navigate('/');
+            setModal({ isOpen: true, title: 'Sikeres rendelés!', message: 'Köszönjük a vásárlást.', redirect: '/' });
             
         } catch (error) {
-            console.error(error);
-            alert(error.message || "Hiba történt a rendeléskor.");
+            setModal({ isOpen: true, title: 'Hiba', message: error.message || "Hiba történt a rendeléskor.", redirect: null });
         }
     };
 
     return (
         <div className="checkoutContainer">
+            <CustomModal 
+                isOpen={modal.isOpen}
+                title={modal.title}
+                message={modal.message}
+                onConfirm={closeModal}
+                type="alert"
+            />
             <h2>Véglegesítés és Fizetés</h2>
             <form onSubmit={handleSubmit} className="checkoutForm">
                 
@@ -85,31 +91,21 @@ export default function Checkout() {
                 </div>
 
                 <h3>Fizetési mód</h3>
-                <div className="paymentMethods">
-                    <label className="paymentOptionLabel">
-                        <input type="radio" name="paymentMethod" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value)} />
-                        <span>Bankkártyás fizetés</span>
-                    </label>
-                    
-                    <label className="paymentOptionLabel">
-                        <input type="radio" name="paymentMethod" value="utanvet" checked={paymentMethod === 'utanvet'} onChange={(e) => setPaymentMethod(e.target.value)} />
-                        <span>Utánvét (Fizetés a futárnál)</span>
-                    </label>
+                <div className="paymentMethodContainer">
+                    <select 
+                        name="paymentMethod" 
+                        className="paymentSelect" 
+                        value={paymentMethod} 
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                    >
+                        <option value="utanvet">Utánvét (Fizetés a futárnál)</option>
+                        <option value="card" disabled>Bankkártyás fizetés</option>
+                    </select>
+                    <p className="unavailableMessage">Sajnáljuk, a bankkártyás fizetés jelenleg nem elérhető.</p>
                 </div>
 
-                {paymentMethod === 'card' && (
-                    <div className="cardDetails">
-                        <h4 className="cardDetailsTitle">Bankkártya adatok</h4>
-                        <input type="text" name="cardNumber" placeholder="Kártyaszám (XXXX XXXX XXXX XXXX)" required maxLength="19"/>
-                        <div className="inputRow cardDetailsInputRow">
-                            <input type="text" name="expiry" placeholder="Lejárat (HH/ÉÉ)" required maxLength="5" />
-                            <input type="text" name="cvc" placeholder="CVC" required maxLength="3" />
-                        </div>
-                    </div>
-                )}
-
                 <button type="submit" className="payButton">
-                    {paymentMethod === 'utanvet' ? 'Rendelés leadása (Utánvét)' : 'Fizetés és Rendelés'}
+                    Rendelés leadása (Utánvét)
                 </button>
             </form>
         </div>

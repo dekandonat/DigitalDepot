@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiFetch } from '../assets/util/fetch';
+import CustomModal from './CustomModal';
 import './AdminUsedProducts.css';
 
 const formatPrice = (price) => {
@@ -9,7 +10,7 @@ const formatPrice = (price) => {
 
 const parsePrice = (formattedPrice) => {
     if (!formattedPrice) return 0;
-    return parseInt(formattedPrice.toString().replace(/[^0-9]/g, '')) || 0; // "/[^0-9]/g" - kicseréli minden karaktert ami nem szamjegy 0-9-ig egy üres stringre, a g pedig az összes karaktert nézi, nem csak az elsőt
+    return parseInt(formattedPrice.toString().replace(/[^0-9]/g, '')) || 0;
 };
 
 export default function AdminUsedProducts() {
@@ -36,7 +37,21 @@ export default function AdminUsedProducts() {
     const [isAddingNewSub, setIsAddingNewSub] = useState(false);
     const [newSubName, setNewSubName] = useState('');
 
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const [toast, setToast] = useState('');
+
     const token = localStorage.getItem('token');
+
+    const closeModal = () => {
+        setModal({ ...modal, isOpen: false });
+    };
+
+    const showToast = (message) => {
+        setToast(message);
+        setTimeout(() => {
+            setToast('');
+        }, 3000);
+    };
 
     useEffect(() => {
         fetchData();
@@ -83,11 +98,11 @@ export default function AdminUsedProducts() {
     }
 
     async function handleAction(id, status) {
-        const price = offerInputs[id];
+        const price = offerInputs[id] || 0;
 
         if (status == 'accepted') {
             if (!price || price <= 0) {
-                alert("Kérlek adj meg egy érvényes ajánlati árat!");
+                setModal({ isOpen: true, title: 'Figyelem', message: 'Kérlek adj meg egy érvényes ajánlati árat!' });
                 return;
             }
         }
@@ -104,11 +119,15 @@ export default function AdminUsedProducts() {
             });
 
             if (data.result == 'success') {
+                if (status == 'rejected') {
+                    showToast('Termék elutasítva!');
+                } else {
+                    showToast('Ajánlat sikeresen elküldve!');
+                }
                 fetchData();
             }
         } catch (err) {
-            console.log(err.message);
-            alert('Hiba történt.');
+            setModal({ isOpen: true, title: 'Hiba', message: 'Hiba történt az állapot frissítésekor.' });
         }
     }
 
@@ -152,23 +171,23 @@ export default function AdminUsedProducts() {
 
         if (isAddingNewMain) {
             if (!newMainName.trim()) {
-                alert("Add meg az új főkategória nevét!");
+                setModal({ isOpen: true, title: 'Figyelem', message: 'Add meg az új főkategória nevét!' });
                 return;
             }
             const newMainId = await createCategory(newMainName, null);
             if (!newMainId) {
-                alert("Hiba a főkategória létrehozásakor.");
+                setModal({ isOpen: true, title: 'Hiba', message: 'Hiba a főkategória létrehozásakor.' });
                 return;
             }
             
             if (isAddingNewSub) {
                 if (!newSubName.trim()) {
-                    alert("Add meg az új alkategória nevét!");
+                    setModal({ isOpen: true, title: 'Figyelem', message: 'Add meg az új alkategória nevét!' });
                     return;
                 }
                 const newSubId = await createCategory(newSubName, newMainId);
                 if (!newSubId) {
-                    alert("Hiba az alkategória létrehozásakor.");
+                    setModal({ isOpen: true, title: 'Hiba', message: 'Hiba az alkategória létrehozásakor.' });
                     return;
                 }
                 finalCategoryId = newSubId;
@@ -178,27 +197,27 @@ export default function AdminUsedProducts() {
         } 
         else if (isAddingNewSub) {
             if (!selectedMainCat) {
-                alert("Válassz főkategóriát!");
+                setModal({ isOpen: true, title: 'Figyelem', message: 'Válassz főkategóriát!' });
                 return;
             }
             if (!newSubName.trim()) {
-                alert("Add meg az új alkategória nevét!");
+                setModal({ isOpen: true, title: 'Figyelem', message: 'Add meg az új alkategória nevét!' });
                 return;
             }
             const newSubId = await createCategory(newSubName, selectedMainCat);
             if (!newSubId) {
-                alert("Hiba az alkategória létrehozásakor.");
+                setModal({ isOpen: true, title: 'Hiba', message: 'Hiba az alkategória létrehozásakor.' });
                 return;
             }
             finalCategoryId = newSubId;
         }
         else {
             if (!selectedMainCat) {
-                alert("Válassz főkategóriát!");
+                setModal({ isOpen: true, title: 'Figyelem', message: 'Válassz főkategóriát!' });
                 return;
             }
             if (subCategories.length > 0 && !selectedSubCat) {
-                alert("Válassz alkategóriát!");
+                setModal({ isOpen: true, title: 'Figyelem', message: 'Válassz alkategóriát!' });
                 return;
             }
             if (!finalCategoryId) finalCategoryId = selectedMainCat;
@@ -217,7 +236,7 @@ export default function AdminUsedProducts() {
         } else if (editingProduct.productImage) {
             formData.append('existingImage', editingProduct.productImage);
         } else {
-            alert("Hiba: Nincs termékkép! Kérlek tölts fel egyet.");
+            setModal({ isOpen: true, title: 'Figyelem', message: 'Hiba: Nincs termékkép! Kérlek tölts fel egyet.' });
             return;
         }
 
@@ -232,16 +251,15 @@ export default function AdminUsedProducts() {
             const result = await response.json();
 
             if(result.result == 'success') {
-                alert('Termék sikeresen listázva!');
+                showToast('Termék sikeresen listázva!');
                 fetchCategories();
                 setEditingProduct(null);
                 fetchData();
             } else {
-                alert('Hiba: ' + result.message);
+                setModal({ isOpen: true, title: 'Hiba', message: 'Hiba: ' + result.message });
             }
         } catch(err) {
-            console.error(err);
-            alert("Hiba a listázás során.");
+            setModal({ isOpen: true, title: 'Hiba', message: 'Hiba a listázás során.' });
         }
     }
 
@@ -254,16 +272,14 @@ export default function AdminUsedProducts() {
         }
     };
 
-    const incomingSubmissions = submissions.filter(sub => ['pending', 'accepted', 'rejected', 'offer_rejected'].includes(sub.status));
+    const incomingSubmissions = submissions.filter(sub => ['pending', 'accepted'].includes(sub.status));
     const waitingListSubmissions = submissions.filter(sub => sub.status == 'offer_accepted');
 
     const getStatusLabel = (status, price) => {
         switch(status) {
             case 'pending': return 'Feldolgozás alatt';
             case 'accepted': return `Ajánlat elküldve (${formatPrice(price)} Ft)`;
-            case 'rejected': return 'Elutasítva';
             case 'offer_accepted': return `Felhasználó elfogadta (${formatPrice(price)} Ft)`;
-            case 'offer_rejected': return 'Felhasználó elutasította';
             default: return status;
         }
     };
@@ -271,6 +287,15 @@ export default function AdminUsedProducts() {
     if (editingProduct) {
         return (
             <div className="adminUsedContainer">
+                <CustomModal 
+                    isOpen={modal.isOpen}
+                    title={modal.title}
+                    message={modal.message}
+                    onConfirm={closeModal}
+                    type="alert"
+                />
+                {toast && <div className="toastMessage">{toast}</div>}
+
                 <h2>Termék listázása</h2>
                 <div className="listingForm">
                     <div className="formGroup">
@@ -375,6 +400,15 @@ export default function AdminUsedProducts() {
 
     return (
         <div className="adminUsedContainer">
+            <CustomModal 
+                isOpen={modal.isOpen}
+                title={modal.title}
+                message={modal.message}
+                onConfirm={closeModal}
+                type="alert"
+            />
+            {toast && <div className="toastMessage">{toast}</div>}
+
             <h2>Használt termékek kezelése</h2>
             
             <div className="tabHeader">

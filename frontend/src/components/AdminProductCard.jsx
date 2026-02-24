@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './AdminProductCard.css';
 import { apiFetch } from '../assets/util/fetch';
+import CustomModal from './CustomModal';
 
 export default function AdminProductCard(props) {
   const [isEditing, setIsEditing] = useState(false);
@@ -9,6 +10,11 @@ export default function AdminProductCard(props) {
   const [description, setDescription] = useState(props.description);
   const [condition, setCondition] = useState(props.condition || '');
   const [toast, setToast] = useState('');
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+
+  const closeModal = () => {
+    setModal({ ...modal, isOpen: false });
+  };
 
   const showToast = (message) => {
     setToast(message);
@@ -39,11 +45,10 @@ export default function AdminProductCard(props) {
         setIsEditing(false);
         showToast('Sikeresen frissítve!');
       } else {
-        alert('Hiba történt: ' + (response.message || 'Ismeretlen hiba'));
+        setModal({ isOpen: true, title: 'Hiba', message: response.message || 'Ismeretlen hiba történt.' });
       }
     } catch (error) {
-      console.error(error);
-      alert('Szerver hiba történt.');
+      setModal({ isOpen: true, title: 'Szerver hiba', message: 'Szerver hiba történt a mentés során.' });
     }
   };
 
@@ -57,6 +62,13 @@ export default function AdminProductCard(props) {
 
   return (
     <div className="adminProductCardDiv">
+      <CustomModal 
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={closeModal}
+        type="alert"
+      />
       {toast && <div className="toastMessage">{toast}</div>}
       
       <img src={props.img} alt={name} className="productCardImg" />

@@ -1,0 +1,148 @@
+.adminOrdersWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.adminOrdersHeader {
+  margin-bottom: 25px;
+}
+
+.adminOrdersHeader h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-align: left;
+}
+
+.ordersGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.noOrdersText {
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.adminOrderCard {
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transition: box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.adminOrderCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.orderCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+
+.orderCardTop h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.orderDate {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+  background-color: #f8fafc;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.orderCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.orderDataRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.orderLabel {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.orderValue {
+  font-size: 1rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+.priceValue {
+  color: #3b82f6;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.orderCardActions {
+  margin-top: 5px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.deleteOrderBtn {
+  width: 100%;
+  padding: 10px 15px;
+  background-color: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.deleteOrderBtn:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+@media (min-width: 768px) {
+  .ordersGrid {
+    gap: 20px;
+  }
+
+  .orderDataRow {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .orderCardActions {
+    justify-content: flex-end;
+  }
+
+  .deleteOrderBtn {
+    width: auto;
+    min-width: 120px;
+  }
+}

@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import './AdminInventory.css';
 import { apiFetch } from '../assets/util/fetch';
+import CustomModal from './CustomModal';
 
 export default function AdminInventory() {
   const [products, setProducts] = useState([]);
   const [id, setId] = useState('');
   const [quantity, setQuantity] = useState('');
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+  const [toast, setToast] = useState('');
 
   function handleIdChange(event) {
     setId(event.target.value);
@@ -15,13 +18,24 @@ export default function AdminInventory() {
     setQuantity(event.target.value);
   }
 
+  const closeModal = () => {
+    setModal({ ...modal, isOpen: false });
+  };
+
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => {
+      setToast('');
+    }, 3000);
+  };
+
   useEffect(() => {
     getMethodFetch('/products')
       .then((data) => {
         setProducts(data.data);
       })
       .catch((err) => {
-        console.error(err);
+        setModal({ isOpen: true, title: 'Hiba', message: 'Nem sikerült betölteni a termékeket.' });
       });
   }, []);
 
@@ -42,7 +56,10 @@ export default function AdminInventory() {
   };
 
   const handleAddInventory = () => {
-    if (!id || !quantity) return;
+    if (!id || !quantity) {
+        setModal({ isOpen: true, title: 'Figyelem', message: 'Kérjük, töltse ki mindkét mezőt!' });
+        return;
+    }
 
     apiFetch('/adminRoute/products/addInventory', {
       body: { id: parseInt(id), quantity: parseInt(quantity) },
@@ -52,7 +69,7 @@ export default function AdminInventory() {
       },
     })
       .then((data) => {
-        alert(data.result);
+        showToast(data.result);
         setId('');
         setQuantity('');
         getMethodFetch('/products')
@@ -60,20 +77,27 @@ export default function AdminInventory() {
             setProducts(data.data);
           })
           .catch((err) => {
-            console.error(err.message);
+            setModal({ isOpen: true, title: 'Hiba', message: 'Sikeres frissítés, de a lista frissítése sikertelen.' });
           });
       })
       .catch((err) => {
-        console.error('Error: ' + err.message);
-        alert('Hiba történt');
+        setModal({ isOpen: true, title: 'Hiba', message: 'Hiba történt a készlet frissítésekor.' });
       });
   };
 
   return (
     <div className="inventoryContainer">
+      <CustomModal 
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={closeModal}
+        type="alert"
+      />
+      {toast && <div className="toastMessage">{toast}</div>}
+
       <div className="inventoryHeader">
         <h2>Leltár Kezelése</h2>
-        <p>Termékek készletmennyiségének manuális frissítése</p>
       </div>
 
       <div className="inventoryCard">

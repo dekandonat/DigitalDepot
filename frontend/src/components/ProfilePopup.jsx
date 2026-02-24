@@ -22,7 +22,7 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
     role = jwtDecode(localStorage.getItem('token'));
     role = role.role;
   } catch (err) {
-    console.log('Hiba: ' + err.message);
+    console.log(err.message);
   }
 
   const isAdminPage = location.pathname.startsWith('/admin');
@@ -50,7 +50,7 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
     localStorage.removeItem('email');
     role = null;
     onClose();
-    window.location.reload();
+    window.location.href = '/';
   };
 
   const saveBankAccount = async () => {
