@@ -15,6 +15,7 @@ const groupMessagesByUser = (messages) => {
     if (!groupMap[userId]) {
       groupMap[userId] = {
         id: userId,
+        unread: false,
         messages: [],
       };
     }
@@ -25,6 +26,10 @@ const groupMessagesByUser = (messages) => {
       recipientId: message.recipientId,
       date: message.sentAt,
     });
+
+    if (!message.recipientId && message.unread) {
+      groupMap[userId].unread = true;
+    }
   }
 
   return Object.values(groupMap);
@@ -124,6 +129,21 @@ router.get('/messages', async (req, res) => {
     res.status(200).json({ result: 'success', data: messageList });
   } catch (err) {
     console.log(err.message);
+    res.status(500).json({ result: 'fail', message: err.message });
+  }
+});
+
+router.patch('/readmessages/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const [rows] = await db.execute(
+      'UPDATE messages SET unread = 0 WHERE sender = ? AND recipientId IS NULL AND unread = 1;',
+      [userId]
+    );
+    res
+      .status(200)
+      .json({ result: 'success', affectedRows: rows.affectedRows });
+  } catch (err) {
     res.status(500).json({ result: 'fail', message: err.message });
   }
 });

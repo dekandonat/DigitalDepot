@@ -39,14 +39,6 @@ module.exports = {
     //ide kerülnek az események
     io.on('connection', (socket) => {
       socket.on('send_message', async (data) => {
-        /*
-        console.log('Új üzenet: ' + message);
-        io.emit('receiveMessage', {
-          text: message,
-          sender: socket.id,
-          date: Date.now(),
-        });
-        */
         const { id, role } = socket.user;
 
         const isObject = typeof data === 'object';

@@ -8,9 +8,14 @@ export default function AdminChatPanel() {
   const [currentUser, setCurrentUser] = useState(null);
   const [typedMessage, setTypedMessage] = useState('');
   const messagesEndRef = useRef(null);
+  const currentUserRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [currentUser]);
+
+  useEffect(() => {
+    currentUserRef.current = currentUser;
   }, [currentUser]);
 
   useEffect(() => {
@@ -32,12 +37,13 @@ export default function AdminChatPanel() {
     socket.connect();
     socket.on('receive_message', (newMessage) => {
       setUserMessages((prev) => {
+        const currentUserId = currentUserRef.current?.id;
         if (newMessage.recipientId) {
           //Admin üzenet -> van recipientId benne
           const userId = newMessage.recipientId;
           return prev.map((u) =>
             u.id === userId
-              ? { ...u, messages: [...u.messages, newMessage] }
+              ? { ...u, unread: false, messages: [...u.messages, newMessage] }
               : u
           );
         } else {
@@ -47,11 +53,22 @@ export default function AdminChatPanel() {
           if (userExists) {
             return prev.map((u) =>
               u.id === newMessage.sender
-                ? { ...u, messages: [...u.messages, newMessage] }
+                ? {
+                    ...u,
+                    unread: newMessage.sender == currentUserId ? false : true,
+                    messages: [...u.messages, newMessage],
+                  }
                 : u
             );
           } else {
-            return [...prev, { id: newMessage.sender, messages: [newMessage] }];
+            return [
+              ...prev,
+              {
+                id: newMessage.sender,
+                unread: newMessage.sender == currentUserId ? false : true,
+                messages: [newMessage],
+              },
+            ];
           }
         }
       });
@@ -76,8 +93,24 @@ export default function AdminChatPanel() {
   };
 
   const handleUserChange = (id) => {
-    let currentUsersMessages = userMessages.find((message) => message.id == id);
-    setCurrentUser(currentUsersMessages);
+    const selectedUser = userMessages.find((u) => u.id == id);
+
+    apiFetch(`/adminRoute/readmessages/${id}`, {
+      method: 'PATCH',
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
+    })
+      .then((data) => {
+        console.log(data);
+        if (selectedUser) {
+          setUserMessages((prev) => {
+            return prev.map((u) => (u.id === id ? { ...u, unread: false } : u));
+          });
+          setCurrentUser({ ...selectedUser, unread: false });
+        }
+      })
+      .catch((err) => {
+        console.error('Hiba az üzenetek frissítése során: ' + err.message);
+      });
   };
 
   const handleMessageSend = () => {
@@ -103,7 +136,10 @@ export default function AdminChatPanel() {
                     handleUserChange(user.id);
                   }}
                 >
-                  <h3>#{user.id} Felhasználó</h3>
+                  <h3>
+                    #{user.id} Felhasználó{' '}
+                    {user.unread ? <span>🔴</span> : null}
+                  </h3>
                   <p>{user.messages[user.messages.length - 1].text}</p>
                 </div>
               );
