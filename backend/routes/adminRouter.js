@@ -148,4 +148,20 @@ router.patch('/readmessages/:userId', async (req, res) => {
   }
 });
 
+router.delete('/messages/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const [rows] = await db.execute(
+      'DELETE FROM messages WHERE messages.sender = ? OR messages.recipientId = ?;',
+      [userId, userId]
+    );
+    res
+      .status(200)
+      .json({ result: 'success', affectedRows: rows.affectedRows });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ result: 'fail' });
+  }
+});
+
 module.exports = router;

@@ -122,6 +122,27 @@ export default function AdminChatPanel() {
     setTypedMessage('');
   };
 
+  const handleDeleteChat = (id) => {
+    apiFetch(`/adminRoute/messages/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token'),
+      },
+    })
+      .then((data) => {
+        if (data.result == 'success') {
+          setUserMessages((prev) => prev.filter((user) => user.id !== id));
+
+          if (currentUser?.id == id) {
+            setCurrentUser(null);
+          }
+        }
+      })
+      .catch((err) => {
+        console.error('Hiba: ' + err.message);
+      });
+  };
+
   return (
     <>
       <div className="adminChatPanelFlexbox">
@@ -136,11 +157,23 @@ export default function AdminChatPanel() {
                     handleUserChange(user.id);
                   }}
                 >
+                  <button
+                    className="deleteChatBtn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteChat(user.id);
+                    }}
+                  >
+                    ×
+                  </button>
                   <h3>
                     #{user.id} Felhasználó{' '}
                     {user.unread ? <span>🔴</span> : null}
                   </h3>
-                  <p>{user.messages[user.messages.length - 1].text}</p>
+                  <p>
+                    {user.messages[user.messages.length - 1]?.text ||
+                      'Nincsen üzenet'}
+                  </p>
                 </div>
               );
             })
@@ -171,6 +204,7 @@ export default function AdminChatPanel() {
                 type="text"
                 value={typedMessage}
                 onChange={handleMessageChange}
+                onKeyDown={(e) => e.key === 'Enter' && handleMessageSend()}
               ></input>
               <button onClick={handleMessageSend}>Küldés</button>
             </div>
