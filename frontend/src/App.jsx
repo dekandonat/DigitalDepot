@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import MainCategoriesMenu from './components/MainCategoriesMenu';
@@ -17,6 +17,8 @@ import AdminChatPanel from './components/AdminChatPanel';
 import { slides } from './data/MainPageGalleryData.json';
 import './main.css';
 import { jwtDecode } from 'jwt-decode';
+import { socket } from '../src//assets/util/socket';
+import { apiFetch } from './assets/util/fetch';
 
 export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -24,9 +26,47 @@ export default function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    apiFetch('/user/messages', {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token'),
+      },
+    })
+      .then((data) => {
+        const unreadList = data.data.filter(
+          (message) => message.unread == true && message.recipientId
+        );
+        setUnreadMessages(unreadList.length);
+      })
+      .catch((err) => {
+        console.error('Hiba: ' + err.message);
+      });
+
+    socket.auth = {
+      token: localStorage.getItem('token'),
+    };
+    socket.connect();
+    socket.on('receive_message', handleReceiveMessage);
+
+    return () => {
+      socket.off('receive_message', handleReceiveMessage);
+    };
+  }, [isLoggedIn, isChatOpen]);
+
+  const handleReceiveMessage = (message) => {
+    if (!isChatOpen && message.recipientId) {
+      setUnreadMessages((prev) => prev + 1);
+    }
+  };
 
   const openProfile = () => {
     setIsLoginOpen(false);
@@ -50,6 +90,19 @@ export default function App() {
   };
 
   const handleChatOpen = async () => {
+    apiFetch('/user/readmessages', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token'),
+      },
+    })
+      .then((data) => {
+        console.log(data);
+        setUnreadMessages(0);
+      })
+      .catch((err) => {
+        console.error('Hiba: ' + err.message);
+      });
     const token = localStorage.getItem('token');
     const decoded = await jwtDecode(token);
     if (token && decoded.role == 'user') {
@@ -122,21 +175,30 @@ export default function App() {
         />
       </Routes>
 
-      {isLoginOpen && <LoginForm onClose={() => setIsLoginOpen(false)} />}
+      {isLoginOpen && (
+        <LoginForm
+          onClose={() => setIsLoginOpen(false)}
+          setIsLoggedIn={setIsLoggedIn}
+        />
+      )}
       {isCartOpen && <Cart onClose={() => setIsCartOpen(false)} />}
       {isProfileOpen && (
         <ProfilePopup
           onClose={() => setIsProfileOpen(false)}
           onProfileUpdate={handleProfileUpdate}
+          setIsLoggedIn={setIsLoggedIn}
         />
       )}
 
       {location.pathname.startsWith('/admin') ? null : (
-        <div>
+        <div className="chatWrapper">
           {isChatOpen ? (
             <ChatPanel changeIsOpen={setIsChatOpen} />
           ) : (
             <div onClick={handleChatOpen} className="chatIcon">
+              {unreadMessages > 0 && (
+                <span className="unreadBadge">{unreadMessages}</span>
+              )}
               <svg
                 version="1.1"
                 id="Layer_1"

@@ -29,6 +29,10 @@ export default function ChatPanel({ changeIsOpen }) {
   }, [messages]);
 
   useEffect(() => {
+    const handleNewMessage = (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    };
+
     apiFetch('/user/messages', {
       method: 'GET',
       headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
@@ -47,12 +51,10 @@ export default function ChatPanel({ changeIsOpen }) {
       token: localStorage.getItem('token'),
     };
     socket.connect();
-    socket.on('receive_message', (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
+    socket.on('receive_message', handleNewMessage);
 
     return () => {
-      socket.off('receive_message');
+      socket.off('receive_message', handleNewMessage);
     };
   }, []);
 

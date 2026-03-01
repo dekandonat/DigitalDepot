@@ -6,7 +6,11 @@ import './LoginForm.css';
 import profileIcon from '../assets/NavImages/profile-pic.png';
 import { jwtDecode } from 'jwt-decode';
 
-export default function ProfilePopup({ onClose, onProfileUpdate }) {
+export default function ProfilePopup({
+  onClose,
+  onProfileUpdate,
+  setIsLoggedIn,
+}) {
   const [userData, setUserData] = useState({
     name: '',
     email: '',
@@ -30,6 +34,7 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         if (data.result === 'success') {
+          setIsLoggedIn(true);
           setUserData(data.data);
           setBankAccountInput(data.data.bankAccountNumber || '');
         }
@@ -41,6 +46,7 @@ export default function ProfilePopup({ onClose, onProfileUpdate }) {
   }, []);
 
   const handleLogout = () => {
+    setIsLoggedIn(false);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('email');

@@ -3,7 +3,7 @@ import { apiFetch } from '../assets/util/fetch';
 import './LoginForm.css';
 import PasswordReset from './passwordReset';
 
-export default function LoginForm({ onClose }) {
+export default function LoginForm({ onClose, setIsLoggedIn }) {
   const [isLogin, setIsLogin] = useState(true);
   const [isReset, setIsReset] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -47,14 +47,15 @@ export default function LoginForm({ onClose }) {
     try {
       const response = await apiFetch(url, {
         method: 'POST',
-        credentials: 'include', 
-        body: dataValues
+        credentials: 'include',
+        body: dataValues,
       });
 
       if (isLogin) {
         localStorage.setItem('token', response.message.token);
         localStorage.setItem('user', response.message.userName);
         localStorage.setItem('email', response.message.email);
+        setIsLoggedIn(true);
         onClose();
         window.location.reload();
       } else {

@@ -19,23 +19,7 @@ export default function AdminChatPanel() {
   }, [currentUser]);
 
   useEffect(() => {
-    apiFetch('/adminRoute/messages', {
-      method: 'GET',
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
-    })
-      .then((data) => {
-        console.log(data.data);
-        setUserMessages(data.data);
-      })
-      .catch((err) => {
-        console.error('Hiba az üzenetek lekérése során: ' + err.message);
-      });
-
-    socket.auth = {
-      token: localStorage.getItem('token'),
-    };
-    socket.connect();
-    socket.on('receive_message', (newMessage) => {
+    const handleNewMessage = (newMessage) => {
       setUserMessages((prev) => {
         const currentUserId = currentUserRef.current?.id;
         if (newMessage.recipientId) {
@@ -72,10 +56,28 @@ export default function AdminChatPanel() {
           }
         }
       });
-    });
+    };
+
+    apiFetch('/adminRoute/messages', {
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
+    })
+      .then((data) => {
+        console.log(data.data);
+        setUserMessages(data.data);
+      })
+      .catch((err) => {
+        console.error('Hiba az üzenetek lekérése során: ' + err.message);
+      });
+
+    socket.auth = {
+      token: localStorage.getItem('token'),
+    };
+    socket.connect();
+    socket.on('receive_message', handleNewMessage);
 
     return () => {
-      socket.off('receive_message');
+      socket.off('receive_message', handleNewMessage);
     };
   }, []);
 
