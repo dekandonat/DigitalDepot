@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import MainCategoriesMenu from './components/MainCategoriesMenu';
@@ -28,13 +28,20 @@ export default function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const isChatOpenRef = useRef(isChatOpen);
 
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    if (!isLoggedIn) return;
+    isChatOpenRef.current = isChatOpen;
+  }, [isChatOpen]);
 
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    if (isChatOpen) {
+      setUnreadMessages(0);
+    }
     apiFetch('/user/messages', {
       method: 'GET',
       headers: {
@@ -42,10 +49,14 @@ export default function App() {
       },
     })
       .then((data) => {
-        const unreadList = data.data.filter(
-          (message) => message.unread == true && message.recipientId
-        );
-        setUnreadMessages(unreadList.length);
+        if (!isChatOpenRef.current) {
+          const unreadList = data.data.filter(
+            (message) => message.unread == true && message.recipientId
+          );
+          setUnreadMessages(unreadList.length);
+        } else {
+          setUnreadMessages(0);
+        }
       })
       .catch((err) => {
         console.error('Hiba: ' + err.message);
@@ -60,10 +71,10 @@ export default function App() {
     return () => {
       socket.off('receive_message', handleReceiveMessage);
     };
-  }, [isLoggedIn, isChatOpen]);
+  }, [isLoggedIn]);
 
   const handleReceiveMessage = (message) => {
-    if (!isChatOpen && message.recipientId) {
+    if (!isChatOpenRef.current && message.recipientId) {
       setUnreadMessages((prev) => prev + 1);
     }
   };

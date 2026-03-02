@@ -7,6 +7,7 @@ export default function AdminChatPanel() {
   const [userMessages, setUserMessages] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [typedMessage, setTypedMessage] = useState('');
+  const [isSideBarOpen, setIsSideBarOpen] = useState(true);
   const messagesEndRef = useRef(null);
   const currentUserRef = useRef(null);
 
@@ -96,7 +97,7 @@ export default function AdminChatPanel() {
 
   const handleUserChange = (id) => {
     const selectedUser = userMessages.find((u) => u.id == id);
-
+    setIsSideBarOpen(false);
     apiFetch(`/adminRoute/readmessages/${id}`, {
       method: 'PATCH',
       headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
@@ -147,7 +148,15 @@ export default function AdminChatPanel() {
 
   return (
     <>
-      <div className="adminChatPanelFlexbox">
+      <button
+        className="mobileMenuToggle"
+        onClick={() => setIsSideBarOpen((prev) => !prev)}
+      >
+        {isSideBarOpen ? '✖ Üzenetek' : '☰ Felhasználók'}
+      </button>
+      <div
+        className={`adminChatPanelFlexbox ${isSideBarOpen ? 'open' : 'closed'}`}
+      >
         <div className="adminChatList">
           {userMessages.length > 0 ? (
             userMessages.map((user) => {
@@ -170,7 +179,9 @@ export default function AdminChatPanel() {
                   </button>
                   <h3>
                     #{user.id} Felhasználó{' '}
-                    {user.unread ? <span>🔴</span> : null}
+                    {user.unread ? (
+                      <span className="unreadBadge">Új</span>
+                    ) : null}
                   </h3>
                   <p>
                     {user.messages[user.messages.length - 1]?.text ||
