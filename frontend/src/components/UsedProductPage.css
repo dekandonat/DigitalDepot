@@ -1,8 +1,10 @@
-.pageWrapper {
+.usedProductPageWrapper {
     width: 100%;
     padding: 10px;
     box-sizing: border-box;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .tabHeader {
@@ -66,7 +68,7 @@ h2 {
 
 .submissionForm {
     width: 100%;
-    margin: 0 auto;
+    margin: 0;
 }
 
 .formGroup {
@@ -316,7 +318,7 @@ h2 {
 }
 
 @media (min-width: 768px) {
-    .pageWrapper {
+    .usedProductPageWrapper {
         max-width: 850px;
         padding: 0 20px;
         margin: 40px auto;

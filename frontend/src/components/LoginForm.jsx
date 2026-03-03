@@ -7,7 +7,14 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
   const [isLogin, setIsLogin] = useState(true);
   const [isReset, setIsReset] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const [toast, setToast] = useState({ message: '', type: '' });
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => {
+        setToast({ message: '', type: '' });
+    }, 3000);
+  };
 
   const stopFormClosing = (e) => {
     if (e.target === e.currentTarget) {
@@ -18,7 +25,6 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
   const submit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
-    setSuccessMsg('');
 
     let form = e.target;
     let email = form.email.value.trim();
@@ -27,7 +33,7 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
     let password2 = form.password2?.value.trim();
 
     if (!isLogin && password !== password2) {
-      setErrorMsg('A két jelzsó nem egyezik!');
+      setErrorMsg('A két jelszó nem egyezik!');
       return;
     }
 
@@ -59,7 +65,7 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
         onClose();
         window.location.reload();
       } else {
-        setSuccessMsg('Sikeres regisztrácó!');
+        showToast('Sikeres regisztráció!', 'success');
         setIsLogin(true);
         form.reset();
       }
@@ -71,6 +77,11 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
 
   return (
     <div className="formBackground" onMouseDown={onClose}>
+      {toast.message && (
+        <div className={`toastMessage toast-${toast.type}`}>
+            {toast.message}
+        </div>
+      )}
       <div className="formContent" onMouseDown={(e) => e.stopPropagation()}>
         <button className="formCloseBtn" onClick={onClose}>
           &times;
@@ -85,11 +96,7 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
                 {errorMsg}
               </p>
             )}
-            {successMsg && (
-              <p className="message" id="success">
-                {successMsg}
-              </p>
-            )}
+
             <form onSubmit={submit}>
               {!isLogin && (
                 <div className="formItems">
@@ -108,7 +115,7 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
                   type="email"
                   name="email"
                   id="userEmailInput"
-                  placeholder="pelad@gmail.com"
+                  placeholder="pelda@gmail.com"
                   required
                 />
               </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { apiFetch } from '../assets/util/fetch';
 import './MobileCategoryMenu.css';
 
-export default function MobileCategoryMenu({ onClose, onCategorySelect }){
+export default function MobileCategoryMenu({ onClose, onCategorySelect, isClosing }){
     const [menuItems, setMenuItems] = useState({});
     const [expandedCategories, setExpandedCategories] = useState({});
 
@@ -44,7 +44,7 @@ export default function MobileCategoryMenu({ onClose, onCategorySelect }){
     };
 
     return (
-        <div id="mobileMenuBackground" onClick={onClose}>
+        <div id="mobileMenuBackground" className={isClosing ? 'closing' : ''} onClick={onClose}>
             <div id="mobileMenuContent" onClick={(e) => e.stopPropagation()}>
                 <div id="mobileMenuHeader">
                     <h2>Kategóriák</h2>

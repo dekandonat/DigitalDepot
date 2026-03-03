@@ -71,7 +71,7 @@ router.get('/admin/all', async (req, res) => {
 
   try {
     const decodedToken = await verifyAsync(token, process.env.SECRET);
-    if (decodedToken.role != 'admin') return res.status(403).json({ result: 'fail' });
+    if (decodedToken.role != 'admin' && decodedToken.role != 'owner') return res.status(403).json({ result: 'fail' });
 
     const rows = await UsedProduct.fetchAll();
     res.status(200).json({ result: 'success', data: rows });
@@ -88,7 +88,7 @@ router.patch('/admin/status', async (req, res) => {
   
     try {
       const decodedToken = await verifyAsync(token, process.env.SECRET);
-      if (decodedToken.role != 'admin') return res.status(403).json({ result: 'fail' });
+      if (decodedToken.role != 'admin' && decodedToken.role != 'owner') return res.status(403).json({ result: 'fail' });
   
       const { submissionId, status, offerPrice } = req.body;
       const result = await UsedProduct.updateStatus(submissionId, status, offerPrice);
@@ -133,7 +133,7 @@ router.post('/admin/list-product', upload.single('file'), async (req, res) => {
   
     try {
       const decodedToken = await verifyAsync(token, process.env.SECRET);
-      if (decodedToken.role != 'admin') return res.status(403).json({ result: 'fail' });
+      if (decodedToken.role != 'admin' && decodedToken.role != 'owner') return res.status(403).json({ result: 'fail' });
   
       const { submissionId, productName, productDescription, productPrice, categoryId, conditionState, existingImage } = req.body;
       

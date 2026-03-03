@@ -1,64 +1,110 @@
-.usersTableContainer {
+.adminUsersContainer {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 80%;
-  margin: 0 auto;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.adminUsersContainer > h2 {
+  margin: 0 0 20px 0;
+  color: #0f172a;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.usersTableWrapper {
+  width: 100%;
 }
 
 .usersTable {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.usersTable th,
+.usersTable thead {
+  display: none;
+}
+
+.usersTable tbody, 
+.usersTable tr, 
 .usersTable td {
-  border: 1px solid #ddd;
-  padding: 12px;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.usersTable tr {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.usersTable td {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 0.95rem;
+  text-align: right;
+}
+
+.usersTable td:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.usersTable td::before {
+  content: attr(data-label);
+  font-weight: 600;
+  color: #475569;
+  margin-right: 15px;
   text-align: left;
 }
 
-.usersTable th {
-  background-color: rgb(83, 212, 212);
-  color: #333;
-}
-
-.usersTable tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.usersTable tr:hover {
-  background-color: #f1f1f1;
-}
-
-.deleteUserBtn {
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.deleteUserBtn:hover {
-  background-color: #e60000;
-}
-
 .roleSelect {
-  padding: 6px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-weight: 600;
-  background-color: white;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background-color: #f8fafc;
+  color: #334155;
+  outline: none;
   cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  vertical-align: middle;
 }
 
 .roleSelect:focus {
-  outline: none;
-  border-color: rgb(83, 212, 212);
+  border-color: #3b82f6;
+  background-color: white;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.deleteUserBtn {
+  background-color: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  vertical-align: middle;
+}
+
+.deleteUserBtn:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
 }
 
 .confirmModalOverlay {
@@ -67,33 +113,36 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(15, 23, 42, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(4px);
 }
 
 .confirmModalContent {
   background-color: white;
   padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   text-align: center;
   max-width: 400px;
+  width: 90%;
   animation: popIn 0.3s ease-out;
 }
 
 @keyframes popIn {
-  from { opacity: 0; transform: scale(0.9); }
+  from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
 
 .confirmModalContent h3 {
   margin-top: 0;
-  color: #333;
+  color: #0f172a;
   margin-bottom: 25px;
+  font-size: 1.25rem;
+  line-height: 1.5;
 }
 
 .confirmModalButtons {
@@ -103,73 +152,98 @@
 }
 
 .confirmYesBtn {
-  background-color: #f4f5f7;
-  color: #4a4a4a;
-  border: 1px solid #dcdfe6;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: bold;
+  flex: 1;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
 .confirmYesBtn:hover {
-  background-color: rgba(46, 204, 113, 0.15);
-  color: #27ae60;
-  border-color: rgba(46, 204, 113, 0.4);
+  background-color: #059669;
+  transform: translateY(-1px);
 }
 
 .confirmNoBtn {
-  background-color: #f4f5f7;
-  color: #4a4a4a;
-  border: 1px solid #dcdfe6;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: bold;
+  flex: 1;
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
 .confirmNoBtn:hover {
-  background-color: rgba(231, 76, 60, 0.15);
-  color: #c0392b;
-  border-color: rgba(231, 76, 60, 0.4);
+  background-color: #e2e8f0;
+  color: #0f172a;
 }
 
-.toastMessage {
-  position: fixed;
-  top: 90px;
-  right: 20px;
-  padding: 15px 25px;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  z-index: 3000;
-  font-weight: bold;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  animation: slideInRight 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
-}
+@media (min-width: 768px) {
+  .adminUsersContainer {
+    padding: 0;
+  }
 
-.toast-success {
-  background-color: rgba(46, 204, 113, 0.15);
-  border: 1px solid rgba(46, 204, 113, 0.4);
-  color: #1e8449;
-}
+  .usersTableWrapper {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
 
-.toast-error {
-  background-color: rgba(231, 76, 60, 0.15);
-  border: 1px solid rgba(231, 76, 60, 0.4);
-  color: #c0392b;
-}
+  .usersTable {
+    display: table;
+  }
 
-@keyframes slideInRight {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
+  .usersTable thead {
+    display: table-header-group;
+  }
 
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; visibility: hidden; }
+  .usersTable tbody {
+    display: table-row-group;
+  }
+
+  .usersTable tr {
+    display: table-row;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .usersTable th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.95rem;
+    text-align: left;
+  }
+
+  .usersTable td {
+    display: table-cell;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .usersTable td::before {
+    display: none;
+  }
+
+  .usersTable tr:hover {
+    background-color: #f8fafc;
+  }
 }

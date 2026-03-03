@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiFetch } from '../assets/util/fetch';
 import './Cart.css';
 
-export default function Cart({ onClose }){
+export default function Cart({ onClose, isClosing }){
     const [cartItems, setCartItems] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
 
@@ -11,25 +11,18 @@ export default function Cart({ onClose }){
 
     const fetchCartData = async () => {
         const token = localStorage.getItem('token');
-
-        if(!token){
-            return;
-        }
+        if(!token) return;
 
         try{
             const response = await apiFetch('/cart', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
 
             if(response.result === 'success'){
                 setCartItems(response.data.items);
-
                 if(response.data.total && response.data.total.length > 0){
                     setCartTotal(response.data.total[0].total || 0);
-                }
-                else{
+                } else {
                     setCartTotal(0);
                 }
             }
@@ -40,18 +33,13 @@ export default function Cart({ onClose }){
 
     const handleQuantityChange = async (productId, amount) => {
         const token = localStorage.getItem('token');
-
-        if(!token){
-            return;
-        }
+        if(!token) return;
 
         try{
             const url = `/cart/${productId}`;
             await apiFetch(url, {
                 method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Authorization': `Bearer ${token}` },
                 body: { amount: amount }
             });
             fetchCartData();
@@ -65,7 +53,7 @@ export default function Cart({ onClose }){
     }, []);
 
     return (
-        <div id="cartBackground" onClick={onClose}>
+        <div id="cartBackground" className={isClosing ? 'closing' : ''} onClick={onClose}>
             <div id="cartContent" onClick={(e) => e.stopPropagation()}>
                 <div id="cartHeader">
                     <h2>Kosár</h2>

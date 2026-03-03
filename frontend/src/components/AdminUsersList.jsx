@@ -105,7 +105,7 @@ export default function AdminUsersList() {
     };
 
     return (
-        <div className="usersTableContainer">
+        <div className="adminUsersContainer">
             {toast.message && (
                 <div className={`toastMessage toast-${toast.type}`}>
                     {toast.message}
@@ -125,47 +125,50 @@ export default function AdminUsersList() {
             )}
 
             <h2>Felhasználók kezelése</h2>
-            <table className="usersTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Név</th>
-                        <th>Email</th>
-                        <th>Szerepkör</th>
-                        <th>Műveletek</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map(user => (
-                        <tr key={user.userId}>
-                            <td>{user.userId}</td>
-                            <td>{user.userName}</td>
-                            <td>{user.email}</td>
-                            <td>
-                                <select 
-                                    className="roleSelect"
-                                    value={user.role} 
-                                    onChange={(e) => initiateRoleChange(user.userId, e.target.value)}
-                                >
-                                    <option value="user">User</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="owner">Owner</option>
-                                </select>
-                            </td>
-                            <td>
-                                {user.role !== 'owner' && (
-                                    <button 
-                                        className="deleteUserBtn"
-                                        onClick={() => initiateDelete(user.userId)}
-                                    >
-                                        Törlés
-                                    </button>
-                                )}
-                            </td>
+            
+            <div className="usersTableWrapper">
+                <table className="usersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Név</th>
+                            <th>Email</th>
+                            <th>Szerepkör</th>
+                            <th>Műveletek</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {users.map(user => (
+                            <tr key={user.userId}>
+                                <td data-label="ID">#{user.userId}</td>
+                                <td data-label="Név">{user.userName}</td>
+                                <td data-label="Email">{user.email}</td>
+                                <td data-label="Szerepkör">
+                                    <select 
+                                        className="roleSelect"
+                                        value={user.role} 
+                                        onChange={(e) => initiateRoleChange(user.userId, e.target.value)}
+                                    >
+                                        <option value="user">User</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="owner">Owner</option>
+                                    </select>
+                                </td>
+                                <td data-label="Műveletek">
+                                    {user.role !== 'owner' && (
+                                        <button 
+                                            className="deleteUserBtn"
+                                            onClick={() => initiateDelete(user.userId)}
+                                        >
+                                            Törlés
+                                        </button>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

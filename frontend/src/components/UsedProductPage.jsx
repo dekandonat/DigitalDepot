@@ -155,7 +155,7 @@ export default function UsedProductPage(props) {
 
     if (hasBankAccount === false) {
         return (
-            <div className="pageWrapper">
+            <div className="usedProductPageWrapper">
                 <div className="usedProductContainer">
                     <h1>Használt termék leadása</h1>
                     <div className="warningBox">
@@ -171,7 +171,7 @@ export default function UsedProductPage(props) {
     }
 
     if (hasBankAccount === null) {
-        return <div className="pageWrapper"><p className="loadingText">Betöltés...</p></div>;
+        return <div className="usedProductPageWrapper"><p className="loadingText">Betöltés...</p></div>;
     }
 
     const activeOffers = mySubmissions.filter(sub => ['pending', 'accepted'].includes(sub.status));
@@ -212,7 +212,7 @@ export default function UsedProductPage(props) {
     );
 
     return (
-        <div className="pageWrapper">
+        <div className="usedProductPageWrapper">
             <CustomModal 
                 isOpen={modal.isOpen}
                 title={modal.title}
