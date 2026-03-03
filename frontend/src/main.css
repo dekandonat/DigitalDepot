@@ -49,3 +49,36 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 1001;
 }
+
+@media (max-width: 768px) {
+  .chatIcon {
+    bottom: 70px !important;
+    right: 15px !important;
+  }
+}
+
+@media screen and (max-width: 900px) and (orientation: landscape) {
+  body::before {
+    content: "Kérlek, fordítsd vissza a telefonod álló helyzetbe!";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    z-index: 99999;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  #root {
+    display: none !important;
+  }
+}

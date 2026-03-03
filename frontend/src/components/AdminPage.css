@@ -1,27 +1,250 @@
-.adminPageContainer {
-    text-align: center;
-    margin-top: 100px;
-}
-
-.selectBtn {
-  border: none;
-  background-color: aquamarine;
-  height: 50px;
-  width: 100px;
-  margin: 5px;
-}
-
-.selectDiv {
+.adminDashboard {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  min-height: calc(100vh - 60px);
+  background-color: #f8fafc;
+  padding-bottom: 50px;
+}
+
+.adminSidebar {
+  display: none;
+}
+
+.adminMainContent {
+  flex: 1;
+  padding: 20px 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.adminContentWrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.adminBottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background-color: white;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+  border-top: 1px solid #eee;
+}
+
+.adminBottomNavBtn {
+  background: none;
+  border: none;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  color: #555;
+  font-size: 0.75rem;
+  gap: 3px;
+  padding: 0;
 }
 
-.activeBtn {
-  background-color: rgb(11, 173, 119);
-  height: 50px;
-  width: 100px;
-  margin: 5px;
+.adminBottomNavBtn:active {
+  background-color: #f8f9fa;
+  color: #007bff;
+}
+
+.adminNavIconText {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.adminMobileMenuBg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  bottom: 50px;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: flex-start;
+  z-index: 2000;
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.adminMobileMenuBg.closing {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+.adminMobileMenuContent {
+  background-color: white;
+  width: 80%;
+  max-width: 350px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: slideInLeft 0.3s ease-out;
+  box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+}
+
+.adminMobileMenuBg.closing .adminMobileMenuContent {
+  animation: slideOutLeft 0.3s ease-in forwards;
+}
+
+.adminMobileMenuHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  background-color: #f8f9fa;
+}
+
+.adminMobileMenuHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.adminMobileMenuCloseBtn {
+  background: none;
   border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #666;
+  line-height: 1;
+  padding: 0 10px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.adminMobileNavLinks {
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.adminMobileNavBtn {
+  text-align: left;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #f1f5f9;
+  color: #475569;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.adminMobileNavBtn.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideOutLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@media (max-width: 767px) {
+  .hideChatOnAdminMobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .adminDashboard {
+    flex-direction: row;
+    min-height: calc(100vh - 70px);
+    padding-bottom: 0;
+  }
+
+  .adminBottomNav, .adminMobileMenuBg {
+    display: none;
+  }
+
+  .adminSidebar {
+    width: 260px;
+    height: calc(100vh - 70px);
+    background-color: white;
+    border-right: 1px solid #e2e8f0;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    overflow-y: auto;
+    box-sizing: border-box;
+    z-index: 50;
+  }
+
+  .adminLogoText {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 30px 0;
+    padding-left: 10px;
+    letter-spacing: -0.5px;
+  }
+
+  .adminNav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .adminNavBtn {
+    text-align: left;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .adminNavBtn:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+  }
+
+  .adminNavBtn.active {
+    background-color: #3b82f6;
+    color: white;
+  }
+
+  .adminMainContent {
+    margin-left: 260px;
+    padding: 40px 30px;
+    width: calc(100% - 260px);
+    box-sizing: border-box;
+  }
 }

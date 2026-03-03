@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiFetch } from '../assets/util/fetch';
+import CustomModal from './CustomModal';
 import './UsedProductPage.css';
 
 const formatPrice = (price) => {
@@ -16,6 +17,7 @@ export default function UsedProductPage(props) {
     const [message, setMessage] = useState('');
     const [hasBankAccount, setHasBankAccount] = useState(null);
     const [mySubmissions, setMySubmissions] = useState([]);
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '', action: null });
 
     const token = localStorage.getItem('token');
     const userEmail = localStorage.getItem('email');
@@ -45,6 +47,14 @@ export default function UsedProductPage(props) {
     function handleImageChange(event) {
         setImage(event.target.files[0]);
     }
+
+    const closeModal = () => {
+        const pendingAction = modal.action;
+        setModal({ isOpen: false, title: '', message: '', action: null });
+        if (pendingAction) {
+            pendingAction();
+        }
+    };
 
     async function checkUserProfile() {
         try {
@@ -104,7 +114,7 @@ export default function UsedProductPage(props) {
                 setProductDescription('');
                 setImage(null);
                 fetchMySubmissions();
-                setTimeout(() => setActiveTab('list'), 2000); 
+                setTimeout(() => setActiveTab('offers'), 2000); 
             } else {
                 setMessage(data.message || 'Hiba történt a beküldéskor.');
             }
@@ -116,8 +126,12 @@ export default function UsedProductPage(props) {
 
     async function handleUserDecision(id, decision) {
         if(!hasBankAccount && decision == 'accept') {
-            alert('A pénz fogadásához kérlek állítsd be a bankszámlaszámodat a profilban!');
-            props.openProfile();
+            setModal({
+                isOpen: true,
+                title: 'Figyelem',
+                message: 'A pénz fogadásához kérlek állítsd be a bankszámlaszámodat a profilban!',
+                action: () => props.openProfile()
+            });
             return;
         }
 
@@ -160,8 +174,53 @@ export default function UsedProductPage(props) {
         return <div className="pageWrapper"><p className="loadingText">Betöltés...</p></div>;
     }
 
+    const activeOffers = mySubmissions.filter(sub => ['pending', 'accepted'].includes(sub.status));
+    const pastOffers = mySubmissions.filter(sub => ['rejected', 'offer_accepted', 'offer_rejected'].includes(sub.status));
+
+    const renderCard = (sub) => (
+        <div key={sub.submissionId} className="mySubmissionCard">
+            <div className="cardHeader">
+                <h4>{sub.productName}</h4>
+                <span className="cardDate">{new Date(sub.submissionDate).toLocaleDateString()}</span>
+            </div>
+            
+            <div className="cardStatusRow">
+                <span>Állapot:</span>
+                <span className={`statusLabel ${sub.status}`}>
+                    {sub.status == 'pending' ? 'Feldolgozás alatt' : 
+                     sub.status == 'accepted' ? 'Ajánlat érkezett' : 
+                     sub.status == 'rejected' ? 'Elutasítva' :
+                     sub.status == 'offer_accepted' ? 'Általad elfogadva' :
+                     'Általad elutasítva'}
+                </span>
+            </div>
+
+            {sub.adminOfferPrice > 0 && sub.status !== 'rejected' && (
+                <div className="offerBox">
+                    <span>Kapott ajánlat:</span>
+                    <span className="offerPrice">{formatPrice(sub.adminOfferPrice)} Ft</span>
+                    
+                    {sub.status == 'accepted' && (
+                        <div className="userDecisionButtons">
+                            <button className="userAcceptBtn" onClick={() => handleUserDecision(sub.submissionId, 'accept')}>Elfogadás</button>
+                            <button className="userRejectBtn" onClick={() => handleUserDecision(sub.submissionId, 'reject')}>Elutasítás</button>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+
     return (
         <div className="pageWrapper">
+            <CustomModal 
+                isOpen={modal.isOpen}
+                title={modal.title}
+                message={modal.message}
+                onConfirm={closeModal}
+                type="alert"
+            />
+            
             <div className="tabHeader">
                 <button 
                     className={`tabButton ${activeTab == 'form' ? 'active' : ''}`} 
@@ -170,15 +229,21 @@ export default function UsedProductPage(props) {
                     Új termék leadása
                 </button>
                 <button 
-                    className={`tabButton ${activeTab == 'list' ? 'active' : ''}`} 
-                    onClick={() => setActiveTab('list')}
+                    className={`tabButton ${activeTab == 'offers' ? 'active' : ''}`} 
+                    onClick={() => setActiveTab('offers')}
                 >
-                    Korábbi leadások / Ajánlatok
+                    Ajánlatok
+                </button>
+                <button 
+                    className={`tabButton ${activeTab == 'history' ? 'active' : ''}`} 
+                    onClick={() => setActiveTab('history')}
+                >
+                    Korábbi leadások
                 </button>
             </div>
 
             <div className="usedProductContainer">
-                {activeTab == 'form' ? (
+                {activeTab == 'form' && (
                     <div className="submissionForm">
                         <h2>Adatok megadása</h2>
                         <form onSubmit={handleSubmit}>
@@ -211,44 +276,25 @@ export default function UsedProductPage(props) {
                         </form>
                         {message && <p className="statusMessage">{message}</p>}
                     </div>
-                ) : (
-                    <div className="mySubmissionsList">
-                        <h2>Leadott termékeim</h2>
-                        {mySubmissions.length == 0 ? <p>Még nincs leadott terméked.</p> : (
-                            <div className="cardsGrid">
-                                {mySubmissions.map(sub => (
-                                    <div key={sub.submissionId} className="mySubmissionCard">
-                                        <div className="cardHeader">
-                                            <h4>{sub.productName}</h4>
-                                            <span className="cardDate">{new Date(sub.submissionDate).toLocaleDateString()}</span>
-                                        </div>
-                                        
-                                        <div className="cardStatusRow">
-                                            <span>Állapot:</span>
-                                            <span className={`statusLabel ${sub.status}`}>
-                                                {sub.status == 'pending' ? 'Feldolgozás alatt' : 
-                                                 sub.status == 'accepted' ? 'Ajánlat érkezett' : 
-                                                 sub.status == 'rejected' ? 'Elutasítva' :
-                                                 sub.status == 'offer_accepted' ? 'Általad elfogadva' :
-                                                 'Általad elutasítva'}
-                                            </span>
-                                        </div>
+                )}
 
-                                        {sub.adminOfferPrice && (
-                                            <div className="offerBox">
-                                                <span>Kapott ajánlat:</span>
-                                                <span className="offerPrice">{formatPrice(sub.adminOfferPrice)} Ft</span>
-                                                
-                                                {sub.status == 'accepted' && (
-                                                    <div className="userDecisionButtons">
-                                                        <button className="userAcceptBtn" onClick={() => handleUserDecision(sub.submissionId, 'accept')}>Elfogadás</button>
-                                                        <button className="userRejectBtn" onClick={() => handleUserDecision(sub.submissionId, 'reject')}>Elutasítás</button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
+                {activeTab == 'offers' && (
+                    <div className="mySubmissionsList">
+                        <h2>Aktív ajánlatok</h2>
+                        {activeOffers.length == 0 ? <p>Jelenleg nincsenek folyamatban lévő ajánlataid.</p> : (
+                            <div className="cardsGrid">
+                                {activeOffers.map(renderCard)}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {activeTab == 'history' && (
+                    <div className="mySubmissionsList">
+                        <h2>Korábbi leadások</h2>
+                        {pastOffers.length == 0 ? <p>Még nincsenek lezárt leadásaid.</p> : (
+                            <div className="cardsGrid">
+                                {pastOffers.map(renderCard)}
                             </div>
                         )}
                     </div>

@@ -1,10 +1,10 @@
 import logo from '../assets/NavImages/logo.png'; 
 import SearchIcon from "../assets/NavImages/search-icon.png";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./Navbar.css";
 import { useNavigate } from 'react-router-dom';
 
-export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSearch }){ 
+export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSearch, isAdminRoute }){ 
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
 
@@ -25,12 +25,14 @@ export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSe
         ></img> 
     
         <div id="navbarActions">
-            <NavSearchBar onSearch={onSearch} />
+            {!isAdminRoute && <NavSearchBar onSearch={onSearch} />}
 
-            <button 
-                id = "navbarCartBtn"
-                onClick={onCartClick}
-            ></button>
+            {!isAdminRoute && (
+                <button 
+                    id = "navbarCartBtn"
+                    onClick={onCartClick}
+                ></button>
+            )}
 
             {user ? (
                 <button
@@ -49,24 +51,46 @@ export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSe
 
 function NavSearchBar({onSearch}) {
     const [searched, setSearched] = useState("");
+    const [isActive, setIsActive] = useState(false);
+    const inputRef = useRef(null);
 
-    const handleSearch = (e) => {
+    const handleSearchSubmit = (e) => {
         e.preventDefault();
-        if (onSearch){
+        if (onSearch && searched.trim()){
             onSearch(searched);
+            setIsActive(false); 
         }
     };
 
+    const handleIconClick = (e) => {
+        if (window.innerWidth < 768 && !isActive) {
+            e.preventDefault();
+            setIsActive(true);
+            setTimeout(() => inputRef.current?.focus(), 100);
+        }
+    };
+
+    const handleBlur = () => {
+        if (window.innerWidth < 768 && searched === "") {
+             setTimeout(() => setIsActive(false), 200); 
+        }
+    }
+
     return (
-        <form className="searchBar" onSubmit={handleSearch}>
+        <form 
+            className={`searchBar ${isActive ? 'active' : ''}`} 
+            onSubmit={handleSearchSubmit}
+        >
             <input
+                ref={inputRef}
                 type="text"
                 value={searched}
                 onChange={(e) => setSearched(e.target.value)}
-                placeholder="Keressen rá valamire"
+                onBlur={handleBlur}
+                placeholder="Keresés..."
                 id="navSearchText"
             ></input>
-            <button id="navSearchButton" type="submit">
+            <button id="navSearchButton" type="submit" onClick={handleIconClick}>
                 <img src={SearchIcon} alt="Search Icon" id="searchIconId"></img>
             </button>
         </form>

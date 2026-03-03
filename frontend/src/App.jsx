@@ -14,6 +14,8 @@ import UserOrders from './components/UserOrders';
 import UsedProductPage from './components/UsedProductPage';
 import ChatPanel from './components/ChatPanel';
 import AdminChatPanel from './components/AdminChatPanel';
+import MobileBottomNav from './components/MobileBottomNav';
+import MobileCategoryMenu from './components/MobileCategoryMenu';
 import { slides } from './data/MainPageGalleryData.json';
 import './main.css';
 import { jwtDecode } from 'jwt-decode';
@@ -25,6 +27,11 @@ export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const [isMobileMenuClosing, setIsMobileMenuClosing] = useState(false);
+  const [isCartClosing, setIsCartClosing] = useState(false);
+
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
@@ -34,6 +41,7 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isAdminRoute = location.pathname.startsWith('/admin');
   useEffect(() => {
     isChatOpenRef.current = isChatOpen;
   }, [isChatOpen]);
@@ -89,12 +97,29 @@ export default function App() {
     navigate(`/search?q=${searchText}`);
   };
 
+  const handleCloseMobileMenu = () => {
+    setIsMobileMenuClosing(true);
+    setTimeout(() => {
+        setIsMobileMenuOpen(false);
+        setIsMobileMenuClosing(false);
+    }, 300);
+  };
+
+  const handleCloseCart = () => {
+    setIsCartClosing(true);
+    setTimeout(() => {
+        setIsCartOpen(false);
+        setIsCartClosing(false);
+    }, 300);
+  };
+
   const handleCategorySelect = (categoryId) => {
     if (categoryId) {
       navigate(`/category/${categoryId}`);
     } else {
       navigate('/');
     }
+    handleCloseMobileMenu();
   };
 
   const handleProfileUpdate = () => {
@@ -122,6 +147,30 @@ export default function App() {
     }
   };
 
+  const toggleMobileMenuFromNav = () => {
+    if (isCartOpen) {
+        handleCloseCart();
+    }
+    
+    if (isMobileMenuOpen) {
+        handleCloseMobileMenu();
+    } else {
+        setIsMobileMenuOpen(true);
+    }
+  };
+
+  const toggleCartFromNav = () => {
+    if (isMobileMenuOpen) {
+        handleCloseMobileMenu();
+    }
+
+    if (isCartOpen) {
+        handleCloseCart();
+    } else {
+        setIsCartOpen(true);
+    }
+  };
+
   return (
     <div className="appContainer">
       <Navbar
@@ -129,11 +178,12 @@ export default function App() {
         onCartClick={() => setIsCartOpen(true)}
         onProfileClick={openProfile}
         onSearch={handleSearch}
+        isAdminRoute={isAdminRoute}
       />
 
       {location.pathname === '/' && <MainPageGallery data={slides} />}
 
-      {!location.pathname.startsWith('/admin') &&
+      {!isAdminRoute &&
         location.pathname !== '/checkout' &&
         location.pathname !== '/my-orders' &&
         location.pathname !== '/used-products' &&
@@ -174,6 +224,8 @@ export default function App() {
         <Route
           path="/admin"
           element={
+            <ProtectedRoute>
+              <AdminPage toggleChat={handleChatOpen} />
             <ProtectedRoute requireAdmin={true}>
               <AdminPage />
             </ProtectedRoute>
@@ -190,13 +242,30 @@ export default function App() {
         />
       </Routes>
 
-      {isLoginOpen && (
-        <LoginForm
-          onClose={() => setIsLoginOpen(false)}
-          setIsLoggedIn={setIsLoggedIn}
+      {!isAdminRoute && (
+        <MobileBottomNav 
+          onOpenCategories={toggleMobileMenuFromNav} 
+          onOpenCart={toggleCartFromNav} 
         />
       )}
-      {isCartOpen && <Cart onClose={() => setIsCartOpen(false)} />}
+
+      {isMobileMenuOpen && (
+        <MobileCategoryMenu 
+            onClose={handleCloseMobileMenu}
+            onCategorySelect={handleCategorySelect}
+            isClosing={isMobileMenuClosing}
+        />
+      )}
+
+      {isLoginOpen && <LoginForm onClose={() => setIsLoginOpen(false)} />}
+      
+      {isCartOpen && (
+        <Cart 
+            onClose={handleCloseCart}
+            isClosing={isCartClosing}
+        />
+      )}
+
       {isProfileOpen && (
         <ProfilePopup
           onClose={() => setIsProfileOpen(false)}

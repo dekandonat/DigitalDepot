@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import './AdminInventory.css';
 import { apiFetch } from '../assets/util/fetch';
+import CustomModal from './CustomModal';
 
 export default function AdminInventory() {
   const [products, setProducts] = useState([]);
-  const [id, setId] = useState(0);
-  const [quantity, setQuantity] = useState(0);
+  const [id, setId] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+  const [toast, setToast] = useState('');
 
   function handleIdChange(event) {
     setId(event.target.value);
@@ -15,13 +18,24 @@ export default function AdminInventory() {
     setQuantity(event.target.value);
   }
 
+  const closeModal = () => {
+    setModal({ ...modal, isOpen: false });
+  };
+
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => {
+      setToast('');
+    }, 3000);
+  };
+
   useEffect(() => {
     getMethodFetch('/products')
       .then((data) => {
         setProducts(data.data);
       })
       .catch((err) => {
-        console.error(err);
+        setModal({ isOpen: true, title: 'Hiba', message: 'Nem sikerült betölteni a termékeket.' });
       });
   }, []);
 
@@ -41,78 +55,108 @@ export default function AdminInventory() {
       });
   };
 
-  return (
-    <div>
-      <h1>Leltár</h1>
-      <div className="adminInventoryDiv">
-        <div>
-          <label htmlFor="azonosito">Azonosító</label>
-          <input
-            id="azonosito"
-            value={id}
-            type="number"
-            onChange={handleIdChange}
-          ></input>
+  const handleAddInventory = () => {
+    if (!id || !quantity) {
+        setModal({ isOpen: true, title: 'Figyelem', message: 'Kérjük, töltse ki mindkét mezőt!' });
+        return;
+    }
 
-          <label htmlFor="mennyiseg">Mennyiség</label>
-          <input
-            id="mennyiseg"
-            value={quantity}
-            type="number"
-            onChange={handleQuantityChange}
-          ></input>
+    apiFetch('/adminRoute/products/addInventory', {
+      body: { id: parseInt(id), quantity: parseInt(quantity) },
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+      .then((data) => {
+        showToast(data.result);
+        setId('');
+        setQuantity('');
+        getMethodFetch('/products')
+          .then((data) => {
+            setProducts(data.data);
+          })
+          .catch((err) => {
+            setModal({ isOpen: true, title: 'Hiba', message: 'Sikeres frissítés, de a lista frissítése sikertelen.' });
+          });
+      })
+      .catch((err) => {
+        setModal({ isOpen: true, title: 'Hiba', message: 'Hiba történt a készlet frissítésekor.' });
+      });
+  };
+
+  return (
+    <div className="inventoryContainer">
+      <CustomModal 
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={closeModal}
+        type="alert"
+      />
+      {toast && <div className="toastMessage">{toast}</div>}
+
+      <div className="inventoryHeader">
+        <h2>Leltár Kezelése</h2>
+      </div>
+
+      <div className="inventoryCard">
+        <div className="inventoryFormGrid">
+          <div className="formGroup">
+            <label htmlFor="azonosito">Termék azonosító (ID)</label>
+            <input
+              id="azonosito"
+              value={id}
+              type="number"
+              placeholder="Pl. 101"
+              onChange={handleIdChange}
+            />
+          </div>
+
+          <div className="formGroup">
+            <label htmlFor="mennyiseg">Hozzáadandó mennyiség</label>
+            <input
+              id="mennyiseg"
+              value={quantity}
+              type="number"
+              placeholder="Pl. 50"
+              onChange={handleQuantityChange}
+            />
+          </div>
 
           <button
             type="button"
-            onClick={() => {
-              apiFetch('/adminRoute/products/addInventory', {
-                body: { id: parseInt(id), quantity: parseInt(quantity) },
-                method: 'PATCH',
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-              })
-                .then((data) => {
-                  alert(data.result);
-                  setId(0);
-                  setQuantity(0);
-                  getMethodFetch('/products')
-                    .then((data) => {
-                      setProducts(data.data);
-                    })
-                    .catch((err) => {
-                      console.error(err.message);
-                    });
-                })
-                .catch((err) => {
-                  console.error('Error: ' + err.message);
-                  alert('Hiba történt');
-                });
-            }}
+            className="submitStockBtn"
+            onClick={handleAddInventory}
           >
-            Hozzáadás
+            Készlet frissítése
           </button>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Azonosító</th>
-              <th>Megnevezés</th>
-              <th>Darabszám</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => {
-              return (
-                <tr key={product.prodId}>
-                  <td>{product.prodId}</td>
-                  <td>{product.productName}</td>
-                  <td>{product.quantity}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      </div>
+
+      <div className="inventoryCard">
+        <div className="tableWrapper">
+          <table className="stockTable">
+            <thead>
+              <tr>
+                <th>Azonosító</th>
+                <th>Megnevezés</th>
+                <th>Készleten</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product) => {
+                return (
+                  <tr key={product.prodId}>
+                    <td className="idCell">#{product.prodId}</td>
+                    <td>{product.productName}</td>
+                    <td className="qtyCell">{product.quantity} db</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
