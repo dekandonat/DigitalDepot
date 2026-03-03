@@ -127,4 +127,32 @@ router.patch('/bank-account', verifyToken, async (req, res) => {
   }
 });
 
+router.get('/messages', verifyToken, async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      'SELECT * FROM messages WHERE messages.sender = ? OR messages.recipientId = ?;',
+      [req.user.id, req.user.id]
+    );
+    res.status(200).json({ result: 'success', data: rows });
+  } catch (err) {
+    console.log('Hiba történt: ' + err.message);
+    res.status(500).json({ result: 'fail', message: err.message });
+  }
+});
+
+router.post('/readmessages', verifyToken, async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      'UPDATE messages SET unread = 0 WHERE recipientId = ? AND unread = 1;',
+      [req.user.id]
+    );
+    res
+      .status(200)
+      .json({ result: 'success', affectedRows: rows.affectedRows });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ result: 'fail', message: err.message });
+  }
+});
+
 module.exports = router;

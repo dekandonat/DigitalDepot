@@ -1,12 +1,14 @@
 import { socket } from '../assets/util/socket';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import './ChatPanel.css';
+import { apiFetch } from '../assets/util/fetch';
 
 export default function ChatPanel({ changeIsOpen }) {
   const [messages, setMessages] = useState([]);
   const [typedMessage, setTypedMessage] = useState('');
   const [myId, setMyId] = useState(null);
+  const messageEndRef = useRef(null);
 
   const handleChatClose = () => {
     changeIsOpen((prev) => !prev);
@@ -23,6 +25,25 @@ export default function ChatPanel({ changeIsOpen }) {
   };
 
   useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  useEffect(() => {
+    const handleNewMessage = (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    };
+
+    apiFetch('/user/messages', {
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
+    })
+      .then((data) => {
+        setMessages(data.data);
+      })
+      .catch((err) => {
+        console.error('Hiba a kérés során');
+      });
+
     const decodedToken = jwtDecode(localStorage.getItem('token'));
     setMyId(decodedToken.id);
 
@@ -30,12 +51,10 @@ export default function ChatPanel({ changeIsOpen }) {
       token: localStorage.getItem('token'),
     };
     socket.connect();
-    socket.on('receive_message', (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
+    socket.on('receive_message', handleNewMessage);
 
     return () => {
-      socket.off('receive_message');
+      socket.off('receive_message', handleNewMessage);
     };
   }, []);
 
@@ -46,7 +65,7 @@ export default function ChatPanel({ changeIsOpen }) {
         <button onClick={handleChatClose}>X</button>
       </div>
       <div className="chatBody">
-        <div>
+        <div className="chatMessages">
           {messages.length > 0 ? (
             messages.map((message) => {
               return (
@@ -55,13 +74,14 @@ export default function ChatPanel({ changeIsOpen }) {
                     message.sender == myId ? 'sentMessage' : 'receivedMessage'
                   }
                 >
-                  {message.text}
+                  {message.message ? message.message : message.text}
                 </p>
               );
             })
           ) : (
             <p>Itt fognak megjelenni az üzenetek!</p>
           )}
+          <div ref={messageEndRef} />
         </div>
         <div className="chatInputArea">
           <input

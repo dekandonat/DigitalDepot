@@ -1,16 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import AdminAddProduct from './AdminAddProduct';
 import AdminProductList from './AdminProductList';
 import AdminCreateAccount from './AdminCreateAccount';
 import AdminOrdersList from './AdminOrdersList';
 import AdminInventory from './AdminInventory';
 import AdminUsedProducts from './AdminUsedProducts';
+import AdminUsersList from './AdminUsersList';
 import './AdminPage.css';
 
 export default function AdminPage({ toggleChat }) {
   const [currentPage, setCurrentPage] = useState('list');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileMenuClosing, setIsMobileMenuClosing] = useState(false);
+  const [userRole, setUserRole] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUserRole(decoded.role);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }, []);
 
   const handleCloseMenu = () => {
     setIsMobileMenuClosing(true);
@@ -49,12 +64,6 @@ export default function AdminPage({ toggleChat }) {
             Leltár kezelése
           </button>
           <button
-            onClick={() => setCurrentPage('createAccount')}
-            className={currentPage === 'createAccount' ? 'adminNavBtn active' : 'adminNavBtn'}
-          >
-            Admin fiókok
-          </button>
-          <button
             onClick={() => setCurrentPage('ordersList')}
             className={currentPage === 'ordersList' ? 'adminNavBtn active' : 'adminNavBtn'}
           >
@@ -66,6 +75,23 @@ export default function AdminPage({ toggleChat }) {
           >
             Használt termékek
           </button>
+
+          {userRole === 'owner' && (
+            <>
+              <button
+                onClick={() => setCurrentPage('usersList')}
+                className={currentPage === 'usersList' ? 'adminNavBtn active' : 'adminNavBtn'}
+              >
+                Felhasználók
+              </button>
+              <button
+                onClick={() => setCurrentPage('createAccount')}
+                className={currentPage === 'createAccount' ? 'adminNavBtn active' : 'adminNavBtn'}
+              >
+                Admin fiók
+              </button>
+            </>
+          )}
         </nav>
       </aside>
 
@@ -73,70 +99,82 @@ export default function AdminPage({ toggleChat }) {
         <div className="adminContentWrapper">
           {currentPage === 'list' && <AdminProductList />}
           {currentPage === 'add' && <AdminAddProduct />}
-          {currentPage === 'createAccount' && <AdminCreateAccount />}
-          {currentPage === 'ordersList' && <AdminOrdersList />}
           {currentPage === 'inventory' && <AdminInventory />}
+          {currentPage === 'ordersList' && <AdminOrdersList />}
           {currentPage === 'usedProducts' && <AdminUsedProducts />}
+          {currentPage === 'usersList' && userRole === 'owner' && <AdminUsersList />}
+          {currentPage === 'createAccount' && userRole === 'owner' && <AdminCreateAccount />}
         </div>
       </main>
 
       <div className="adminBottomNav">
         <button className="adminBottomNavBtn" onClick={() => setIsMobileMenuOpen(true)}>
-            <span className="adminNavIconText">☰</span>
-            <span>Vezérlőpult</span>
+          <span className="adminNavIconText">☰</span>
+          <span>Vezérlőpult</span>
         </button>
-        <button className="adminBottomNavBtn" onClick={toggleChat}>
-            <span className="adminNavIconText">💬</span>
-            <span>Chat</span>
+        <button className="adminBottomNavBtn hideChatOnAdminMobile" onClick={toggleChat}>
+          <span className="adminNavIconText">💬</span>
+          <span>Chat</span>
         </button>
       </div>
 
       {isMobileMenuOpen && (
         <div className={`adminMobileMenuBg ${isMobileMenuClosing ? 'closing' : ''}`} onClick={handleCloseMenu}>
-            <div className="adminMobileMenuContent" onClick={(e) => e.stopPropagation()}>
-                <div className="adminMobileMenuHeader">
-                    <h2>Vezérlőpult</h2>
-                    <button className="adminMobileMenuCloseBtn" onClick={handleCloseMenu}>&times;</button>
-                </div>
-                <div className="adminMobileNavLinks">
-                    <button
-                        onClick={() => handlePageChange('list')}
-                        className={currentPage === 'list' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
-                    >
-                        Termékek listája
-                    </button>
-                    <button
-                        onClick={() => handlePageChange('add')}
-                        className={currentPage === 'add' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
-                    >
-                        Új termék
-                    </button>
-                    <button
-                        onClick={() => handlePageChange('inventory')}
-                        className={currentPage === 'inventory' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
-                    >
-                        Leltár kezelése
-                    </button>
-                    <button
-                        onClick={() => handlePageChange('createAccount')}
-                        className={currentPage === 'createAccount' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
-                    >
-                        Admin fiókok
-                    </button>
-                    <button
-                        onClick={() => handlePageChange('ordersList')}
-                        className={currentPage === 'ordersList' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
-                    >
-                        Rendelések
-                    </button>
-                    <button
-                        onClick={() => handlePageChange('usedProducts')}
-                        className={currentPage === 'usedProducts' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
-                    >
-                        Használt termékek
-                    </button>
-                </div>
+          <div className="adminMobileMenuContent" onClick={(e) => e.stopPropagation()}>
+            <div className="adminMobileMenuHeader">
+              <h2>Vezérlőpult</h2>
+              <button className="adminMobileMenuCloseBtn" onClick={handleCloseMenu}>&times;</button>
             </div>
+            <div className="adminMobileNavLinks">
+              <button
+                onClick={() => handlePageChange('list')}
+                className={currentPage === 'list' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
+              >
+                Termékek listája
+              </button>
+              <button
+                onClick={() => handlePageChange('add')}
+                className={currentPage === 'add' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
+              >
+                Új termék
+              </button>
+              <button
+                onClick={() => handlePageChange('inventory')}
+                className={currentPage === 'inventory' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
+              >
+                Leltár kezelése
+              </button>
+              <button
+                onClick={() => handlePageChange('ordersList')}
+                className={currentPage === 'ordersList' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
+              >
+                Rendelések
+              </button>
+              <button
+                onClick={() => handlePageChange('usedProducts')}
+                className={currentPage === 'usedProducts' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
+              >
+                Használt termékek
+              </button>
+
+              {userRole === 'owner' && (
+                <>
+                  <button
+                    onClick={() => handlePageChange('usersList')}
+                    className={currentPage === 'usersList' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
+                  >
+                    Felhasználók
+                  </button>
+                  <button
+                    onClick={() => handlePageChange('createAccount')}
+                    className={currentPage === 'createAccount' ? 'adminMobileNavBtn active' : 'adminMobileNavBtn'}
+                  >
+                    Admin fiókok
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

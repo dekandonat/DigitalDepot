@@ -36,7 +36,13 @@ app.use(
     credentials: true,
   })
 );
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, 'uploads'), {
+    maxAge: '1d',
+  })
+);
 
 app.use('/products', productRouter);
 app.use('/user', userRouter);
@@ -48,5 +54,5 @@ app.use('/used-products', usedProductRouter);
 app.use('/reviews', reviewRouter);
 
 server.listen(PORT, IP, () => {
-  console.log(`Server running on: ${IP}:${PORT}`);
+  console.log(`Server running on: http://${IP}:${PORT}`);
 });
