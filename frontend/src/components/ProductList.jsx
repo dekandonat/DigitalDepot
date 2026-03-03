@@ -4,58 +4,39 @@ import ReviewModal from './ReviewModal';
 import { apiFetch } from '../assets/util/fetch';
 import './ProductList.css';
 
-function ProductCard({ product, onOpenReviews }) {
-    const [loginMessage, setLoginMessage] = useState("");
-    const [avgRating, setAvgRating] = useState(0);
-    const [reviewCount, setReviewCount] = useState(0);
+function ProductCard({ product, onOpenReviews, showToast }) {
+    const navigate = useNavigate();
+
+    const avgRating = parseFloat(product.avgRating) || 0;
+    const reviewCount = product.reviewCount || 0;
 
     const formatPrice = (price) => {
         return parseInt(price).toLocaleString('hu-HU').replaceAll(',', ' ');
     };
 
-    useEffect(() => {
-        const fetchReviews = async () => {
-            try {
-                const data = await apiFetch(`/reviews/${product.prodId}`);
-                if (data.result === 'success' && data.data.length > 0) {
-                    const total = data.data.reduce((acc, curr) => acc + curr.rating, 0);
-                    setAvgRating(total / data.data.length);
-                    setReviewCount(data.data.length);
-                } else {
-                    setAvgRating(0);
-                    setReviewCount(0);
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        };
-        fetchReviews();
-    }, [product.prodId]);
-
-    const addToCart = async () => {
+    const addToCart = async (e) => {
+        e.stopPropagation();
         const userToken = localStorage.getItem('token');
 
         if(!userToken){
-            setLoginMessage("Jelentkezzen be!");
-            setTimeout(() => {
-                setLoginMessage("");
-            }, 3000);
+            showToast("Jelentkezzen be a vásárláshoz!", "error");
             return;
         }
 
         try{
             await apiFetch(`/cart/add/${product.prodId}/1`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
-                }
+                method: 'POST'
             });
+            showToast("Sikeresen a kosárba helyezve!", "success");
         } catch(error){
-            console.error("Hiba: ", error);
-            setLoginMessage("Hiba történt!");
-            setTimeout(() => setLoginMessage(""), 3000);
+            console.error(error);
+            showToast("Hiba történt a művelet során!", "error");
         }
     };
+
+    const navigateToProduct = () => {
+        navigate(`/product/${product.prodId}`);
+    }
 
     return (
         <div className="productCard">
@@ -65,14 +46,14 @@ function ProductCard({ product, onOpenReviews }) {
                 </div>
             )}
             
-            <div className="imageContainer">
+            <div className="imageContainer" onClick={navigateToProduct}>
                 <img src={product.productImg} alt={product.productName} loading="lazy" />
             </div>
 
             <div className="cardContent">
-                <h3>{product.productName}</h3>
+                <h3 onClick={navigateToProduct}>{product.productName}</h3>
                 
-                <div className="ratingDisplay" onClick={() => onOpenReviews(product)}>
+                <div className="ratingDisplay" onClick={(e) => { e.stopPropagation(); onOpenReviews(product); }}>
                     <div className="starsContainer">
                         <span className="starFilled">{'★'.repeat(Math.round(avgRating))}</span>
                         <span className="starEmpty">{'★'.repeat(5 - Math.round(avgRating))}</span>
@@ -93,12 +74,6 @@ function ProductCard({ product, onOpenReviews }) {
                     </button>
                 </div>
             </div>
-
-            {loginMessage && (
-                <div className="loginErrorMessage">
-                    {loginMessage}
-                </div>
-            )}
         </div>
     );
 }
@@ -108,11 +83,19 @@ export default function ProductList() {
     const [allCategories, setAllCategories] = useState([]);
     const [currentCategoryName, setCurrentCategoryName] = useState("");
     const [selectedProductForReview, setSelectedProductForReview] = useState(null);
+    const [toast, setToast] = useState({ message: '', type: '' });
     const navigate = useNavigate();
 
     const { categoryId } = useParams();
     const [queryParams] = useSearchParams();
     const searchText = queryParams.get('q');
+
+    const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => {
+            setToast({ message: '', type: '' });
+        }, 3000);
+    };
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -169,7 +152,7 @@ export default function ProductList() {
             }
             catch(error) 
             {
-                console.error("Hiba: ", error);
+                console.error(error);
                 setProducts([]);
             }
         }
@@ -183,6 +166,12 @@ export default function ProductList() {
 
     return (
         <div id="productListContainer">
+            {toast.message && (
+                <div className={`toastMessage toast-${toast.type}`}>
+                    {toast.message}
+                </div>
+            )}
+
             {(categoryId || searchText) && (
                 <div id="activeFilterContainer">
                     <span id="activeFilterName">{currentCategoryName}</span>
@@ -201,6 +190,7 @@ export default function ProductList() {
                             key={product.prodId} 
                             product={product} 
                             onOpenReviews={setSelectedProductForReview}
+                            showToast={showToast}
                         />
                     ))}
                 </div>

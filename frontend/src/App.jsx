@@ -17,8 +17,9 @@ import AdminChatPanel from './components/AdminChatPanel';
 import { slides } from './data/MainPageGalleryData.json';
 import './main.css';
 import { jwtDecode } from 'jwt-decode';
-import { socket } from '../src//assets/util/socket';
+import { socket } from './assets/util/socket';
 import { apiFetch } from './assets/util/fetch';
+import ProductPage from './components/ProductPage';
 
 export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -122,7 +123,7 @@ export default function App() {
   };
 
   return (
-    <>
+    <div className="appContainer">
       <Navbar
         onLoginClick={() => setIsLoginOpen(true)}
         onCartClick={() => setIsCartOpen(true)}
@@ -135,7 +136,8 @@ export default function App() {
       {!location.pathname.startsWith('/admin') &&
         location.pathname !== '/checkout' &&
         location.pathname !== '/my-orders' &&
-        location.pathname !== '/used-products' && (
+        location.pathname !== '/used-products' &&
+        !location.pathname.startsWith('/product/') && (
           <MainCategoriesMenu onCategorySelect={handleCategorySelect} />
         )}
 
@@ -143,6 +145,8 @@ export default function App() {
         <Route path="/" element={<ProductList />} />
         <Route path="/category/:categoryId" element={<ProductList />} />
         <Route path="/search" element={<ProductList />} />
+
+        <Route path="/product/:productId" element={<ProductPage />} />
 
         <Route path="/checkout" element={<Checkout />} />
 
@@ -170,7 +174,7 @@ export default function App() {
         <Route
           path="/admin"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requireAdmin={true}>
               <AdminPage />
             </ProtectedRoute>
           }
@@ -231,6 +235,6 @@ export default function App() {
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }

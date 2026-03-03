@@ -24,6 +24,39 @@ module.exports = class User {
     this.role = role;
   }
 
+  static async fetchAllUsers() {
+    try {
+      const [rows] = await db.execute('SELECT userId, userName, email, role FROM users');
+      return rows;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  static async deleteUser(userId) {
+    try {
+      await db.execute('DELETE FROM carts WHERE userId = ?', [userId]);
+      await db.execute('DELETE FROM reviews WHERE userId = ?', [userId]);
+      await db.execute('DELETE FROM used_product_submissions WHERE userId = ?', [userId]);
+      await db.execute('DELETE FROM order_items WHERE orderId IN (SELECT orderId FROM orders WHERE userId = ?)', [userId]);
+      await db.execute('DELETE FROM orders WHERE userId = ?', [userId]);
+      await db.execute('DELETE FROM refreshtokens WHERE userId = ?', [userId]);
+      await db.execute('DELETE FROM users WHERE userId = ?', [userId]);
+      return { result: 'success' };
+    } catch (err) {
+      return { result: 'fail', message: err.message };
+    }
+  }
+
+  static async updateRole(userId, newRole) {
+    try {
+      await db.execute('UPDATE users SET role = ? WHERE userId = ?', [newRole, userId]);
+      return { result: 'success' };
+    } catch (err) {
+      return { result: 'fail', message: err.message };
+    }
+  }
+
   static async resetPassword(email, code, password) {
     try {
       const [rows] = await db.execute(
@@ -74,22 +107,18 @@ module.exports = class User {
 
   static async getCode(email) {
     try {
-      //id keresése
       const [rows] = await db.execute(
         'SELECT users.userId FROM users WHERE email = ?',
         [email]
       );
 
       if (rows.length > 0) {
-        //Kód generálása
         const code = Math.floor(100000 + Math.random() * 900000);
 
-        //lejárt kódok törlése
         recoveryCodes = recoveryCodes.filter(
           (code) => code.expiresAt > Date.now()
         );
 
-        //felhasználó régi kódjainak a törlése
         recoveryCodes = recoveryCodes.filter(
           (code) => code.id != rows[0].userId
         );
@@ -100,7 +129,6 @@ module.exports = class User {
           expiresAt: Date.now() + 5 * 60 * 1000,
         });
 
-        //Email küldése
         await transporter.sendMail({
           from: `"DigitalDepot" <${process.env.EMAIL_USER}>`,
           to: email,
@@ -154,7 +182,7 @@ module.exports = class User {
         const userName = rows[0].userName;
         const id = rows[0].userId;
         const role = rows[0].role;
-        //Access Token generálás
+        
         const accessToken = jwt.sign(
           {
             id: id,
@@ -165,7 +193,7 @@ module.exports = class User {
             expiresIn: '15m',
           }
         );
-        //refresh token generálás
+        
         await db.execute('DELETE FROM refreshTokens WHERE userId = ?', [
           rows[0].userId,
         ]);
