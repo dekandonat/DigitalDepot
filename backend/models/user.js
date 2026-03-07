@@ -26,7 +26,9 @@ module.exports = class User {
 
   static async fetchAllUsers() {
     try {
-      const [rows] = await db.execute('SELECT userId, userName, email, role FROM users');
+      const [rows] = await db.execute(
+        'SELECT userId, userName, email, role FROM users'
+      );
       return rows;
     } catch (err) {
       throw err;
@@ -37,8 +39,14 @@ module.exports = class User {
     try {
       await db.execute('DELETE FROM carts WHERE userId = ?', [userId]);
       await db.execute('DELETE FROM reviews WHERE userId = ?', [userId]);
-      await db.execute('DELETE FROM used_product_submissions WHERE userId = ?', [userId]);
-      await db.execute('DELETE FROM order_items WHERE orderId IN (SELECT orderId FROM orders WHERE userId = ?)', [userId]);
+      await db.execute(
+        'DELETE FROM used_product_submissions WHERE userId = ?',
+        [userId]
+      );
+      await db.execute(
+        'DELETE FROM order_items WHERE orderId IN (SELECT orderId FROM orders WHERE userId = ?)',
+        [userId]
+      );
       await db.execute('DELETE FROM orders WHERE userId = ?', [userId]);
       await db.execute('DELETE FROM refreshtokens WHERE userId = ?', [userId]);
       await db.execute('DELETE FROM users WHERE userId = ?', [userId]);
@@ -50,7 +58,10 @@ module.exports = class User {
 
   static async updateRole(userId, newRole) {
     try {
-      await db.execute('UPDATE users SET role = ? WHERE userId = ?', [newRole, userId]);
+      await db.execute('UPDATE users SET role = ? WHERE userId = ?', [
+        newRole,
+        userId,
+      ]);
       return { result: 'success' };
     } catch (err) {
       return { result: 'fail', message: err.message };
@@ -148,6 +159,15 @@ module.exports = class User {
 
   async register() {
     try {
+      const [rows] = await db.execute(
+        'SELECT * FROM users WHERE email LIKE ?;',
+        [this.email]
+      );
+
+      if (rows.length >= 1) {
+        return { result: 'fail', message: 'email already in use' };
+      }
+
       const hashedPassword = await bcrypt.hash(this.password, 10);
       this.password = hashedPassword;
       await db.execute(
@@ -171,7 +191,7 @@ module.exports = class User {
       );
 
       if (rows.length == 0) {
-        return { result: 'fail', data: 'no such user exists' };
+        return { result: 'fail', message: 'nem létezik ez a felhasználó' };
       }
 
       const hashedPassword = rows[0].hashedPassword;
@@ -182,7 +202,7 @@ module.exports = class User {
         const userName = rows[0].userName;
         const id = rows[0].userId;
         const role = rows[0].role;
-        
+
         const accessToken = jwt.sign(
           {
             id: id,
@@ -193,7 +213,7 @@ module.exports = class User {
             expiresIn: '15m',
           }
         );
-        
+
         await db.execute('DELETE FROM refreshTokens WHERE userId = ?', [
           rows[0].userId,
         ]);
@@ -216,7 +236,7 @@ module.exports = class User {
           refreshToken: refreshtoken,
         };
       } else {
-        return { result: 'fail', data: 'incorrect password' };
+        return { result: 'fail', message: 'helytelen jelszó' };
       }
     } catch (err) {
       return { result: 'fail', message: 'server error' };
