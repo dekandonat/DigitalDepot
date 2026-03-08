@@ -53,7 +53,11 @@ export default function AdminAddProduct() {
 
   const handleAddProduct = () => {
     if (img == undefined) {
-      setModal({ isOpen: true, title: 'Hiba', message: 'Nem adott meg képet a termékhez!' });
+      setModal({
+        isOpen: true,
+        title: 'Hiba',
+        message: 'Nem adott meg képet a termékhez!',
+      });
       return;
     }
 
@@ -72,32 +76,40 @@ export default function AdminAddProduct() {
       body: formData,
     })
       .then((data) => {
-        if(data.result === 'Sikeres feltöltés') {
-            showToast('Sikeres feltöltés!');
-            setName('');
-            setDescription('');
-            setPrice(0);
-            setImg(undefined);
-            document.getElementById('imgId').value = '';
+        if (data.result === 'success') {
+          showToast('Sikeres feltöltés!');
+          setName('');
+          setDescription('');
+          setPrice(0);
+          setImg(undefined);
+          document.getElementById('imgId').value = '';
         } else {
-            setModal({ isOpen: true, title: 'Hiba történt', message: data.result });
+          setModal({
+            isOpen: true,
+            title: 'Hiba történt',
+            message: data.message,
+          });
         }
       })
       .catch((err) => {
-        setModal({ isOpen: true, title: 'Szerver hiba', message: 'Nem sikerült csatlakozni a szerverhez.' });
+        setModal({
+          isOpen: true,
+          title: 'Hiba',
+          message: err.message,
+        });
       });
   };
 
   return (
     <div className="adminFormWrapper">
-      <CustomModal 
+      <CustomModal
         isOpen={modal.isOpen}
         title={modal.title}
         message={modal.message}
         onConfirm={closeModal}
         type="alert"
       />
-      
+
       {toast && <div className="toastMessage">{toast}</div>}
 
       <div className="adminFormHeader">
@@ -114,7 +126,7 @@ export default function AdminAddProduct() {
               value={name}
             />
           </div>
-          
+
           <div className="formControl">
             <label htmlFor="descriptionId">Termék leírása</label>
             <textarea
@@ -124,7 +136,7 @@ export default function AdminAddProduct() {
               rows="4"
             />
           </div>
-          
+
           <div className="formControl">
             <label htmlFor="priceId">Termék ára (HUF)</label>
             <input
@@ -134,7 +146,7 @@ export default function AdminAddProduct() {
               value={price}
             />
           </div>
-          
+
           <div className="formControl">
             <label htmlFor="categoryId">Termék kategóriája</label>
             <select id="categoryId" ref={selectRef}>
@@ -148,7 +160,12 @@ export default function AdminAddProduct() {
 
           <div className="formControl">
             <label htmlFor="imgId">Termék képe</label>
-            <input type="file" id="imgId" onChange={handleImgChange} className="fileInput" />
+            <input
+              type="file"
+              id="imgId"
+              onChange={handleImgChange}
+              className="fileInput"
+            />
           </div>
 
           <button

@@ -79,6 +79,7 @@ export default function AdminChatPanel() {
 
     return () => {
       socket.off('receive_message', handleNewMessage);
+      socket.disconnect();
     };
   }, []);
 

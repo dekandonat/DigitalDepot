@@ -210,9 +210,18 @@ router.get('/messages', async (req, res) => {
 router.patch('/readmessages/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
+
+    const idNum = Number(userId);
+
+    if (!Number.isInteger(idNum) || idNum <= 0) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'id must be a number' });
+    }
+
     const [rows] = await db.execute(
       'UPDATE messages SET unread = 0 WHERE sender = ? AND recipientId IS NULL AND unread = 1;',
-      [userId]
+      [idNum]
     );
     res
       .status(200)
@@ -225,9 +234,18 @@ router.patch('/readmessages/:userId', async (req, res) => {
 router.delete('/messages/:id', async (req, res) => {
   try {
     const userId = req.params.id;
+
+    const idNum = Number(userId);
+
+    if (!Number.isInteger(idNum) || idNum <= 0) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'id must be a number' });
+    }
+
     const [rows] = await db.execute(
       'DELETE FROM messages WHERE messages.sender = ? OR messages.recipientId = ?;',
-      [userId, userId]
+      [idNum, idNum]
     );
     res
       .status(200)
@@ -235,6 +253,29 @@ router.delete('/messages/:id', async (req, res) => {
   } catch (err) {
     console.log(err.message);
     res.status(500).json({ result: 'fail' });
+  }
+});
+
+router.post('/', async (req, res) => {
+  try {
+    const { categoryName, parentId } = req.body;
+
+    const parent = parentId ? parentId : null;
+
+    if (!categoryName) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'no categoryName given' });
+    }
+
+    const [result] = await db.execute(
+      'INSERT INTO categories (categoryName, parentId) VALUES (?, ?)',
+      [categoryName, parent]
+    );
+
+    res.status(201).json({ result: 'success', insertId: result.insertId });
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: err.message });
   }
 });
 

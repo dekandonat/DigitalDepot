@@ -7,6 +7,13 @@ const verifyToken = require('../util/tokenVerify');
 
 router.get('/items/:orderId', async (req, res) => {
   const orderId = req.params.orderId;
+
+  const idNum = Number(orderId);
+
+  if (!Number.isInteger(idNum) || idNum <= 0) {
+    return res.status(400).json({ result: 'fail', message: 'invalid orderId' });
+  }
+
   try {
     const items = await Order.getOrderItems(orderId);
     res.status(200).json({ result: 'success', data: items });
