@@ -43,6 +43,10 @@ router.post('/register', async (req, res) => {
         .json({ result: 'fail', message: 'only owners can create admins' });
     }
 
+    if (!req.body.userName || !req.body.password || !req.body.email) {
+      return res.status(400).json({ result: 'fail', message: 'hiányzó adat' });
+    }
+
     const user = new User(
       req.body.userName,
       req.body.password,
@@ -83,13 +87,20 @@ router.patch('/users/:userId/role', async (req, res) => {
         .json({ result: 'fail', message: 'only owners can change roles' });
     }
     const userId = req.params.userId;
+
+    const numId = Number(userId);
+
+    if (!Number.isInteger(numId) || numId <= 0) {
+      return res.status(400).json({ result: 'fail', message: 'invalid id' });
+    }
+
     const { role } = req.body;
 
     if (role !== 'user' && role !== 'admin' && role !== 'owner') {
       return res.status(400).json({ result: 'fail', message: 'invalid role' });
     }
 
-    const result = await User.updateRole(userId, role);
+    const result = await User.updateRole(numId, role);
     if (result.result === 'success') {
       res.status(200).json(result);
     } else {
@@ -108,7 +119,14 @@ router.delete('/users/:userId', async (req, res) => {
         .json({ result: 'fail', message: 'only owners can delete users' });
     }
     const userId = req.params.userId;
-    const result = await User.deleteUser(userId);
+
+    const numId = Number(userId);
+
+    if (!Number.isInteger(numId) || numId <= 0) {
+      return res.status(400).json({ result: 'fail', message: 'invalid id' });
+    }
+
+    const result = await User.deleteUser(numId);
     if (result.result === 'success') {
       res.status(200).json(result);
     } else {
@@ -134,7 +152,14 @@ router.get('/orders', async (req, res) => {
 router.get('/orders/:orderId', async (req, res) => {
   try {
     const orderId = req.params.orderId;
-    const result = await Order.getOrderItems(orderId);
+
+    const numId = Number(orderId);
+
+    if (!Number.isInteger(numId) || numId <= 0) {
+      return res.status(400).json({ result: 'fail', message: 'invalid id' });
+    }
+
+    const result = await Order.getOrderItems(numId);
     res.status(200).json({ result: 'success', data: result });
   } catch (err) {
     res.status(500).json({ result: 'fail', message: err.message });
@@ -144,7 +169,14 @@ router.get('/orders/:orderId', async (req, res) => {
 router.delete('/orders/:orderId', async (req, res) => {
   try {
     const orderId = req.params.orderId;
-    const result = await Order.delete(orderId);
+
+    const numId = Number(orderId);
+
+    if (!Number.isInteger(numId) || numId <= 0) {
+      return res.status(400).json({ result: 'fail', message: 'invalid id' });
+    }
+
+    const result = await Order.delete(numId);
     if (result.result === 'success') {
       res.status(200).json(result);
     } else {
@@ -176,12 +208,34 @@ router.patch('/products/:prodId', async (req, res) => {
   const id = req.params.prodId;
   const { prodName, prodDescription, prodPrice, conditionState } = req.body;
 
+  if (
+    !prodName ||
+    !prodDescription ||
+    !prodPrice ||
+    conditionState === undefined
+  ) {
+    return res.status(400).json({ result: 'fail', message: 'missing values' });
+  }
+
+  const numId = Number(id);
+  const numPrice = Number(prodPrice);
+
+  if (!Number.isInteger(numPrice) || numPrice <= 0) {
+    return res.status(400).json({ result: 'fail', message: 'invalid price' });
+  }
+
+  if (!Number.isInteger(numId) || numId <= 0) {
+    return res
+      .status(400)
+      .json({ result: 'fail', message: 'id must be a number' });
+  }
+
   try {
     const result = await Products.update(
-      id,
+      numId,
       prodName,
       prodDescription,
-      prodPrice,
+      numPrice,
       conditionState
     );
     if (result.result === 'success') {

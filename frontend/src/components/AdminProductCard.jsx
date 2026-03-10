@@ -45,10 +45,18 @@ export default function AdminProductCard(props) {
         setIsEditing(false);
         showToast('Sikeresen frissítve!');
       } else {
-        setModal({ isOpen: true, title: 'Hiba', message: response.message || 'Ismeretlen hiba történt.' });
+        setModal({
+          isOpen: true,
+          title: 'Hiba',
+          message: response.message || 'Ismeretlen hiba történt.',
+        });
       }
     } catch (error) {
-      setModal({ isOpen: true, title: 'Szerver hiba', message: 'Szerver hiba történt a mentés során.' });
+      setModal({
+        isOpen: true,
+        title: 'Szerver hiba',
+        message: error.message,
+      });
     }
   };
 
@@ -62,7 +70,7 @@ export default function AdminProductCard(props) {
 
   return (
     <div className="adminProductCardDiv">
-      <CustomModal 
+      <CustomModal
         isOpen={modal.isOpen}
         title={modal.title}
         message={modal.message}
@@ -70,7 +78,7 @@ export default function AdminProductCard(props) {
         type="alert"
       />
       {toast && <div className="toastMessage">{toast}</div>}
-      
+
       <img src={props.img} alt={name} className="productCardImg" />
 
       <div className="productCardContent">
