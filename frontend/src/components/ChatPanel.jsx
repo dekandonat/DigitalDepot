@@ -8,7 +8,17 @@ export default function ChatPanel({ changeIsOpen }) {
   const [messages, setMessages] = useState([]);
   const [typedMessage, setTypedMessage] = useState('');
   const [myId, setMyId] = useState(null);
+  const [topicSelected, setTopicSelected] = useState(false);
   const messageEndRef = useRef(null);
+
+  const predefinedTopics = [
+    'Szállítás', 
+    'Fizetés', 
+    'Termékhiba', 
+    'Garancia', 
+    'Visszaküldés', 
+    'Rendelés'
+  ];
 
   const handleChatClose = () => {
     changeIsOpen((prev) => !prev);
@@ -24,9 +34,21 @@ export default function ChatPanel({ changeIsOpen }) {
     setTypedMessage('');
   };
 
+  const handleTopicSelect = async (topic) => {
+    try {
+      await apiFetch('/user/chat-topic', {
+        method: 'PATCH',
+        body: { topic: topic }
+      });
+      setTopicSelected(true);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, topicSelected]);
 
   useEffect(() => {
     const handleNewMessage = (message) => {
@@ -38,9 +60,13 @@ export default function ChatPanel({ changeIsOpen }) {
       headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
     })
       .then((data) => {
-        setMessages(data.data);
+        const msgs = data.data[0]?.messages || [];
+        setMessages(msgs);
+        if (msgs.length > 0) {
+          setTopicSelected(true);
+        }
       })
-      .catch((err) => {
+      .catch(() => {
         console.error('Hiba a kérés során');
       });
 
@@ -64,32 +90,68 @@ export default function ChatPanel({ changeIsOpen }) {
         <h4>Segítség kérés</h4>
         <button onClick={handleChatClose}>X</button>
       </div>
+      
       <div className="chatBody">
         <div className="chatMessages">
-          {messages.length > 0 ? (
-            messages.map((message) => {
-              return (
-                <p
-                  className={
-                    message.sender == myId ? 'sentMessage' : 'receivedMessage'
-                  }
+          {!topicSelected ? (
+            <div className="topicSelectorFull">
+              <h3>Miben segíthetünk?</h3>
+              <div className="topicGrid">
+                {predefinedTopics.map((topic) => (
+                  <button
+                    key={topic}
+                    className="topicFullBtn"
+                    onClick={() => handleTopicSelect(topic)}
+                  >
+                    {topic}
+                  </button>
+                ))}
+                <button
+                  className="topicFullBtn otherBtn"
+                  onClick={() => handleTopicSelect('Egyéb')}
                 >
-                  {message.message ? message.message : message.text}
-                </p>
-              );
-            })
+                  Egyéb
+                </button>
+              </div>
+            </div>
           ) : (
-            <p>Itt fognak megjelenni az üzenetek!</p>
+            <>
+              {messages.length > 0 ? (
+                messages.map((message, index) => {
+                  const text = message.message || message.text || '';
+                  const d = new Date(message.date || message.sentAt || Date.now());
+                  const timeStr = !isNaN(d.getTime()) ? d.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+                  const isSent = message.sender == myId;
+
+                  return (
+                    <div key={index} className={`messageWrapper ${isSent ? 'sent' : 'received'}`}>
+                      <div className={isSent ? 'sentMessage' : 'receivedMessage'}>
+                        {text}
+                      </div>
+                      <span className="messageTime">{timeStr}</span>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="chatEmptyState">
+                  Kezdd el a beszélgetést!
+                </p>
+              )}
+            </>
           )}
           <div ref={messageEndRef} />
         </div>
+
         <div className="chatInputArea">
           <input
             type="text"
             value={typedMessage}
             onChange={handleInputChange}
-          ></input>
-          <button onClick={sendMessage}>Küldés</button>
+            onKeyDown={(e) => e.key === 'Enter' && topicSelected && sendMessage()}
+            placeholder={topicSelected ? "Írj egy üzenetet..." : "Kérlek válassz a fenti témákból..."}
+            disabled={!topicSelected}
+          />
+          <button onClick={sendMessage} disabled={!topicSelected}>Küldés</button>
         </div>
       </div>
     </div>

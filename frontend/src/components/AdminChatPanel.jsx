@@ -8,12 +8,33 @@ export default function AdminChatPanel() {
   const [currentUser, setCurrentUser] = useState(null);
   const [typedMessage, setTypedMessage] = useState('');
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
+  const [openTopics, setOpenTopics] = useState({
+    'Szállítás': true,
+    'Fizetés': true,
+    'Termékhiba': true,
+    'Garancia': true,
+    'Visszaküldés': true,
+    'Rendelés': true,
+    'Egyéb': true
+  });
+  
   const messagesEndRef = useRef(null);
   const currentUserRef = useRef(null);
+  const predefinedTopics = [
+    'Szállítás', 
+    'Fizetés', 
+    'Termékhiba', 
+    'Garancia', 
+    'Visszaküldés', 
+    'Rendelés', 
+    'Egyéb'
+  ];
+
+  const activeUser = currentUser ? userMessages.find(u => u.id === currentUser.id) : null;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentUser]);
+  }, [activeUser, activeUser?.messages]);
 
   useEffect(() => {
     currentUserRef.current = currentUser;
@@ -22,9 +43,7 @@ export default function AdminChatPanel() {
   useEffect(() => {
     const handleNewMessage = (newMessage) => {
       setUserMessages((prev) => {
-        const currentUserId = currentUserRef.current?.id;
         if (newMessage.recipientId) {
-          //Admin üzenet -> van recipientId benne
           const userId = newMessage.recipientId;
           return prev.map((u) =>
             u.id === userId
@@ -32,182 +51,150 @@ export default function AdminChatPanel() {
               : u
           );
         } else {
-          //User üzenet
           const userExists = prev.find((u) => u.id === newMessage.sender);
-
           if (userExists) {
             return prev.map((u) =>
               u.id === newMessage.sender
-                ? {
-                    ...u,
-                    unread: newMessage.sender == currentUserId ? false : true,
-                    messages: [...u.messages, newMessage],
-                  }
+                ? { ...u, unread: currentUserRef.current?.id !== newMessage.sender, messages: [...u.messages, newMessage] }
                 : u
             );
           } else {
-            return [
-              ...prev,
-              {
-                id: newMessage.sender,
-                unread: newMessage.sender == currentUserId ? false : true,
-                messages: [newMessage],
-              },
-            ];
+            fetchMessages();
+            return prev;
           }
         }
       });
     };
 
-    apiFetch('/adminRoute/messages', {
-      method: 'GET',
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
-    })
-      .then((data) => {
-        console.log(data.data);
-        setUserMessages(data.data);
-      })
-      .catch((err) => {
-        console.error('Hiba az üzenetek lekérése során: ' + err.message);
-      });
-
-    socket.auth = {
-      token: localStorage.getItem('token'),
-    };
+    socket.auth = { token: localStorage.getItem('token') };
     socket.connect();
     socket.on('receive_message', handleNewMessage);
+    fetchMessages();
 
     return () => {
       socket.off('receive_message', handleNewMessage);
     };
   }, []);
 
-  useEffect(() => {
-    if (currentUser) {
-      let currentUsersMessages = userMessages.find(
-        (message) => message.id == currentUser.id
-      );
-      setCurrentUser(currentUsersMessages);
+  const fetchMessages = async () => {
+    try {
+      const data = await apiFetch('/adminRoute/messages');
+      if (data.result === 'success') {
+        setUserMessages(data.data);
+      }
+    } catch (err) {
+      console.error(err);
     }
-  }, [userMessages]);
-
-  const handleMessageChange = (event) => {
-    setTypedMessage(event.target.value);
   };
 
-  const handleUserChange = (id) => {
-    const selectedUser = userMessages.find((u) => u.id == id);
+  const handleUserClick = async (user) => {
+    setCurrentUser(user);
     setIsSideBarOpen(false);
-    apiFetch(`/adminRoute/readmessages/${id}`, {
-      method: 'PATCH',
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
-    })
-      .then((data) => {
-        console.log(data);
-        if (selectedUser) {
-          setUserMessages((prev) => {
-            return prev.map((u) => (u.id === id ? { ...u, unread: false } : u));
-          });
-          setCurrentUser({ ...selectedUser, unread: false });
-        }
-      })
-      .catch((err) => {
-        console.error('Hiba az üzenetek frissítése során: ' + err.message);
-      });
+    if (user.unread) {
+      try {
+        await apiFetch(`/adminRoute/readmessages/${user.id}`, { method: 'PATCH' });
+        setUserMessages((prev) =>
+          prev.map((u) => (u.id === user.id ? { ...u, unread: false } : u))
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
+  const handleMessageChange = (e) => {
+    setTypedMessage(e.target.value);
   };
 
   const handleMessageSend = () => {
     if (typedMessage.trim() === '') return;
-    socket.emit('send_message', {
-      text: typedMessage,
+    const msgData = {
+      text: typedMessage, 
       recipientId: currentUser.id,
-    });
+    };
+    socket.emit('send_message', msgData);
     setTypedMessage('');
   };
 
-  const handleDeleteChat = (id) => {
-    apiFetch(`/adminRoute/messages/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('token'),
-      },
-    })
-      .then((data) => {
-        if (data.result == 'success') {
-          setUserMessages((prev) => prev.filter((user) => user.id !== id));
-
-          if (currentUser?.id == id) {
-            setCurrentUser(null);
-          }
-        }
-      })
-      .catch((err) => {
-        console.error('Hiba: ' + err.message);
-      });
+  const toggleTopic = (topic) => {
+    setOpenTopics(prev => ({ ...prev, [topic]: !prev[topic] }));
   };
+
+  const getGroupedUsers = () => {
+    const groups = {
+      'Szállítás': [],
+      'Fizetés': [],
+      'Termékhiba': [],
+      'Garancia': [],
+      'Visszaküldés': [],
+      'Rendelés': [],
+      'Egyéb': []
+    };
+    userMessages.forEach(u => {
+      const t = u.chatTopic && predefinedTopics.includes(u.chatTopic) ? u.chatTopic : 'Egyéb';
+      groups[t].push(u);
+    });
+    return groups;
+  };
+
+  const groupedUsers = getGroupedUsers();
 
   return (
     <>
-      <button
-        className="mobileMenuToggle"
-        onClick={() => setIsSideBarOpen((prev) => !prev)}
-      >
-        {isSideBarOpen ? '✖ Üzenetek' : '☰ Felhasználók'}
+      <h1 className="adminChatPanelH1">Üzenetek Kezelése</h1>
+      <button className="mobileMenuToggle" onClick={() => setIsSideBarOpen(!isSideBarOpen)}>
+        {isSideBarOpen ? 'Kategóriák Bezárása' : 'Kategóriák / Ügyfelek'}
       </button>
-      <div
-        className={`adminChatPanelFlexbox ${isSideBarOpen ? 'open' : 'closed'}`}
-      >
-        <div className="adminChatList">
-          {userMessages.length > 0 ? (
-            userMessages.map((user) => {
-              return (
-                <div
-                  key={user.id}
-                  className={`adminChatUser ${currentUser?.id == user.id ? 'active' : null}`}
-                  onClick={() => {
-                    handleUserChange(user.id);
-                  }}
-                >
-                  <button
-                    className="deleteChatBtn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteChat(user.id);
-                    }}
-                  >
-                    ×
-                  </button>
-                  <h3>
-                    #{user.id} Felhasználó{' '}
-                    {user.unread ? (
-                      <span className="unreadBadge">Új</span>
-                    ) : null}
-                  </h3>
-                  <p>
-                    {user.messages[user.messages.length - 1]?.text ||
-                      'Nincsen üzenet'}
+      
+      <div className="adminChatPanelFlexbox">
+        <div className={`adminChatList ${isSideBarOpen ? 'open' : ''}`}>
+          {predefinedTopics.map(topic => (
+            <div key={topic} className="topicAccordion">
+              <div className="topicAccordionHeader" onClick={() => toggleTopic(topic)}>
+                <span>{topic} ({groupedUsers[topic].length})</span>
+                <span>{openTopics[topic] ? '▲' : '▼'}</span>
+              </div>
+              
+              <div className={`topicAccordionBody ${openTopics[topic] ? 'open' : ''}`}>
+                {groupedUsers[topic].length > 0 ? (
+                  groupedUsers[topic].map((user) => (
+                    <div
+                      key={user.id}
+                      className={`adminChatUser ${currentUser?.id === user.id ? 'active' : ''}`}
+                      onClick={() => handleUserClick(user)}
+                    >
+                      <h3>
+                        {user.userName || `Felhasználó #${user.id}`}
+                        {user.unread && <span className="unreadBadge">Új</span>}
+                      </h3>
+                      <p>{user.messages[user.messages.length - 1]?.text || 'Nincs üzenet'}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="adminEmptyTopic">
+                    Nincs beszélgetés
                   </p>
-                </div>
-              );
-            })
-          ) : (
-            <h4>Itt fognak megjelenni az üzenetek</h4>
-          )}
+                )}
+              </div>
+            </div>
+          ))}
         </div>
-        {currentUser ? (
+
+        {activeUser ? (
           <div className="adminChatText">
             <div className="adminChatMessageField">
-              {currentUser?.messages?.map((message) => {
+              {activeUser.messages.map((message, idx) => {
+                const d = new Date(message.date || message.sentAt || Date.now());
+                const timeStr = !isNaN(d.getTime()) ? d.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+                const isSent = message.recipientId != null;
+
                 return (
-                  <h3
-                    className={
-                      message.recipientId
-                        ? 'sentMessageAdmin'
-                        : 'receivedMessageAdmin'
-                    }
-                  >
-                    {message.text}
-                  </h3>
+                  <div key={idx} className={`adminMessageWrapper ${isSent ? 'sent' : 'received'}`}>
+                    <div className={isSent ? 'sentMessageAdmin' : 'receivedMessageAdmin'}>
+                      {message.text}
+                    </div>
+                    <span className="messageTimeAdmin">{timeStr}</span>
+                  </div>
                 );
               })}
               <div ref={messagesEndRef} />
@@ -218,11 +205,16 @@ export default function AdminChatPanel() {
                 value={typedMessage}
                 onChange={handleMessageChange}
                 onKeyDown={(e) => e.key === 'Enter' && handleMessageSend()}
-              ></input>
+                placeholder="Írj egy választ..."
+              />
               <button onClick={handleMessageSend}>Küldés</button>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="adminNoChatSelected">
+            <h2>Válassz ki egy beszélgetést!</h2>
+          </div>
+        )}
       </div>
     </>
   );

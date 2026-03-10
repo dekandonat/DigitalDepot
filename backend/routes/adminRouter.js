@@ -15,6 +15,8 @@ const groupMessagesByUser = (messages) => {
     if (!groupMap[userId]) {
       groupMap[userId] = {
         id: userId,
+        userName: message.userName || null,
+        chatTopic: message.chatTopic || 'Egyéb',
         unread: false,
         messages: [],
       };
@@ -209,8 +211,13 @@ router.patch('/products/:prodId', async (req, res) => {
 router.get('/messages', async (req, res) => {
   try {
     const [rows] = await db.execute(
-      'SELECT * FROM messages ORDER BY messages.id'
+      `SELECT messages.*, users.userName, users.chatTopic 
+       FROM messages 
+       LEFT JOIN users ON (users.userId = messages.sender OR users.userId = messages.recipientId) 
+       WHERE users.role = 'user' 
+       ORDER BY messages.id ASC`
     );
+    
     const messageList = groupMessagesByUser(rows);
     res.status(200).json({ result: 'success', data: messageList });
   } catch (err) {
