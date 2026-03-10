@@ -58,12 +58,24 @@ export async function apiFetch(url, options = {}) {
     }
 
     if (!response.ok) {
-      throw new Error('Hiba: ' + response.statusText);
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (err) {
+        errorData = { message: response.statusText };
+      }
+      const error = new Error(errorData.message || 'Hiba történt');
+      error.status = response.status;
+      error.data = errorData;
+      throw error;
     }
 
     const data = await response.json();
     return data;
   } catch (err) {
+    if (err.status) {
+      throw err;
+    }
     throw new Error('Hiba: ' + err.message);
   }
 }

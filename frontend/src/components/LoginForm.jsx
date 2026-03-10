@@ -12,7 +12,7 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => {
-        setToast({ message: '', type: '' });
+      setToast({ message: '', type: '' });
     }, 3000);
   };
 
@@ -79,7 +79,7 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
     <div className="formBackground" onMouseDown={onClose}>
       {toast.message && (
         <div className={`toastMessage toast-${toast.type}`}>
-            {toast.message}
+          {toast.message}
         </div>
       )}
       <div className="formContent" onMouseDown={(e) => e.stopPropagation()}>

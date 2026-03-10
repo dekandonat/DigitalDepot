@@ -8,17 +8,24 @@ const verifyToken = require('../util/tokenVerify');
 const router = express.Router();
 
 router.post('/register', async (req, res) => {
-  const user = new User(
-    req.body.userName,
-    req.body.password,
-    req.body.email,
-    'user'
-  );
-  const result = await user.register();
-  if (result.result == 'success') {
-    res.status(201).json(result);
-  } else {
-    res.status(500).json(result);
+  try {
+    const { userName, password, email } = req.body;
+
+    if (userName.trim() == '' || password.trim() == '' || email.trim() == '') {
+      return res.status(400).json({ result: 'fail', message: 'invalid data' });
+    }
+
+    const user = new User(userName, password, email, 'user');
+    const result = await user.register();
+    if (result.result == 'success') {
+      res.status(201).json(result);
+    } else if (result.message == 'email használatban van') {
+      res.status(409).json(result);
+    } else {
+      res.status(500).json(result);
+    }
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: err.message });
   }
 });
 
