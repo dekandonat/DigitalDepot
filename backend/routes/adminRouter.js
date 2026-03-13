@@ -188,6 +188,18 @@ router.delete('/orders/:orderId', async (req, res) => {
   }
 });
 
+router.patch('/orders/:orderId/status', async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const { status } = req.body;
+    await db.execute('UPDATE orders SET status = ? WHERE orderId = ?', [status, orderId]);
+    res.status(200).json({ result: 'success' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
+
 router.patch('/products/addInventory', async (req, res) => {
   try {
     const { id, quantity } = req.body;
