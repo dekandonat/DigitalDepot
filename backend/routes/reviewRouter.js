@@ -6,7 +6,15 @@ const verifyToken = require('../util/tokenVerify');
 
 router.get('/:productId', async (req, res) => {
   try {
-    const reviews = await Review.fetchByProductId(req.params.productId);
+    const numId = Number(req.params.productId);
+
+    if (!Number.isInteger(numId) || numId <= 0) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'id must be a number' });
+    }
+
+    const reviews = await Review.fetchByProductId(numId);
     res.status(200).json({ result: 'success', data: reviews });
   } catch (err) {
     res.status(500).json({ result: 'fail', message: err.message });
@@ -18,6 +26,19 @@ router.post('/', verifyToken, async (req, res) => {
     console.log(req.cookies);
     const userId = req.user.id;
     const { productId, rating, comment } = req.body;
+
+    if (!productId || !rating || !comment) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'missing fields' });
+    }
+
+    const numId = Number(productId);
+    if (!Number.isInteger(numId) || numId <= 0) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'id must be a number' });
+    }
 
     const review = new Review(userId, productId, rating, comment);
     const result = await review.save();
