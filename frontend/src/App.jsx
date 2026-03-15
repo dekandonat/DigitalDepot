@@ -16,6 +16,7 @@ import ChatPanel from './components/ChatPanel';
 import AdminChatPanel from './components/AdminChatPanel';
 import MobileBottomNav from './components/MobileBottomNav';
 import MobileCategoryMenu from './components/MobileCategoryMenu';
+import ProfilePage from './components/ProfilePage';
 import { slides } from './data/MainPageGalleryData.json';
 import './main.css';
 import { jwtDecode } from 'jwt-decode';
@@ -180,12 +181,13 @@ export default function App() {
         isAdminRoute={isAdminRoute}
       />
 
-      {location.pathname === '/' && <MainPageGallery data={slides} />}
+      {location.pathname === '/' && <MainPageGallery data={slides || []} />}
 
       {!isAdminRoute &&
         location.pathname !== '/checkout' &&
         location.pathname !== '/my-orders' &&
         location.pathname !== '/used-products' &&
+        location.pathname !== '/profile' &&
         !location.pathname.startsWith('/product/') && (
           <MainCategoriesMenu onCategorySelect={handleCategorySelect} />
         )}
@@ -196,6 +198,15 @@ export default function App() {
         <Route path="/search" element={<ProductList />} />
         <Route path="/product/:productId" element={<ProductPage />} />
         <Route path="/checkout" element={<Checkout />} />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/my-orders"
@@ -271,6 +282,14 @@ export default function App() {
           onClose={() => setIsProfileOpen(false)}
           onProfileUpdate={handleProfileUpdate}
           setIsLoggedIn={setIsLoggedIn}
+          onLogout={() => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('email');
+            setIsLoggedIn(false);
+            setIsProfileOpen(false);
+            socket.disconnect();
+            navigate('/');
+          }}
         />
       )}
 

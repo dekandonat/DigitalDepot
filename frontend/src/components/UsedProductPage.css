@@ -317,6 +317,72 @@ h2 {
     background-color: #c82333;
 }
 
+
+.addressPickerContainer {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.addressPickerTitle {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    color: #333;
+}
+
+.addressInputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.addressInputRow {
+    display: flex;
+    gap: 8px;
+}
+
+.addressInput {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.addressInputFlex1 {
+    flex: 1;
+}
+
+.addressInputFlex2 {
+    flex: 2;
+}
+
+.decisionButtonRow {
+    display: flex;
+    gap: 10px;
+}
+
+.decisionButtonRow .userAcceptBtn,
+.decisionButtonRow .userRejectBtn {
+    flex: 1;
+    margin-top: 0;
+}
+
+.userRejectBtn.cancelBtn {
+    background-color: #6c757d;
+}
+
+.userRejectBtn.cancelBtn:hover {
+    background-color: #5a6268;
+}
+
+.tabContent {
+    padding-top: 25px;
+}
+
 @media (min-width: 768px) {
     .usedProductPageWrapper {
         max-width: 850px;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../assets/util/fetch';
 import CustomModal from './CustomModal';
@@ -7,7 +7,29 @@ import './Checkout.css';
 export default function Checkout() {
     const navigate = useNavigate();
     const [paymentMethod, setPaymentMethod] = useState('utanvet');
+    const [savedAddresses, setSavedAddresses] = useState([]);
+    const [selectedAddressId, setSelectedAddressId] = useState('new');
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', redirect: null });
+
+    useEffect(() => {
+        const fetchAddresses = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const data = await apiFetch('/user/addresses');
+                    if (data.result === 'success') {
+                        setSavedAddresses(data.data);
+                        if (data.data.length > 0) {
+                            setSelectedAddressId(data.data[0].id.toString());
+                        }
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        };
+        fetchAddresses();
+    }, []);
 
     const closeModal = () => {
         const redirectPath = modal.redirect;
@@ -29,56 +51,79 @@ export default function Checkout() {
         }
 
         const name = form.name.value.trim();
-        const zip = form.zip.value.trim();
-        const city = form.city.value.trim();
-        const address = form.address.value.trim();
+        let shippingAddress = '';
+
+        if (selectedAddressId === 'new') {
+            const zip = form.zip.value.trim();
+            const city = form.city.value.trim();
+            const address = form.address.value.trim();
+            shippingAddress = `${zip} ${city}, ${address}`;
+        } else {
+            const selected = savedAddresses.find(a => a.id.toString() === selectedAddressId);
+            if (selected) {
+                shippingAddress = `${selected.zipCode} ${selected.city}, ${selected.streetAddress}`;
+            }
+        }
+        
         const couponCode = form.couponCode?.value.trim() || "";
 
-        const shippingAddress = `${zip} ${city}, ${address} (${name})`;
-
-        let orderInfo = {
-            shippingAddress: shippingAddress,
-            paymentMethod: paymentMethod,
-            couponCode: couponCode
-        };
-
         try {
-            await apiFetch('/order/place-order', {
+            const data = await apiFetch('/order/place-order', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: orderInfo
+                body: { shippingAddress, paymentMethod, couponCode }
             });
 
-            setModal({ isOpen: true, title: 'Sikeres rendelés!', message: 'Köszönjük a vásárlást.', redirect: '/' });
-            
+            if(data.result === 'success') {
+                setModal({ isOpen: true, title: 'Sikeres rendelés!', message: 'Köszönjük a vásárlást! A rendelésedet rögzítettük.', redirect: '/my-orders' });
+            } else {
+                setModal({ isOpen: true, title: 'Hiba', message: data.message || 'Hiba történt a rendelés során.', redirect: null });
+            }
         } catch (error) {
-            setModal({ isOpen: true, title: 'Hiba', message: error.message || "Hiba történt a rendeléskor.", redirect: null });
+            setModal({ isOpen: true, title: 'Hiba', message: 'Nem sikerült csatlakozni a szerverhez.', redirect: null });
         }
     };
 
     return (
         <div className="checkoutContainer">
             <CustomModal 
-                isOpen={modal.isOpen}
-                title={modal.title}
-                message={modal.message}
-                onConfirm={closeModal}
-                type="alert"
+                isOpen={modal.isOpen} 
+                title={modal.title} 
+                message={modal.message} 
+                onConfirm={closeModal} 
             />
-            <h2>Véglegesítés és Fizetés</h2>
-            <form onSubmit={handleSubmit} className="checkoutForm">
-                
-                <h3>Szállítási adatok</h3>
+
+            <h2>Pénztár</h2>
+            <form className="checkoutForm" onSubmit={handleSubmit}>
+                <h3>Számlázási és Szállítási adatok</h3>
                 <input type="text" name="name" placeholder="Teljes név" required />
                 
-                <div className="inputRow">
-                    <input type="text" name="zip" placeholder="Irányítószám" required />
-                    <input type="text" name="city" placeholder="Város" required />
-                </div>
-                
-                <input type="text" name="address" placeholder="Utca, házszám" required />
+                {savedAddresses.length > 0 && (
+                    <div className="addressSelectionGroup">
+                        <label className="addressSelectionLabel">Válassz szállítási címet:</label>
+                        <select 
+                            className="paymentSelect" 
+                            value={selectedAddressId} 
+                            onChange={(e) => setSelectedAddressId(e.target.value)}
+                        >
+                            {savedAddresses.map(addr => (
+                                <option key={addr.id} value={addr.id}>
+                                    {addr.zipCode} {addr.city}, {addr.streetAddress}
+                                </option>
+                            ))}
+                            <option value="new">+ Új cím megadása</option>
+                        </select>
+                    </div>
+                )}
+
+                {selectedAddressId === 'new' && (
+                    <>
+                        <div className="inputRow">
+                            <input type="text" name="zip" placeholder="Irányítószám" required />
+                            <input type="text" name="city" placeholder="Település" required />
+                        </div>
+                        <input type="text" name="address" placeholder="Utca, házszám" required />
+                    </>
+                )}
 
                 <div className="couponSection">
                     <h3 className="couponSectionTitle">Kupon:</h3>
