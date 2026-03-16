@@ -197,25 +197,43 @@ export default function UsedProductPage(props) {
     const pastOffers = mySubmissions.filter(sub => sub.status !== 'pending' && sub.status !== 'accepted');
 
     const renderCard = (sub) => (
-        <div key={sub.submissionId} className="subCard">
-            <div className="subCardHeader">
-                <span className="subDate">{new Date(sub.submissionDate).toLocaleDateString()}</span>
-                <span className={`subStatus status-${sub.status}`}>
+        <div key={sub.submissionId} className="mySubmissionCard">
+            <div className="cardHeader">
+                <span className="cardDate">{new Date(sub.submissionDate).toLocaleDateString()}</span>
+                <span className={`statusLabel ${sub.status}`}>
                     {sub.status === 'pending' ? 'Értékelés alatt' : 
                      sub.status === 'accepted' ? 'Ajánlat érkezett' : 
                      sub.status === 'offer_accepted' ? 'Elfogadva' : 
                      sub.status === 'listed' ? 'Piacra dobva' : 'Elutasítva'}
                 </span>
             </div>
-            <div className="subCardBody">
-                {sub.productImage && <img src={`/${sub.productImage}`} alt={sub.productName} />}
-                <div className="subCardInfo">
-                    <h3>{sub.productName}</h3>
-                    <p>{sub.conditionState}</p>
+            
+            <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
+                {sub.productImage && (
+                    <div style={{ flexShrink: 0 }}>
+                        <img src={`/${sub.productImage}`} alt={sub.productName} style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #ddd' }} />
+                    </div>
+                )}
+                
+                <div style={{ flexGrow: 1 }}>
+                    <h3 style={{ margin: '0 0 5px 0', fontSize: '1.2rem', color: '#333' }}>{sub.productName}</h3>
+                    <p style={{ margin: 0, color: '#666' }}>{sub.conditionState}</p>
+                    
                     {sub.adminOfferPrice && (
-                        <div className="offerPriceHighlight">
-                            <span>Ajánlatunk:</span>
-                            <strong>{formatPrice(sub.adminOfferPrice)} Ft</strong>
+                        <div className="offerBox">
+                            <span>Ajánlatunk: </span>
+                            <strong className="offerPrice">{formatPrice(sub.adminOfferPrice)} Ft</strong>
+                        </div>
+                    )}
+
+                    {activeTab === 'history' && (
+                        <div style={{ 
+                            marginTop: '10px', 
+                            fontSize: '1.05rem', 
+                            fontWeight: 'bold', 
+                            color: (sub.status === 'offer_accepted' || sub.status === 'listed') ? '#28a745' : '#dc3545' 
+                        }}>
+                            {sub.status === 'offer_accepted' || sub.status === 'listed' ? 'Elfogadva' : 'Elutasítva'}
                         </div>
                     )}
                     
