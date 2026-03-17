@@ -20,17 +20,33 @@ module.exports = class Order {
   }
 
   async save() {
+    let connection;
     try {
-      const [cartItems] = await db.execute(
-        `SELECT products.prodId, products.productPrice, carts.quantity 
+      connection = await db.getConnection();
+      //Start transaction
+      await connection.beginTransaction();
+
+      const [cartItems] = await connection.execute(
+        `SELECT products.prodId, products.productPrice, products.quantity AS stock, carts.quantity 
          FROM products 
          INNER JOIN carts ON products.prodId = carts.productId 
-         WHERE carts.userId = ?;`,
+         WHERE carts.userId = ? FOR UPDATE;`,
         [this.userId]
       );
 
       if (cartItems.length === 0) {
+        await connection.rollback();
         return { result: 'fail', message: 'Cart is empty' };
+      }
+
+      for (const product of cartItems) {
+        if (product.stock < product.quantity) {
+          await connection.rollback();
+          return {
+            result: 'fail',
+            message: 'Egy vagy több termék nincs készleten',
+          };
+        }
       }
 
       let totalAmount = 0;
@@ -38,7 +54,7 @@ module.exports = class Order {
         totalAmount += item.productPrice * item.quantity;
       });
 
-      const [orderResult] = await db.execute(
+      const [orderResult] = await connection.execute(
         `INSERT INTO orders (userId, totalAmount, shippingAddress, paymentMethod, couponCode, orderDate) 
          VALUES (?, ?, ?, ?, ?, NOW())`,
         [
@@ -53,28 +69,30 @@ module.exports = class Order {
       const orderId = orderResult.insertId;
 
       for (let item of cartItems) {
-        await db.execute(
+        await connection.execute(
           `INSERT INTO order_items (orderId, productId, quantity, price) 
            VALUES (?, ?, ?, ?)`,
           [orderId, item.prodId, item.quantity, item.productPrice]
+        );
+
+        await connection.execute(
+          `UPDATE products SET quantity = quantity - ? WHERE prodId = ?`,
+          [item.quantity, item.prodId]
         );
       }
 
       //E-mail küldése
       let email;
       let ordered_products;
-      try {
-        email = await db.execute(
-          'SELECT users.email FROM users WHERE userId = ?',
-          [this.userId]
-        );
-        ordered_products = await db.execute(
-          'SELECT products.productName, products.productPrice, order_items.quantity FROM products INNER JOIN order_items ON products.prodId = order_items.productId WHERE order_items.orderId = ?',
-          [orderId]
-        );
-      } catch (err) {
-        console.log(err.message);
-      }
+
+      email = await connection.execute(
+        'SELECT users.email FROM users WHERE userId = ?',
+        [this.userId]
+      );
+      ordered_products = await connection.execute(
+        'SELECT products.productName, products.productPrice, order_items.quantity FROM products INNER JOIN order_items ON products.prodId = order_items.productId WHERE order_items.orderId = ?',
+        [orderId]
+      );
 
       ordered_products = ordered_products[0];
       let htmlbody =
@@ -86,22 +104,26 @@ module.exports = class Order {
 
       htmlbody += `</table><br><h1>Fizetendő összeg: ${totalAmount} Ft</h1>`;
 
-      try {
-        await transporter.sendMail({
-          from: `"DigitalDepot" <${process.env.EMAIL_USER}>`,
-          to: email[0][0].email,
-          subject: 'Sikeres Rendelés',
-          text: 'Rendszerünk sikeresen rögzítette rendelését!',
-          html: htmlbody,
-        });
-      } catch (err) {
-        console.log(err.message);
-      }
+      await transporter.sendMail({
+        from: `"DigitalDepot" <${process.env.EMAIL_USER}>`,
+        to: email[0][0].email,
+        subject: 'Sikeres Rendelés',
+        text: 'Rendszerünk sikeresen rögzítette rendelését!',
+        html: htmlbody,
+      });
 
-      await db.execute(`DELETE FROM carts WHERE userId = ?`, [this.userId]);
-
+      await connection.execute(`DELETE FROM carts WHERE userId = ?`, [
+        this.userId,
+      ]);
+      await connection.commit();
+      connection.release();
       return { result: 'success' };
     } catch (err) {
+      if (connection) {
+        await connection.rollback();
+        await connection.release();
+      }
+      console.log(err.message);
       return { result: 'fail', message: err.message };
     }
   }
