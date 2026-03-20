@@ -52,17 +52,21 @@ export default function AdminCreateAccount() {
           setEmail('');
           setPassword('');
         } else {
-          setModal({ isOpen: true, title: 'Hiba történt', message: 'Sikertelen fiók létrehozás!' });
+          setModal({
+            isOpen: true,
+            title: 'Hiba történt',
+            message: 'Sikertelen fiók létrehozás!',
+          });
         }
       })
       .catch((err) => {
-        setModal({ isOpen: true, title: 'Szerver hiba', message: 'Nem sikerült csatlakozni a szerverhez.' });
+        setModal({ isOpen: true, title: 'Szerver hiba', message: err.message });
       });
   };
 
   return (
     <div className="adminFormWrapper">
-      <CustomModal 
+      <CustomModal
         isOpen={modal.isOpen}
         title={modal.title}
         message={modal.message}

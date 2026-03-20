@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const cookieparser = require('cookie-parser');
+const { rateLimit } = require('express-rate-limit');
 const socket = require('./util/socket');
 
 const verifyToken = require('./util/tokenVerify');
@@ -13,7 +14,12 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-
+const limiter = rateLimit({
+  windowMs: 60 * 1000, //1 perc
+  limit: 50,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 const io = socket.init(server);
 
 const productRouter = require('./routes/productRouter');
@@ -28,6 +34,7 @@ const reviewRouter = require('./routes/reviewRouter');
 const IP = process.env.IP;
 const PORT = process.env.PORT;
 
+app.use(limiter);
 app.use(express.json());
 app.use(cookieparser());
 app.use(
@@ -50,7 +57,7 @@ app.use('/category', categoryRouter);
 app.use('/cart', verifyToken, cartRouter);
 app.use('/order', orderRouter);
 app.use('/adminRoute', verifyAdmin, adminRouter);
-app.use('/used-products', usedProductRouter);
+app.use('/used-products', verifyToken, usedProductRouter);
 app.use('/reviews', reviewRouter);
 
 server.listen(PORT, IP, () => {
