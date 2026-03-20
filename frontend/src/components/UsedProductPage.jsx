@@ -143,7 +143,7 @@ export default function UsedProductPage(props) {
 
     const confirmDecision = async (submissionId, decision) => {
         try {
-            const data = await apiFetch('/used-products/respond', {
+            const data = await apiFetch('/used-products/user-response', {
                 method: 'PATCH',
                 body: { submissionId, decision }
             });
