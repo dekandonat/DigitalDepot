@@ -53,6 +53,24 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/logout', async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refresh_token;
+    if (refreshToken) {
+      await User.logout(refreshToken);
+    }
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+    });
+    res.status(200).json({ result: 'success' });
+  } catch (err) {
+    res.status(500).json({ result: 'fail' });
+  }
+});
+
 router.post('/reset-code', async (req, res) => {
   const email = req.body.email;
   if (!email) {

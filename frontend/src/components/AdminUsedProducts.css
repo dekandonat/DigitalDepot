@@ -11,18 +11,17 @@
   font-weight: 700;
   letter-spacing: -0.5px;
   text-align: left;
-  width: fit-content;
 }
 
 .tabHeader {
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   border-bottom: 2px solid #e2e8f0;
   width: 100%;
 }
 
 .tabButton {
-  padding: 12px 20px;
+  padding: 12px 24px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -31,18 +30,17 @@
   margin-right: 10px;
   border-radius: 8px 8px 0 0;
   position: relative;
-  transition: color 0.2s;
+  transition: all 0.2s;
   font-size: 0.95rem;
 }
 
 .tabButton:hover {
   color: #0f172a;
-  background-color: #f8fafc;
+  background-color: #f1f5f9;
 }
 
 .tabButton.active {
   color: #3b82f6;
-  background-color: #eff6ff;
 }
 
 .tabButton.active::after {
@@ -55,320 +53,177 @@
   background-color: #3b82f6;
 }
 
-.adminSubGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 100%;
-}
-
-.adminSubCard {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  text-align: left;
-  box-sizing: border-box;
-  width: 100%;
-  transition: box-shadow 0.2s;
-}
-
-.adminSubCard:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.subHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-  color: #64748b;
-  margin-bottom: 15px;
-  border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 10px;
-}
-
-.subDate {
-  font-weight: 500;
-  background-color: #f8fafc;
-  padding: 4px 10px;
-  border-radius: 20px;
-}
-
-.adminSubCard h4 {
-  margin: 0 0 10px 0;
-  font-size: 1.15rem;
-  color: #0f172a;
-}
-
-.subUser {
-  font-size: 0.95rem;
-  margin: 5px 0;
-  color: #475569;
-  word-break: break-word;
-}
-
-.subCond {
-  margin-top: 5px;
-  font-size: 0.95rem;
-  color: #475569;
-}
-
-.subDesc {
-  background-color: #f8fafc;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  margin: 15px 0;
-  color: #334155;
-  font-size: 0.9rem;
-  white-space: pre-wrap; 
-  font-family: inherit;
-  line-height: 1.5;
-}
-
-.subImg {
-  width: 100%;
-  height: auto;
-  max-height: 250px;
-  object-fit: contain;
-  border-radius: 8px;
-  margin: 15px 0;
-  background-color: #f8fafc;
-}
-
-.subStatus {
-  font-weight: 600;
-  font-size: 0.95rem;
-  margin-top: 15px;
-  padding: 10px 15px;
-  border-radius: 6px;
-  text-align: center;
-}
-
-.subStatus.pending { color: #d97706; background-color: #fef3c7; }
-.subStatus.accepted { color: #1d4ed8; background-color: #dbeafe; }
-.subStatus.rejected { color: #b91c1c; background-color: #fee2e2; }
-.subStatus.offer_accepted { color: #047857; background-color: #d1fae5; }
-.subStatus.offer_rejected { color: #b91c1c; background-color: #fee2e2; }
-
-.bankProvided {
-  color: #10b981;
-  font-weight: 600;
-  word-break: break-all;
-}
-
-.offerBox {
-  margin-top: 15px;
-  padding: 15px;
-  background-color: #eff6ff;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.offerPrice {
-  color: #3b82f6;
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-
-.subActions {
-  margin-top: 20px;
-  border-top: 1px solid #f1f5f9;
-  padding-top: 15px;
-}
-
-.offerInput input {
-  width: 100%;
-  padding: 12px 15px;
-  margin-bottom: 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 1rem;
-  box-sizing: border-box;
-  background-color: #f8fafc;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.offerInput input:focus {
-  border-color: #3b82f6;
-  background-color: white;
-}
-
-.btnGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.acceptBtn, .rejectBtn {
-  width: 100%;
-  padding: 12px 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: all 0.2s;
-}
-
-.acceptBtn {
-  background-color: #10b981;
-  color: white;
-  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.15);
-}
-
-.acceptBtn:hover {
-  background-color: #059669;
-  transform: translateY(-2px);
-}
-
-.rejectBtn {
-  background-color: #fef2f2;
-  color: #ef4444;
-  border: 1px solid #fecaca;
-}
-
-.rejectBtn:hover {
-  background-color: #fee2e2;
-  color: #dc2626;
-  border-color: #fca5a5;
-}
-
 .listingForm {
-  background: white;
-  padding: 20px;
-  border: 1px solid #e2e8f0;
+  background-color: white;
+  padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  width: 100%;
-  box-sizing: border-box;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  max-width: 700px;
+}
+
+.listingForm h3 {
+  margin: 0 0 20px 0;
+  color: #1e293b;
+  font-size: 1.25rem;
 }
 
 .formGroup {
-  margin-bottom: 15px;
-  width: 100%;
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 
 .formGroup label {
-  display: block;
-  margin-bottom: 8px;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #475569;
-  font-size: 0.95rem;
 }
 
-.formGroup input, .formGroup textarea, .formGroup select {
-  width: 100%;
-  padding: 12px 15px;
+.formGroup input,
+.formGroup textarea,
+.formGroup select {
+  padding: 12px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  box-sizing: border-box;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-family: inherit;
-  background-color: #f8fafc;
   outline: none;
   transition: border-color 0.2s;
 }
 
-.formGroup input:focus, .formGroup textarea:focus, .formGroup select:focus {
+.formGroup input:focus,
+.formGroup textarea:focus,
+.formGroup select:focus {
   border-color: #3b82f6;
-  background-color: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .categorySelection {
   background-color: #f8fafc;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #e2e8f0;
   margin-bottom: 20px;
-  box-sizing: border-box;
 }
 
-.categorySelection h3 {
-  margin-top: 0;
-  font-size: 1.1rem;
-  margin-bottom: 15px;
-  color: #0f172a;
+.categorySelection h4 {
+  margin: 0 0 15px 0;
+  font-size: 1rem;
+  color: #334155;
 }
 
-.selectWithButton, .inputWithButton {
+.catRow {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  box-sizing: border-box;
+  gap: 12px;
+  margin-bottom: 15px;
 }
 
-.addCatBtn {
-  background-color: #eff6ff;
-  color: #3b82f6;
-  border: 1px solid #bfdbfe;
-  border-radius: 8px;
-  padding: 12px 15px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.addCatBtn:hover {
-  background-color: #dbeafe;
-}
-
-.cancelCatBtn {
-  background-color: #f1f5f9;
-  color: #475569;
-  border: 1px solid #e2e8f0;
-  padding: 12px 15px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.cancelCatBtn:hover {
-  background-color: #e2e8f0;
+.catRow:last-child {
+  margin-bottom: 0;
 }
 
 .listingButtons {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 25px;
+  gap: 12px;
+  margin-top: 10px;
 }
 
-@media (min-width: 768px) {
-  .adminSubGrid {
-    gap: 20px;
-  }
+.acceptBtn, .rejectBtn {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
 
-  .adminSubCard {
-    padding: 25px;
-  }
+.acceptBtn {
+  background-color: #3b82f6;
+  color: white;
+}
 
-  .btnGroup, .listingButtons {
-    flex-direction: row;
-  }
+.acceptBtn:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
 
-  .acceptBtn, .rejectBtn {
-    flex: 1;
-  }
+.rejectBtn {
+  background-color: #f1f5f9;
+  color: #475569;
+}
 
-  .selectWithButton, .inputWithButton {
-    flex-direction: row;
-  }
+.rejectBtn:hover {
+  background-color: #e2e8f0;
+}
 
-  .selectWithButton select, .inputWithButton input {
-    flex-grow: 1;
-  }
+.adminSubGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
 
-  .addCatBtn, .cancelCatBtn {
-    padding: 0 20px;
-    white-space: nowrap;
-  }
+.adminSubCard {
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s;
+}
+
+.subHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.adminSubCard h4 {
+  margin: 0 0 10px 0;
+  color: #0f172a;
+}
+
+.subImg {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 15px 0;
+}
+
+.offerInput {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.offerInput input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}
+
+.offerBox {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 12px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.offerPrice {
+  color: #166534;
+  font-weight: 700;
 }

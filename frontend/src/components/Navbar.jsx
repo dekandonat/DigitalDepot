@@ -4,16 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import "./Navbar.css";
 import { useNavigate } from 'react-router-dom';
 
-export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSearch, isAdminRoute }){ 
-    const [user, setUser] = useState(null);
+export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSearch, isAdminRoute, isLoggedIn }){ 
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if(storedUser){
-            setUser(storedUser);
-        }
-    }, []);
 
     return ( 
     <nav id="navbar"> 
@@ -34,7 +26,7 @@ export default function Navbar({ onLoginClick, onProfileClick, onCartClick, onSe
                 ></button>
             )}
 
-            {user ? (
+            {isLoggedIn ? (
                 <button
                 id = "navbarProfileBtn"
                 onClick={onProfileClick}
@@ -90,8 +82,12 @@ function NavSearchBar({onSearch}) {
                 placeholder="Keresés..."
                 id="navSearchText"
             ></input>
-            <button id="navSearchButton" type="submit" onClick={handleIconClick}>
-                <img src={SearchIcon} alt="Search Icon" id="searchIconId"></img>
+            <button 
+                type="submit" 
+                id="navSearchButton"
+                onClick={handleIconClick}
+            >
+                <img src={SearchIcon} alt="Keresés" id="searchIconId" />
             </button>
         </form>
     );

@@ -31,196 +31,113 @@ export default function AdminUsedProducts() {
     
     const [selectedMainCat, setSelectedMainCat] = useState('');
     const [selectedSubCat, setSelectedSubCat] = useState('');
-
-    const [isAddingNewMain, setIsAddingNewMain] = useState(false);
-    const [newMainName, setNewMainName] = useState('');
-    const [isAddingNewSub, setIsAddingNewSub] = useState(false);
-    const [newSubName, setNewSubName] = useState('');
-
+    const [newMainCatName, setNewMainCatName] = useState('');
+    const [newSubCatName, setNewSubCatName] = useState('');
+    
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
     const [toast, setToast] = useState('');
 
-    const token = localStorage.getItem('token');
-
-    const closeModal = () => {
-        setModal({ ...modal, isOpen: false });
-    };
-
-    const showToast = (message) => {
-        setToast(message);
-        setTimeout(() => {
-            setToast('');
-        }, 3000);
-    };
-
     useEffect(() => {
-        fetchData();
+        fetchSubmissions();
         fetchCategories();
-    }, [token]);
+    }, []);
 
-    useEffect(() => {
-        if (selectedMainCat && !isAddingNewMain) {
-            const subs = allCategories.filter(c => c.parentId == selectedMainCat);
+    const showToast = (msg) => {
+        setToast(msg);
+        setTimeout(() => setToast(''), 3000);
+    };
+
+    const fetchSubmissions = async () => {
+        try {
+            const data = await apiFetch('/used-products/admin/all');
+            if (data.result === 'success') {
+                setSubmissions(data.data);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const fetchCategories = async () => {
+        try {
+            const data = await apiFetch('/category');
+            if (data.result === 'success') {
+                setAllCategories(data.data);
+                const mains = data.data.filter(c => c.parentId === null);
+                setMainCategories(mains);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleMainCatChange = (e) => {
+        const val = e.target.value;
+        setSelectedMainCat(val);
+        setSelectedSubCat('');
+        setNewMainCatName('');
+        setNewSubCatName('');
+
+        if (val && val !== 'new') {
+            const subs = allCategories.filter(c => c.parentId === parseInt(val));
             setSubCategories(subs);
-            setSelectedSubCat('');
         } else {
             setSubCategories([]);
         }
-    }, [selectedMainCat, allCategories, isAddingNewMain]);
+    };
 
-    async function fetchData() {
-        try {
-            const data = await apiFetch('/used-products/admin/all', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if(data.result == 'success') setSubmissions(data.data);
-        } catch (err) {
-            console.log(err.message);
-        }
-    }
+    const handleOfferChange = (id, value) => {
+        setOfferInputs(prev => ({ ...prev, [id]: value }));
+    };
 
-    async function fetchCategories() {
-        try {
-            const data = await apiFetch('/category');
-            if(data.data) {
-                setAllCategories(data.data);
-                setMainCategories(data.data.filter(c => c.parentId === null));
-            }
-        } catch(err) {
-            console.log(err);
-        }
-    }
-
-    function handleOfferChange(id, value) {
-        const newOffers = Object.assign({}, offerInputs);
-        newOffers[id] = value;
-        setOfferInputs(newOffers);
-    }
-
-    async function handleAction(id, status) {
-        const price = offerInputs[id] || 0;
-
-        if (status == 'accepted') {
-            if (!price || price <= 0) {
-                setModal({ isOpen: true, title: 'Figyelem', message: 'Kérlek adj meg egy érvényes ajánlati árat!' });
-                return;
-            }
+    const sendOffer = async (id) => {
+        const price = offerInputs[id];
+        if (!price || price <= 0) {
+            setModal({ isOpen: true, title: 'Hiba', message: 'Kérlek adj meg egy érvényes ajánlati árat!' });
+            return;
         }
 
         try {
             const data = await apiFetch('/used-products/admin/status', {
                 method: 'PATCH',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: {
-                    submissionId: id,
-                    status: status,
-                    offerPrice: price
-                }
+                body: { submissionId: id, status: 'accepted', offerPrice: price }
             });
-
-            if (data.result == 'success') {
-                if (status == 'rejected') {
-                    showToast('Termék elutasítva!');
-                } else {
-                    showToast('Ajánlat sikeresen elküldve!');
-                }
-                fetchData();
+            if (data.result === 'success') {
+                showToast('Ajánlat elküldve a felhasználónak!');
+                fetchSubmissions();
             }
         } catch (err) {
-            setModal({ isOpen: true, title: 'Hiba', message: 'Hiba történt az állapot frissítésekor.' });
+            console.error(err);
         }
-    }
+    };
 
-    function startListing(sub) {
+    const startListing = (sub) => {
         setEditingProduct(sub);
         setEditName(sub.productName);
         setEditDesc(sub.productDescription);
         setEditPriceFormatted(formatPrice(sub.adminOfferPrice));
         setEditCondition(sub.conditionState);
-        setListingImage(null); 
-        
+        setListingImage(null);
         setSelectedMainCat('');
         setSelectedSubCat('');
-        setIsAddingNewMain(false);
-        setIsAddingNewSub(false);
-    }
+        setNewMainCatName('');
+        setNewSubCatName('');
+    };
 
-    function cancelListing() {
-        setEditingProduct(null);
-    }
-
-    async function createCategory(name, parentId) {
-        try {
-            const result = await apiFetch('/category', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: {
-                    categoryName: name,
-                    parentId: parentId
-                }
-            });
-            return result.insertId;
-        } catch (err) {
-            console.error(err);
-            return null;
+    const handleListProduct = async () => {
+        if (!selectedMainCat) {
+            setModal({ isOpen: true, title: 'Hiba', message: 'Kérlek válassz legalább egy fő kategóriát!' });
+            return;
         }
-    }
 
-    async function submitListing() {
-        let finalCategoryId = selectedSubCat;
-
-        if (isAddingNewMain) {
-            if (!newMainName.trim()) {
-                setModal({ isOpen: true, title: 'Figyelem', message: 'Add meg az új főkategória nevét!' });
-                return;
-            }
-            const newMainId = await createCategory(newMainName, null);
-            if (!newMainId) {
-                setModal({ isOpen: true, title: 'Hiba', message: 'Hiba a főkategória létrehozásakor.' });
-                return;
-            }
-            
-            if (isAddingNewSub) {
-                if (!newSubName.trim()) {
-                    setModal({ isOpen: true, title: 'Figyelem', message: 'Add meg az új alkategória nevét!' });
-                    return;
-                }
-                const newSubId = await createCategory(newSubName, newMainId);
-                if (!newSubId) {
-                    setModal({ isOpen: true, title: 'Hiba', message: 'Hiba az alkategória létrehozásakor.' });
-                    return;
-                }
-                finalCategoryId = newSubId;
-            } else {
-                finalCategoryId = newMainId; 
-            }
-        } 
-        else if (isAddingNewSub) {
-            if (!selectedMainCat) {
-                setModal({ isOpen: true, title: 'Figyelem', message: 'Válassz főkategóriát!' });
-                return;
-            }
-            if (!newSubName.trim()) {
-                setModal({ isOpen: true, title: 'Figyelem', message: 'Add meg az új alkategória nevét!' });
-                return;
-            }
-            const newSubId = await createCategory(newSubName, selectedMainCat);
-            if (!newSubId) {
-                setModal({ isOpen: true, title: 'Hiba', message: 'Hiba az alkategória létrehozásakor.' });
-                return;
-            }
-            finalCategoryId = newSubId;
+        if (selectedMainCat === 'new' && !newMainCatName.trim()) {
+            setModal({ isOpen: true, title: 'Hiba', message: 'Kérlek add meg az új fő kategória nevét!' });
+            return;
         }
-        else {
-            if (!selectedMainCat) {
-                setModal({ isOpen: true, title: 'Figyelem', message: 'Válassz főkategóriát!' });
-                return;
-            }
-            if (subCategories.length > 0 && !selectedSubCat) {
-                setModal({ isOpen: true, title: 'Figyelem', message: 'Válassz alkategóriát!' });
-                return;
-            }
-            if (!finalCategoryId) finalCategoryId = selectedMainCat;
+
+        if (selectedSubCat === 'new' && !newSubCatName.trim()) {
+            setModal({ isOpen: true, title: 'Hiba', message: 'Kérlek add meg az új alkategória nevét!' });
+            return;
         }
 
         const formData = new FormData();
@@ -228,278 +145,197 @@ export default function AdminUsedProducts() {
         formData.append('productName', editName);
         formData.append('productDescription', editDesc);
         formData.append('productPrice', parsePrice(editPriceFormatted));
-        formData.append('categoryId', finalCategoryId);
         formData.append('conditionState', editCondition);
+        formData.append('existingImage', editingProduct.productImage);
         
+        formData.append('categoryId', selectedSubCat !== 'new' ? selectedSubCat : '');
+        formData.append('selectedMainCat', selectedMainCat !== 'new' ? selectedMainCat : '');
+        formData.append('newMainCategory', newMainCatName);
+        formData.append('newSubCategory', newSubCatName);
+
         if (listingImage) {
             formData.append('file', listingImage);
-        } else if (editingProduct.productImage) {
-            formData.append('existingImage', editingProduct.productImage);
-        } else {
-            setModal({ isOpen: true, title: 'Figyelem', message: 'Hiba: Nincs termékkép! Kérlek tölts fel egyet.' });
-            return;
         }
 
         try {
             const response = await fetch('/used-products/admin/list-product', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
                 body: formData
             });
-            const result = await response.json();
+            const data = await response.json();
 
-            if(result.result == 'success') {
-                showToast('Termék sikeresen listázva!');
-                fetchCategories();
+            if (data.result === 'success') {
+                showToast('Termék sikeresen listázva a webshopban!');
                 setEditingProduct(null);
-                fetchData();
+                fetchSubmissions();
+                fetchCategories();
             } else {
-                setModal({ isOpen: true, title: 'Hiba', message: 'Hiba: ' + result.message });
+                setModal({ isOpen: true, title: 'Hiba', message: data.message || 'Hiba történt a mentés során.' });
             }
-        } catch(err) {
-            setModal({ isOpen: true, title: 'Hiba', message: 'Hiba a listázás során.' });
-        }
-    }
-
-    const handlePriceInputChange = (e) => {
-        const rawValue = e.target.value.replace(/[^0-9]/g, '');
-        if (rawValue === '') {
-            setEditPriceFormatted('');
-        } else {
-            setEditPriceFormatted(formatPrice(rawValue));
+        } catch (err) {
+            console.error(err);
         }
     };
 
-    const incomingSubmissions = submissions.filter(sub => ['pending', 'accepted'].includes(sub.status));
-    const waitingListSubmissions = submissions.filter(sub => sub.status == 'offer_accepted');
-
-    const getStatusLabel = (status, price) => {
-        switch(status) {
-            case 'pending': return 'Feldolgozás alatt';
-            case 'accepted': return `Ajánlat elküldve (${formatPrice(price)} Ft)`;
-            case 'offer_accepted': return `Felhasználó elfogadta (${formatPrice(price)} Ft)`;
-            default: return status;
-        }
-    };
-
-    if (editingProduct) {
-        return (
-            <div className="adminUsedContainer">
-                <CustomModal 
-                    isOpen={modal.isOpen}
-                    title={modal.title}
-                    message={modal.message}
-                    onConfirm={closeModal}
-                    type="alert"
-                />
-                {toast && <div className="toastMessage">{toast}</div>}
-
-                <h2>Termék listázása</h2>
-                <div className="listingForm">
-                    <div className="formGroup">
-                        <label>Termék neve:</label>
-                        <input type="text" value={editName} onChange={e => setEditName(e.target.value)} />
-                    </div>
-                    <div className="formGroup">
-                        <label>Leírás:</label>
-                        <textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} />
-                    </div>
-                    <div className="formGroup">
-                        <label>Ár (Ft):</label>
-                        <input 
-                            type="text" 
-                            value={editPriceFormatted} 
-                            onChange={handlePriceInputChange} 
-                        />
-                    </div>
-                    <div className="formGroup">
-                        <label>Állapot:</label>
-                        <select value={editCondition} onChange={e => setEditCondition(e.target.value)}>
-                            <option value="bontatlan">Bontatlan</option>
-                            <option value="felbontott">Felbontott</option>
-                            <option value="használt">Használt</option>
-                        </select>
-                    </div>
-                    <div className="formGroup">
-                        <label>Kép módosítása/feltöltése:</label>
-                        {editingProduct.productImage && !listingImage && (
-                            <div style={{marginBottom: '10px'}}>
-                                <small>Jelenlegi kép: </small>
-                                <img src={`/${editingProduct.productImage}`} alt="Jelenlegi" style={{height: '50px', verticalAlign: 'middle'}}/>
-                            </div>
-                        )}
-                        <input type="file" onChange={(e) => setListingImage(e.target.files[0])} accept="image/*" />
-                    </div>
-
-                    <div className="categorySelection">
-                        <h3>Kategória kiválasztása</h3>
-                        
-                        <div className="formGroup">
-                            <label>Főkategória:</label>
-                            {!isAddingNewMain ? (
-                                <div className="selectWithButton">
-                                    <select value={selectedMainCat} onChange={e => setSelectedMainCat(e.target.value)}>
-                                        <option value="">Válassz...</option>
-                                        {mainCategories.map(cat => (
-                                            <option key={cat.categoryId} value={cat.categoryId}>{cat.categoryName}</option>
-                                        ))}
-                                    </select>
-                                    <button className="addCatBtn" onClick={() => setIsAddingNewMain(true)}>Új kategória</button>
-                                </div>
-                            ) : (
-                                <div className="inputWithButton">
-                                    <input 
-                                        type="text" 
-                                        placeholder="Új főkategória neve" 
-                                        value={newMainName} 
-                                        onChange={e => setNewMainName(e.target.value)} 
-                                    />
-                                    <button className="cancelCatBtn" onClick={() => setIsAddingNewMain(false)}>Mégse</button>
-                                </div>
-                            )}
-                        </div>
-
-                        {(selectedMainCat || isAddingNewMain) && (
-                            <div className="formGroup">
-                                <label>Alkategória:</label>
-                                {!isAddingNewSub ? (
-                                    <div className="selectWithButton">
-                                        <select value={selectedSubCat} onChange={e => setSelectedSubCat(e.target.value)} disabled={isAddingNewMain}>
-                                            <option value="">Válassz...</option>
-                                            {subCategories.map(cat => (
-                                                <option key={cat.categoryId} value={cat.categoryId}>{cat.categoryName}</option>
-                                            ))}
-                                        </select>
-                                        <button className="addCatBtn" onClick={() => setIsAddingNewSub(true)}>Új alkategória</button>
-                                    </div>
-                                ) : (
-                                    <div className="inputWithButton">
-                                        <input 
-                                            type="text" 
-                                            placeholder="Új alkategória neve" 
-                                            value={newSubName} 
-                                            onChange={e => setNewSubName(e.target.value)} 
-                                        />
-                                        <button className="cancelCatBtn" onClick={() => setIsAddingNewSub(false)}>Mégse</button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="listingButtons">
-                        <button className="acceptBtn" onClick={submitListing}>Listázás</button>
-                        <button className="rejectBtn" onClick={cancelListing}>Mégse</button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    const incomingSubmissions = submissions.filter(s => s.status === 'pending');
+    const waitingListSubmissions = submissions.filter(s => s.status === 'offer_accepted');
 
     return (
         <div className="adminUsedContainer">
             <CustomModal 
-                isOpen={modal.isOpen}
-                title={modal.title}
-                message={modal.message}
-                onConfirm={closeModal}
-                type="alert"
+                isOpen={modal.isOpen} 
+                title={modal.title} 
+                message={modal.message} 
+                onConfirm={() => setModal({ ...modal, isOpen: false })} 
             />
             {toast && <div className="toastMessage">{toast}</div>}
 
             <h2>Használt termékek kezelése</h2>
-            
+
             <div className="tabHeader">
-                <button 
-                    className={`tabButton ${activeTab == 'incoming' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('incoming')}
-                >
-                    Beérkezett
-                </button>
-                <button 
-                    className={`tabButton ${activeTab == 'waiting' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('waiting')}
-                >
-                    Listázásra váró
-                </button>
+                <button className={activeTab == 'incoming' ? 'tabButton active' : 'tabButton'} onClick={() => setActiveTab('incoming')}>Beérkező leadások</button>
+                <button className={activeTab == 'waiting' ? 'tabButton active' : 'tabButton'} onClick={() => setActiveTab('waiting')}>Listázásra váró</button>
             </div>
 
-            <div className="adminSubGrid">
-                {activeTab == 'incoming' && incomingSubmissions.map(sub => (
-                    <div key={sub.submissionId} className="adminSubCard">
-                        <div className="subHeader">
-                            <span>#{sub.submissionId}</span>
-                            <span className="subDate">{new Date(sub.submissionDate).toLocaleDateString()}</span>
+            <div className="tabContent">
+                {editingProduct && (
+                    <div className="listingForm">
+                        <h3>Termék listázása a shopba</h3>
+                        
+                        <div className="formGroup">
+                            <label>Terméknév:</label>
+                            <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} />
                         </div>
-                        <h4>{sub.productName}</h4>
-                        <p className="subUser">Felhasználó: {sub.userName} ({sub.email})</p>
-                        <p className="subUser">Bankszámla: <span className="bankProvided">{sub.bankAccountNumber}</span></p>
-                        <p className="subCond">Állapot: <strong>{sub.conditionState}</strong></p>
-                        <pre className="subDesc">{sub.productDescription}</pre>
                         
-                        {sub.productImage && (
-                            <img src={`/${sub.productImage}`} alt="Termék" className="subImg" />
-                        )}
+                        <div className="formGroup">
+                            <label>Leírás:</label>
+                            <textarea value={editDesc} rows="4" onChange={(e) => setEditDesc(e.target.value)} />
+                        </div>
+                        
+                        <div className="formGroup">
+                            <label>Ár (HUF):</label>
+                            <input type="text" value={editPriceFormatted} onChange={(e) => setEditPriceFormatted(formatPrice(e.target.value))} />
+                        </div>
+                        
+                        <div className="formGroup">
+                            <label>Állapot:</label>
+                            <select value={editCondition} onChange={(e) => setEditCondition(e.target.value)}>
+                                <option value="használt">Használt</option>
+                                <option value="felbontott">Felbontott</option>
+                                <option value="bontatlan">Bontatlan</option>
+                            </select>
+                        </div>
 
-                        <p className={`subStatus ${sub.status}`}>
-                            Státusz: {getStatusLabel(sub.status, sub.adminOfferPrice)}
-                        </p>
-                        
-                        <div className="subActions">
-                            {sub.status == 'pending' ? (
-                                <>
-                                    <div className="offerInput">
+                        <div className="categorySelection">
+                            <h4>Kategória besorolás</h4>
+                            
+                            <div className="catRow">
+                                <label>Fő kategória:</label>
+                                <select value={selectedMainCat} onChange={handleMainCatChange}>
+                                    <option value="">-- Válassz --</option>
+                                    {mainCategories.map(c => (
+                                        <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>
+                                    ))}
+                                    <option value="new">+ Új fő kategória létrehozása...</option>
+                                </select>
+                                
+                                {selectedMainCat === 'new' && (
+                                    <input 
+                                        type="text" 
+                                        placeholder="Új fő kategória neve" 
+                                        value={newMainCatName}
+                                        onChange={(e) => setNewMainCatName(e.target.value)}
+                                    />
+                                )}
+                            </div>
+
+                            {(selectedMainCat || selectedMainCat === 'new') && (
+                                <div className="catRow">
+                                    <label>Alkategória:</label>
+                                    <select value={selectedSubCat} onChange={(e) => setSelectedSubCat(e.target.value)}>
+                                        <option value="">-- Válassz (opcionális) --</option>
+                                        {subCategories.map(c => (
+                                            <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>
+                                        ))}
+                                        <option value="new">+ Új alkategória létrehozása...</option>
+                                    </select>
+                                    
+                                    {selectedSubCat === 'new' && (
                                         <input 
-                                            type="number" 
-                                            placeholder="Ajánlott ár (Ft)"
-                                            onChange={(e) => handleOfferChange(sub.submissionId, e.target.value)}
+                                            type="text" 
+                                            placeholder="Új alkategória neve" 
+                                            value={newSubCatName}
+                                            onChange={(e) => setNewSubCatName(e.target.value)}
                                         />
-                                    </div>
-                                    <div className="btnGroup">
-                                        <button 
-                                            className="acceptBtn"
-                                            onClick={() => handleAction(sub.submissionId, 'accepted')}
-                                        >
-                                            Ajánlat küldése
-                                        </button>
-                                        <button 
-                                            className="rejectBtn"
-                                            onClick={() => handleAction(sub.submissionId, 'rejected')}
-                                        >
-                                            Elutasítás
-                                        </button>
-                                    </div>
-                                </>
-                            ) : null}
+                                    )}
+                                </div>
+                            )}
                         </div>
-                    </div>
-                ))}
 
-                {activeTab == 'waiting' && waitingListSubmissions.map(sub => (
-                    <div key={sub.submissionId} className="adminSubCard">
-                        <div className="subHeader">
-                            <span>#{sub.submissionId}</span>
-                            <span className="subDate">{new Date(sub.submissionDate).toLocaleDateString()}</span>
+                        <div className="formGroup">
+                            <label>Termékkép (elhagyható, ha jó az eredeti):</label>
+                            <input type="file" onChange={(e) => setListingImage(e.target.files[0])} />
                         </div>
-                        <h4>{sub.productName}</h4>
-                        <p className="subUser">Felhasználó: {sub.userName}</p>
-                        <p className="subCond">Állapot: <strong>{sub.conditionState}</strong></p>
-                        <div className="offerBox">
-                            <span>Elfogadott ár:</span>
-                            <span className="offerPrice">{formatPrice(sub.adminOfferPrice)} Ft</span>
-                        </div>
-                        {sub.productImage && (
-                            <img src={`/${sub.productImage}`} alt="Termék" className="subImg" />
-                        )}
-                        <div className="subActions">
-                            <button className="acceptBtn" onClick={() => startListing(sub)}>
-                                Termék listázása
-                            </button>
+                        
+                        <div className="listingButtons">
+                            <button className="acceptBtn" onClick={handleListProduct}>Termék listázása</button>
+                            <button className="rejectBtn" onClick={() => setEditingProduct(null)}>Mégse</button>
                         </div>
                     </div>
-                ))}
+                )}
+
+                {!editingProduct && (
+                    <div className="adminSubGrid">
+                        {activeTab == 'incoming' && incomingSubmissions.map(sub => (
+                            <div key={sub.submissionId} className="adminSubCard">
+                                <div className="subHeader">
+                                    <span>#{sub.submissionId}</span>
+                                    <span>{new Date(sub.submissionDate).toLocaleDateString()}</span>
+                                </div>
+                                <h4>{sub.productName}</h4>
+                                <p><strong>Felhasználó:</strong> {sub.userName}</p>
+                                <p><strong>Állapot:</strong> {sub.conditionState}</p>
+                                <p style={{fontSize: '0.9rem', color: '#64748b', margin: '10px 0'}}>{sub.productDescription}</p>
+                                {sub.productImage && (
+                                    <img src={`/${sub.productImage}`} alt="Termék" className="subImg" />
+                                )}
+                                <div className="offerInput">
+                                    <input 
+                                        type="number" 
+                                        placeholder="Ár (Ft)" 
+                                        value={offerInputs[sub.submissionId] || ''} 
+                                        onChange={(e) => handleOfferChange(sub.submissionId, e.target.value)}
+                                    />
+                                    <button className="acceptBtn" onClick={() => sendOffer(sub.submissionId)}>Küldés</button>
+                                </div>
+                            </div>
+                        ))}
+
+                        {activeTab == 'waiting' && waitingListSubmissions.map(sub => (
+                            <div key={sub.submissionId} className="adminSubCard">
+                                <div className="subHeader">
+                                    <span>#{sub.submissionId}</span>
+                                    <span>{new Date(sub.submissionDate).toLocaleDateString()}</span>
+                                </div>
+                                <h4>{sub.productName}</h4>
+                                <p><strong>Felhasználó:</strong> {sub.userName}</p>
+                                <div className="offerBox">
+                                    <span>Elfogadott ár:</span>
+                                    <span className="offerPrice">{formatPrice(sub.adminOfferPrice)} Ft</span>
+                                </div>
+                                {sub.productImage && (
+                                    <img src={`/${sub.productImage}`} alt="Termék" className="subImg" />
+                                )}
+                                <button className="acceptBtn" style={{marginTop: 'auto'}} onClick={() => startListing(sub)}>
+                                    Listázás indítása
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -68,6 +68,21 @@ module.exports = class User {
     }
   }
 
+  static async logout(token) {
+    try {
+      const hashedToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+      await db.execute('DELETE FROM refreshTokens WHERE tokenId = ?', [
+        hashedToken,
+      ]);
+      return { result: 'success' };
+    } catch (err) {
+      return { result: 'fail' };
+    }
+  }
+
   static async resetPassword(email, code, password) {
     try {
       const [rows] = await db.execute(

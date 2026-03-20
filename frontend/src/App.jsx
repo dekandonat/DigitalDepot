@@ -179,6 +179,7 @@ export default function App() {
         onProfileClick={openProfile}
         onSearch={handleSearch}
         isAdminRoute={isAdminRoute}
+        isLoggedIn={isLoggedIn}
       />
 
       {location.pathname === '/' && <MainPageGallery data={slides || []} />}
@@ -282,7 +283,10 @@ export default function App() {
           onClose={() => setIsProfileOpen(false)}
           onProfileUpdate={handleProfileUpdate}
           setIsLoggedIn={setIsLoggedIn}
-          onLogout={() => {
+          onLogout={async () => {
+            try {
+              await fetch('/user/logout', { method: 'POST' });
+            } catch (err) {}
             localStorage.removeItem('token');
             localStorage.removeItem('email');
             setIsLoggedIn(false);

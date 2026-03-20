@@ -25,6 +25,10 @@ export async function apiFetch(url, options = {}) {
     let response = await fetch(url, settings);
 
     if (response.status == 401) {
+      if (!localStorage.getItem('token')) {
+        throw new Error('Unauthorized');
+      }
+
       const rawRefreshData = await fetch('/user/refresh', {
         credentials: 'include',
       });

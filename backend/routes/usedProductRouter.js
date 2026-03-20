@@ -153,6 +153,9 @@ router.post('/admin/list-product', upload.single('file'), async (req, res) => {
       categoryId,
       conditionState,
       existingImage,
+      newMainCategory,
+      newSubCategory,
+      selectedMainCat
     } = req.body;
 
     let finalImage = existingImage;
@@ -167,12 +170,36 @@ router.post('/admin/list-product', upload.single('file'), async (req, res) => {
       });
     }
 
+    let finalCategoryId = categoryId;
+
+    if (newMainCategory) {
+      const [mainResult] = await db.execute(
+        'INSERT INTO categories (categoryName, parentId) VALUES (?, NULL)',
+        [newMainCategory]
+      );
+      finalCategoryId = mainResult.insertId;
+
+      if (newSubCategory) {
+        const [subResult] = await db.execute(
+          'INSERT INTO categories (categoryName, parentId) VALUES (?, ?)',
+          [newSubCategory, finalCategoryId]
+        );
+        finalCategoryId = subResult.insertId;
+      }
+    } else if (newSubCategory) {
+      const [subResult] = await db.execute(
+        'INSERT INTO categories (categoryName, parentId) VALUES (?, ?)',
+        [newSubCategory, selectedMainCat]
+      );
+      finalCategoryId = subResult.insertId;
+    }
+
     const productData = {
       productName,
       productDescription,
       productPrice,
       productImg: finalImage,
-      categoryId,
+      categoryId: finalCategoryId,
       conditionState,
     };
 
