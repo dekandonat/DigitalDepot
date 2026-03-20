@@ -37,6 +37,14 @@
   gap: 15px;
 }
 
+@media (min-width: 768px) {
+  .inventoryFormGrid {
+    grid-template-columns: 1fr 1fr auto;
+    align-items: end;
+    gap: 20px;
+  }
+}
+
 .formGroup {
   display: flex;
   flex-direction: column;
@@ -44,11 +52,9 @@
 }
 
 .formGroup label {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .formGroup input {
@@ -56,29 +62,27 @@
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   font-size: 0.95rem;
-  color: #1e293b;
-  background-color: #f8fafc;
-  transition: all 0.2s ease;
+  height: 45px;
+  box-sizing: border-box;
   outline: none;
 }
 
 .formGroup input:focus {
-  background-color: white;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .submitStockBtn {
   background-color: #10b981;
   color: white;
   border: none;
-  padding: 12px 20px;
   border-radius: 8px;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
   height: 45px;
+  padding: 0 25px;
+  box-sizing: border-box;
 }
 
 .submitStockBtn:hover {
@@ -119,49 +123,19 @@
   padding: 16px;
   border-bottom: 1px solid #f1f5f9;
   color: #334155;
-  font-size: 0.95rem;
 }
 
-.stockTable tbody tr {
-  transition: background-color 0.2s;
-}
-
-.stockTable tbody tr:hover {
+.stockTable tr:hover td {
   background-color: #f8fafc;
 }
 
-.stockTable tbody tr:last-child td {
-  border-bottom: none;
-}
-
 .idCell {
+  font-family: monospace;
+  color: #64748b;
   font-weight: 600;
-  color: #0f172a !important;
 }
 
 .qtyCell {
   font-weight: 700;
-  color: #3b82f6 !important;
-}
-
-@media (min-width: 768px) {
-  .inventoryContainer {
-    gap: 30px;
-  }
-
-  .inventoryCard {
-    padding: 30px;
-  }
-
-  .inventoryFormGrid {
-    grid-template-columns: 1fr 1fr auto;
-    align-items: end;
-    gap: 20px;
-  }
-
-  .tableWrapper {
-    margin: -30px;
-    margin-top: 0;
-    padding: 0 30px 30px 30px;
-  }
+  color: #0f172a;
 }

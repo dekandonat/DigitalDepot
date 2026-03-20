@@ -41,53 +41,46 @@ export default function AdminInventory() {
 
   const getMethodFetch = (url) => {
     return fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        return data;
-      })
+      .then((res) => res.json())
       .catch((err) => {
-        throw new Error(err.message);
+        throw err;
       });
   };
 
-  const handleAddInventory = () => {
+  const handleAddInventory = async () => {
     if (!id || !quantity) {
-        setModal({ isOpen: true, title: 'Figyelem', message: 'Kérjük, töltse ki mindkét mezőt!' });
-        return;
+      setModal({ isOpen: true, title: 'Hiba', message: 'Kérem adja meg a termék azonosítót és a mennyiséget!' });
+      return;
     }
 
-    apiFetch('/adminRoute/products/addInventory', {
-      body: { id: parseInt(id), quantity: parseInt(quantity) },
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-      .then((data) => {
-        showToast(data.result);
+    try {
+      const data = await apiFetch('/adminRoute/products/addInventory', {
+        method: 'PATCH',
+        body: { id: parseInt(id), quantity: parseInt(quantity) },
+      });
+
+      if (data.result === 'success') {
+        showToast('Készlet sikeresen frissítve!');
+        setProducts(prevProducts =>
+          prevProducts.map(product =>
+            product.prodId === parseInt(id)
+              ? { ...product, quantity: product.quantity + parseInt(quantity) }
+              : product
+          )
+        );
         setId('');
         setQuantity('');
-        getMethodFetch('/products')
-          .then((data) => {
-            setProducts(data.data);
-          })
-          .catch((err) => {
-            setModal({ isOpen: true, title: 'Hiba', message: 'Sikeres frissítés, de a lista frissítése sikertelen.' });
-          });
-      })
-      .catch((err) => {
-        setModal({ isOpen: true, title: 'Hiba', message: 'Hiba történt a készlet frissítésekor.' });
-      });
+      } else {
+        setModal({ isOpen: true, title: 'Hiba', message: data.message || 'Hiba történt a frissítés során.' });
+      }
+    } catch (err) {
+      setModal({ isOpen: true, title: 'Hiba', message: 'Szerver hiba történt.' });
+    }
   };
 
   return (
     <div className="inventoryContainer">
-      <CustomModal 
+      <CustomModal
         isOpen={modal.isOpen}
         title={modal.title}
         message={modal.message}
@@ -97,13 +90,14 @@ export default function AdminInventory() {
       {toast && <div className="toastMessage">{toast}</div>}
 
       <div className="inventoryHeader">
-        <h2>Leltár Kezelése</h2>
+        <h2>Leltár kezelése</h2>
+        <p>Termékek készletének gyors frissítése</p>
       </div>
 
       <div className="inventoryCard">
         <div className="inventoryFormGrid">
           <div className="formGroup">
-            <label htmlFor="azonosito">Termék azonosító (ID)</label>
+            <label htmlFor="azonosito">Termék Azonosító (ID)</label>
             <input
               id="azonosito"
               value={id}
@@ -124,13 +118,16 @@ export default function AdminInventory() {
             />
           </div>
 
-          <button
-            type="button"
-            className="submitStockBtn"
-            onClick={handleAddInventory}
-          >
-            Készlet frissítése
-          </button>
+          <div className="formGroup">
+            <label style={{ visibility: 'hidden' }}>Rejtett</label>
+            <button
+              type="button"
+              className="submitStockBtn"
+              onClick={handleAddInventory}
+            >
+              Készlet frissítése
+            </button>
+          </div>
         </div>
       </div>
 
