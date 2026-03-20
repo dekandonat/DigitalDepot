@@ -42,6 +42,12 @@ router.post('/place-order', verifyToken, async (req, res) => {
 
     const { shippingAddress, paymentMethod, couponCode } = req.body;
 
+    if (!shippingAddress || !paymentMethod) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'missing parameters' });
+    }
+
     const order = new Order(userId, shippingAddress, paymentMethod, couponCode);
 
     const result = await order.save();

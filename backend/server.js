@@ -57,7 +57,7 @@ app.use('/category', categoryRouter);
 app.use('/cart', verifyToken, cartRouter);
 app.use('/order', orderRouter);
 app.use('/adminRoute', verifyAdmin, adminRouter);
-app.use('/used-products', usedProductRouter);
+app.use('/used-products', verifyToken, usedProductRouter);
 app.use('/reviews', reviewRouter);
 
 server.listen(PORT, IP, () => {

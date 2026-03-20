@@ -1,55 +1,43 @@
-import './AdminAddProduct.css';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { apiFetch } from '../assets/util/fetch';
 import CustomModal from './CustomModal';
+import './AdminAddProduct.css';
 
 export default function AdminAddProduct() {
-  const [categories, setCategories] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
   const [img, setImg] = useState(undefined);
+  const [categories, setCategories] = useState([]);
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
   const [toast, setToast] = useState('');
-
-  const selectRef = useRef();
+  const selectRef = useRef(null);
 
   useEffect(() => {
-    apiFetch('/category')
-      .then((data) => {
-        setCategories(data.data);
-      })
-      .catch((err) => {
+    const fetchCategories = async () => {
+      try {
+        const data = await apiFetch('/category');
+        if (data.data) {
+          setCategories(data.data);
+        }
+      } catch (err) {
         console.error(err);
-      });
+      }
+    };
+    fetchCategories();
   }, []);
 
-  function handleNameChange(event) {
-    setName(event.target.value);
-  }
-
-  function handleDescriptionChange(event) {
-    setDescription(event.target.value);
-  }
-
-  function handlePriceChange(event) {
-    setPrice(event.target.value);
-  }
-
-  function handleImgChange(event) {
-    setImg(event.target.files[0]);
-  }
-
-  const closeModal = () => {
-    setModal({ ...modal, isOpen: false });
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
   };
+  
+  const closeModal = () => setModal({ ...modal, isOpen: false });
 
-  const showToast = (message) => {
-    setToast(message);
-    setTimeout(() => {
-      setToast('');
-    }, 3000);
-  };
+  const handleNameChange = (e) => setName(e.target.value);
+  const handleDescriptionChange = (e) => setDescription(e.target.value);
+  const handlePriceChange = (e) => setPrice(e.target.value);
+  const handleImgChange = (e) => setImg(e.target.files[0]);
 
   const handleAddProduct = () => {
     if (img == undefined) {
@@ -62,10 +50,10 @@ export default function AdminAddProduct() {
     }
 
     const formData = new FormData();
-    formData.append('prodName', name);
-    formData.append('prodDescription', description);
-    formData.append('prodPrice', price);
-    formData.append('categoryId', selectRef.current.value);
+    formData.append('productName', name);
+    formData.append('productDescription', description);
+    formData.append('productPrice', price);
+    if (selectRef.current) formData.append('categoryId', selectRef.current.value);
     formData.append('file', img);
 
     apiFetch('/products', {
@@ -168,12 +156,8 @@ export default function AdminAddProduct() {
             />
           </div>
 
-          <button
-            type="button"
-            className="adminSubmitBtn"
-            onClick={handleAddProduct}
-          >
-            Hozzáadás
+          <button type="button" onClick={handleAddProduct} className="adminSubmitBtn">
+            Termék Feltöltése
           </button>
         </form>
       </div>

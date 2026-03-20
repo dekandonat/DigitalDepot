@@ -53,7 +53,10 @@ export async function apiFetch(url, options = {}) {
 
         response = await fetch(url, newOptions);
       } else {
-        throw new Error('Jelentkezzen be újra!');
+        localStorage.clear();
+        window.location.href = '/';
+        location.reload();
+        return;
       }
     }
 
