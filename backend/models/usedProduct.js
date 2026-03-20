@@ -1,4 +1,15 @@
 const db = require('../util/database');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
 
 module.exports = class UsedProduct {
   constructor(userId, productName, productDescription, conditionState, productImage) {
@@ -55,6 +66,38 @@ module.exports = class UsedProduct {
             `UPDATE used_product_submissions SET status = ?, adminOfferPrice = ? WHERE submissionId = ?`,
             [status, offerPrice, submissionId]
         );
+
+        if (status === 'accepted') {
+            try {
+                const [rows] = await db.execute(
+                    `SELECT users.email, used_product_submissions.productName 
+                     FROM used_product_submissions 
+                     JOIN users ON used_product_submissions.userId = users.userId 
+                     WHERE submissionId = ?`,
+                    [submissionId]
+                );
+
+                if (rows.length > 0) {
+                    const email = rows[0].email;
+                    const productName = rows[0].productName;
+                    
+                    let htmlbody = `<h1>Ajánlat érkezett!</h1>
+                                    <p>Tisztelt Ügyfelünk!</p>
+                                    <p>Az Ön által beküldött <b>${productName}</b> termékre üzletünk <b>${offerPrice} Ft</b> összegű ajánlatot tesz.</p>
+                                    <p>Kérjük, lépjen be a weboldalra, és a profilján belül fogadja el, vagy utasítsa el az ajánlatot.</p>`;
+
+                    await transporter.sendMail({
+                        from: `"DigitalDepot" <${process.env.EMAIL_USER}>`,
+                        to: email,
+                        subject: 'Ajánlat érkezett használt termékére',
+                        html: htmlbody,
+                    });
+                }
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+
         return { result: 'success' };
     } catch (err) {
         return { result: 'fail', message: err.message };
@@ -69,6 +112,44 @@ module.exports = class UsedProduct {
               `UPDATE used_product_submissions SET status = ? WHERE submissionId = ?`,
               [newStatus, submissionId]
           );
+
+          if (decision === 'accept') {
+              try {
+                  const [rows] = await db.execute(
+                      `SELECT users.email, used_product_submissions.productName, used_product_submissions.adminOfferPrice 
+                       FROM used_product_submissions 
+                       JOIN users ON used_product_submissions.userId = users.userId 
+                       WHERE submissionId = ?`,
+                      [submissionId]
+                  );
+
+                  if (rows.length > 0) {
+                      const email = rows[0].email;
+                      const productName = rows[0].productName;
+                      const offerPrice = rows[0].adminOfferPrice;
+                      
+                      let htmlbody = `<h1>Sikeres megegyezés!</h1>
+                                      <p>Tisztelt Ügyfelünk!</p>
+                                      <p>Ön sikeresen elfogadta a(z) <b>${productName}</b> termékre tett <b>${offerPrice} Ft</b> összegű ajánlatunkat.</p>
+                                      <h3>A következő lépések:</h3>
+                                      <ul>
+                                        <li>Kérjük, csomagolja be a terméket biztonságosan, hogy a szállítás során ne sérülhessen meg.</li>
+                                        <li>Hamarosan küldjük a futárunkat a csomagért az Ön által megadott címre.</li>
+                                        <li>A termék beérkezése és fizikai állapotának ellenőrzése után a megegyezett összeget 1-3 munkanapon belül átutaljuk a profiljában megadott bankszámlaszámra.</li>
+                                      </ul>
+                                      <p>Köszönjük, hogy minket választott!</p>`;
+
+                      await transporter.sendMail({
+                          from: `"DigitalDepot" <${process.env.EMAIL_USER}>`,
+                          to: email,
+                          subject: 'Sikeres megegyezés - Teendők',
+                          html: htmlbody,
+                      });
+                  }
+              } catch (err) {
+                  console.log(err.message);
+              }
+          }
 
           return { result: 'success' };
       } catch (err) {

@@ -4,22 +4,21 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 3000;
-  backdrop-filter: blur(5px);
 }
 
 .formContent {
   background-color: white;
-  padding: 30px 30px 20px 30px;
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  padding: 40px 30px 30px 30px;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
   position: relative;
   width: 90%;
-  max-width: 400px;
+  max-width: 380px;
   animation: scaleIn 0.3s ease-out;
   box-sizing: border-box;
 }
@@ -31,139 +30,101 @@
 
 .formCloseBtn {
   position: absolute;
-  top: 10px;
-  right: 15px;
+  top: 15px;
+  right: 20px;
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   cursor: pointer !important;
-  color: #888;
+  color: #aaa;
+  line-height: 1;
+}
+
+.formCloseBtn:hover {
+  color: #555;
 }
 
 .formContent h2 {
   text-align: center;
-  margin-bottom: 25px;
+  margin-top: 0;
   color: #333;
-  user-select: none;
+  font-size: 1.8rem;
 }
 
-.inputGroup, .formItems {
-  margin-bottom: 15px;
+.formItems {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
 }
 
-.inputGroup label, .formItems label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+.formItems label {
+  margin-bottom: 8px;
   color: #555;
-  user-select: none;
+  font-weight: bold;
+  font-size: 1rem;
 }
 
-.inputGroup input, .formItems input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-sizing: border-box;
+.formItems input {
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.formItems input:focus {
+  border-color: #007bff;
 }
 
 .submitBtn {
   width: 100%;
-  padding: 12px;
-  background-color: #3b82f6;
+  padding: 15px;
+  background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 10px;
+  font-size: 1.2rem;
   font-weight: bold;
   cursor: pointer !important;
-  transition: all 0.2s;
-  user-select: none;
+  margin-top: 15px;
+  transition: background-color 0.2s;
 }
 
 .submitBtn:hover {
-  background-color: #2563eb;
-  transform: translateY(-2px);
+  background-color: #0056b3;
 }
 
-.switchText, .switchModeText {
+.switchModeText {
   text-align: center;
-  margin-top: 15px;
-  font-size: 0.9rem;
-  user-select: none;
+  margin-top: 20px;
+  color: #007bff;
   cursor: pointer !important;
+  font-size: 1rem;
 }
 
-.switchText *, .switchModeText * {
-  cursor: pointer !important;
-}
-
-.switchText span, .switchModeText span {
-  color: #3b82f6;
-  font-weight: bold;
-  transition: color 0.2s;
-}
-
-.switchText span:hover, .switchModeText span:hover {
-  color: #2563eb;
+.switchModeText:hover {
   text-decoration: underline;
 }
 
 .forgotPassword {
   text-align: center;
-  margin-top: 15px;
-  font-size: 0.9rem;
-  user-select: none;
-  display: block;
-  width: 100%;
-  color: #3b82f6;
-  font-weight: bold;
+  color: #888;
   cursor: pointer !important;
-  text-decoration: none;
-  transition: color 0.2s;
+  font-size: 0.95rem;
+  margin-top: 8px;
 }
 
 .forgotPassword:hover {
-  color: #2563eb;
-  text-decoration: underline;
+  color: #555;
 }
 
-.errorMsg, .message#error {
-  color: #ef4444;
-  text-align: center;
-  margin-bottom: 10px;
-  font-size: 0.9rem;
-}
-
-.profilePicContainer {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-#profileImg {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #3b82f6;
-  user-select: none;
-}
-
-.profileDataSection {
-  margin-bottom: 25px;
-  background-color: #f8f9fa;
-  padding: 15px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-}
-
-.profileDataRow {
+.profileInfoRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  font-size: 0.95rem;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
 }
 
 .profileLabel {
@@ -180,20 +141,21 @@
 .editBankBtn {
   background: transparent;
   border: none;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   cursor: pointer !important;
   padding: 5px;
-  margin-left: 8px;
+  margin-left: 10px;
 }
 
 .saveBankBtn {
-  padding: 6px 12px;
+  padding: 8px 16px;
   background-color: #10b981;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer !important;
+  font-size: 1rem;
 }
 
 .adminPageBtn,
@@ -202,14 +164,14 @@
 .myOrdersBtn,
 #logoutBtn {
   width: 100%;
-  padding: 12px 15px;
+  padding: 15px 20px;
   border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer !important;
   transition: all 0.2s ease;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -223,7 +185,7 @@
 .myOrdersBtn {
   background-color: #3b82f6;
   color: white;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 3px 6px rgba(59, 130, 246, 0.2);
 }
 
 .adminPageBtn:hover,
@@ -231,11 +193,12 @@
 .usedProductBtn:hover,
 .myOrdersBtn:hover {
   background-color: #2563eb;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(59, 130, 246, 0.3);
 }
 
 #logoutBtn {
-  margin-top: 20px;
+  margin-top: 25px;
   margin-bottom: 0;
   background-color: #f8fafc;
   color: #ef4444;
@@ -245,4 +208,43 @@
 #logoutBtn:hover {
   background-color: #fee2e2;
   color: #dc2626;
+}
+
+.profileHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 35px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.profileHeader img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  object-fit: cover;
+  border: 3px solid #f0f0f0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.profileHeaderText {
+  width: 100%;
+  text-align: left;
+}
+
+.profileHeaderText h2 {
+  margin: 0 0 8px 0;
+  text-align: left;
+  font-size: 1.4rem;
+  color: #222;
+}
+
+.profileHeaderText p {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+  word-break: break-all;
+  line-height: 1.4;
 }

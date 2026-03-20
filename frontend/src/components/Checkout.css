@@ -122,6 +122,17 @@
     margin: 0;
 }
 
+.addressSelectionGroup {
+    margin-bottom: 15px;
+}
+
+.addressSelectionLabel {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
 @media (min-width: 600px) {
     .couponButton {
         width: auto;

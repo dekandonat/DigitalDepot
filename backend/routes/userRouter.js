@@ -133,6 +133,47 @@ router.patch('/bank-account', verifyToken, async (req, res) => {
   }
 });
 
+router.get('/addresses', verifyToken, async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      'SELECT * FROM user_addresses WHERE userId = ?',
+      [req.user.id]
+    );
+    res.status(200).json({ result: 'success', data: rows });
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: err.message });
+  }
+});
+
+router.post('/addresses', verifyToken, async (req, res) => {
+  try {
+    const { zipCode, city, streetAddress } = req.body;
+    if (!zipCode || !city || !streetAddress) {
+      return res.status(400).json({ result: 'fail', message: 'Missing fields' });
+    }
+    await db.execute(
+      'INSERT INTO user_addresses (userId, zipCode, city, streetAddress) VALUES (?, ?, ?, ?)',
+      [req.user.id, zipCode, city, streetAddress]
+    );
+    res.status(201).json({ result: 'success' });
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: err.message });
+  }
+});
+
+router.delete('/addresses/:id', verifyToken, async (req, res) => {
+  try {
+    const addressId = req.params.id;
+    await db.execute(
+      'DELETE FROM user_addresses WHERE id = ? AND userId = ?',
+      [addressId, req.user.id]
+    );
+    res.status(200).json({ result: 'success' });
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: err.message });
+  }
+});
+
 router.patch('/chat-topic', verifyToken, async (req, res) => {
   try {
     const { topic } = req.body;
@@ -168,7 +209,6 @@ router.get('/messages', verifyToken, async (req, res) => {
       data: [{ messages: rows, chatTopic: chatTopic }] 
     });
   } catch (err) {
-    console.log('Hiba történt: ' + err.message);
     res.status(500).json({ result: 'fail', message: err.message });
   }
 });
@@ -179,11 +219,8 @@ router.post('/readmessages', verifyToken, async (req, res) => {
       'UPDATE messages SET unread = 0 WHERE recipientId = ? AND unread = 1;',
       [req.user.id]
     );
-    res
-      .status(200)
-      .json({ result: 'success', affectedRows: rows.affectedRows });
+    res.status(200).json({ result: 'success', affectedRows: rows.affectedRows });
   } catch (err) {
-    console.log(err.message);
     res.status(500).json({ result: 'fail', message: err.message });
   }
 });

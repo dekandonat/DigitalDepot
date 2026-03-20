@@ -16,11 +16,9 @@ export default function ProfilePopup({
     email: '',
     bankAccountNumber: '',
   });
-  const [bankAccountInput, setBankAccountInput] = useState('');
-  const [isEditingBank, setIsEditingBank] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   let role;
 
   try {
@@ -38,98 +36,52 @@ export default function ProfilePopup({
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await apiFetch('/user/profile', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        });
+        const data = await apiFetch('/user/profile');
         if (data.result === 'success') {
-          setIsLoggedIn(true);
-          setUserData(data.data);
-          setBankAccountInput(data.data.bankAccountNumber || '');
+          setUserData({
+            name: data.data.userName,
+            email: data.data.email,
+            bankAccountNumber: data.data.bankAccountNumber || '',
+          });
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     };
     fetchProfile();
   }, []);
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
     localStorage.removeItem('email');
-    role = null;
+    setIsLoggedIn(false);
     onClose();
-    window.location.href = '/';
-  };
-
-  const saveBankAccount = async () => {
-    try {
-      await apiFetch('/user/bank-account', {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: { bankAccountNumber: bankAccountInput },
-      });
-      setUserData({ ...userData, bankAccountNumber: bankAccountInput });
-      setIsEditingBank(false);
-      if (onProfileUpdate) onProfileUpdate();
-    } catch (err) {
-      console.error(err);
-    }
+    navigate('/');
   };
 
   return (
-    <div className="formBackground" onMouseDown={onClose}>
-      <div className="formContent" onMouseDown={(e) => e.stopPropagation()}>
+    <div className="formBackground" onClick={onClose}>
+      <div className="formContent" onClick={(e) => e.stopPropagation()}>
         <button className="formCloseBtn" onClick={onClose}>
-          &times;
+          X
         </button>
-        <h2>Profilom</h2>
-        <div className="profilePicContainer">
-          <img src={profileIcon} alt="Profilkép" id="profileImg"></img>
-        </div>
-        <div className="profileDataSection">
-          <div className="profileDataRow">
-            <span className="profileLabel">Felhasználónév:</span>
-            <span className="profileData">{userData.userName}</span>
-          </div>
-
-          <div className="profileDataRow">
-            <span className="profileLabel">E-mail:</span>
-            <span className="profileData">{userData.email}</span>
-          </div>
-
-          <div className="profileDataRow">
-            <span className="profileLabel">Számlaszám:</span>
-            {isEditingBank ? (
-              <div className="bankEditContainer">
-                <input
-                  value={bankAccountInput}
-                  onChange={(e) => setBankAccountInput(e.target.value)}
-                  placeholder="Pl. 117733..."
-                  className="bankInput"
-                />
-                <button onClick={saveBankAccount} className="saveBankBtn">
-                  Mentés
-                </button>
-              </div>
-            ) : (
-              <div className="bankDisplayContainer">
-                <span className="profileData">
-                  {userData.bankAccountNumber || 'Nincs megadva'}
-                </span>
-                <button
-                  onClick={() => setIsEditingBank(true)}
-                  className="editBankBtn"
-                >
-                  ✏️
-                </button>
-              </div>
-            )}
+        <div className="profileHeader">
+          <img src={profileIcon} alt="Profile" />
+          <div className="profileHeaderText">
+            <h2>{userData.name}</h2>
+            <p>{userData.email}</p>
           </div>
         </div>
+
+        <button
+          onClick={() => {
+            onClose();
+            navigate('/profile');
+          }}
+          className="myOrdersBtn"
+        >
+          Profil adatok
+        </button>
 
         {role === 'admin' || role === 'owner' ? (
           <>
