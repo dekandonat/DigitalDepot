@@ -15,7 +15,6 @@ module.exports = {
       },
     });
 
-    //JWT ellenőrzés
     io.use(async (socket, next) => {
       const token = socket.handshake.auth.token;
       if (!token) return next(new Error('Nincs token'));
@@ -24,7 +23,7 @@ module.exports = {
         const decodedToken = await verifyAsync(token, process.env.SECRET);
         socket.user = decodedToken;
 
-        if (socket.user.role === 'admin') {
+        if (socket.user.role === 'admin' || socket.user.role === 'owner') {
           socket.join('room_admin');
         } else {
           socket.join(`room_${socket.user.id}`);
@@ -36,15 +35,19 @@ module.exports = {
       }
     });
 
-    //ide kerülnek az események
+    // ide kerülnek az események
     io.on('connection', (socket) => {
       socket.on('send_message', async (data) => {
         const { id, role } = socket.user;
+        
+        let messageText = '';
+        if (typeof data === 'string') {
+          messageText = data;
+        } else if (data && typeof data === 'object') {
+          messageText = data.text || data.messageText || data.message || '';
+        }
 
-        const isObject = typeof data === 'object';
-        const messageText = isObject ? data.text : data;
-
-        if (role == 'user') {
+        if (role === 'user') {
           const message = {
             text: messageText,
             sender: id,
@@ -58,7 +61,7 @@ module.exports = {
               [message.sender, message.text]
             );
           } catch (err) {
-            console.log('Nem sikerült menteni egy üzenetet');
+            console.log('Hiba a user üzenet mentésekor: ' + err.message);
           }
         } else {
           if (data.recipientId) {
@@ -76,7 +79,7 @@ module.exports = {
                 [message.sender, message.text, message.recipientId]
               );
             } catch (err) {
-              console.log('Nem sikerült menteni egy üzenetet');
+              console.log('Hiba az admin üzenet mentésekor: ' + err.message);
             }
           } else {
             console.log('Nem volt megadva a fogadó');
@@ -89,7 +92,7 @@ module.exports = {
   },
   getIO: () => {
     if (!io) {
-      throw new Error('Socket.io nincs inicializálva');
+      throw new Error('Socket.io nincs inicializálva!');
     }
     return io;
   },

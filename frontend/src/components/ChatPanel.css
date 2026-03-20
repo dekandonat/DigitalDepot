@@ -56,6 +56,21 @@
   gap: 8px;
 }
 
+.messageWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.messageWrapper.sent {
+  align-items: flex-end;
+}
+
+.messageWrapper.received {
+  align-items: flex-start;
+}
+
 .sentMessage,
 .receivedMessage {
   max-width: 75%;
@@ -66,17 +81,70 @@
 }
 
 .sentMessage {
-  align-self: flex-end;
   background: #4f46e5;
   color: white;
   border-bottom-right-radius: 4px;
 }
 
 .receivedMessage {
-  align-self: flex-start;
   background: white;
   border: 1px solid #e5e7eb;
   border-bottom-left-radius: 4px;
+}
+
+.messageTime {
+  font-size: 0.65rem;
+  color: #888;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.topicSelectorFull {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto 0;
+  width: 100%;
+}
+
+.topicSelectorFull h3 {
+  margin: 0 0 15px 0;
+  color: #374151;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.topicGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.topicFullBtn {
+  background: white;
+  border: 2px solid #e5e7eb;
+  padding: 10px 5px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #4f46e5;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.topicFullBtn:hover {
+  border-color: #4f46e5;
+  background: #eef2ff;
+  transform: translateY(-2px);
+}
+
+.otherBtn {
+  grid-column: span 2;
+  width: 60%;
+  justify-self: center;
+  margin-top: 5px;
 }
 
 .chatInputArea {
@@ -99,6 +167,11 @@
   border-color: #4f46e5;
 }
 
+.chatInputArea input:disabled {
+  background: #e5e7eb;
+  cursor: not-allowed;
+}
+
 .chatInputArea button {
   background: #4f46e5;
   border: none;
@@ -113,11 +186,22 @@
   background: #4338ca;
 }
 
+.chatInputArea button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.chatEmptyState {
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
 @media (max-width: 768px) {
   .mainChatDiv {
     width: 95%;
     right: 2.5%;
-    bottom: 60px;
+    bottom: 70px;
     height: 70vh;
   }
 }

@@ -77,7 +77,6 @@ router.post('/reset-password', async (req, res) => {
 });
 
 router.get('/refresh', async (req, res) => {
-  console.log('refresh');
   try {
     const refreshToken = req.cookies.refresh_token;
 
@@ -134,13 +133,40 @@ router.patch('/bank-account', verifyToken, async (req, res) => {
   }
 });
 
+router.patch('/chat-topic', verifyToken, async (req, res) => {
+  try {
+    const { topic } = req.body;
+    await db.execute(
+      'UPDATE users SET chatTopic = ? WHERE userId = ?',
+      [topic, req.user.id]
+    );
+    res.status(200).json({ result: 'success' });
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: err.message });
+  }
+});
+
 router.get('/messages', verifyToken, async (req, res) => {
   try {
     const [rows] = await db.execute(
-      'SELECT * FROM messages WHERE messages.sender = ? OR messages.recipientId = ?;',
+      'SELECT * FROM messages WHERE messages.sender = ? OR messages.recipientId = ? ORDER BY id ASC;',
       [req.user.id, req.user.id]
     );
-    res.status(200).json({ result: 'success', data: rows });
+    
+    const [userRows] = await db.execute(
+      'SELECT chatTopic FROM users WHERE userId = ?',
+      [req.user.id]
+    );
+    
+    let chatTopic = 'Egyéb';
+    if(userRows.length > 0 && userRows[0].chatTopic) {
+        chatTopic = userRows[0].chatTopic;
+    }
+
+    res.status(200).json({ 
+      result: 'success', 
+      data: [{ messages: rows, chatTopic: chatTopic }] 
+    });
   } catch (err) {
     console.log('Hiba történt: ' + err.message);
     res.status(500).json({ result: 'fail', message: err.message });
