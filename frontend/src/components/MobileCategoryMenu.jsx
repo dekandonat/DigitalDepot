@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from 'react-router-dom';
 import { apiFetch } from '../assets/util/fetch';
 import './MobileCategoryMenu.css';
 
-export default function MobileCategoryMenu({ onClose, onCategorySelect, isClosing }){
+export default function MobileCategoryMenu({ onClose, onCategorySelect, onSortSelect, isClosing }){
     const [menuItems, setMenuItems] = useState({});
     const [expandedCategories, setExpandedCategories] = useState({});
+    const location = useLocation();
+    const currentSort = new URLSearchParams(location.search).get('sort') || 'default';
 
     useEffect(() => {
         const fetchCategories = async() => {
@@ -46,25 +49,24 @@ export default function MobileCategoryMenu({ onClose, onCategorySelect, isClosin
     return (
         <div id="mobileMenuBackground" className={isClosing ? 'closing' : ''} onClick={onClose}>
             <div id="mobileMenuContent" onClick={(e) => e.stopPropagation()}>
-                <div id="mobileMenuHeader">
-                    <h2>Kategóriák</h2>
-                    <button id="mobileMenuCloseBtn" onClick={onClose}>&times;</button>
+                
+                <div className="mobileSortSection">
+                    <div className="mobileCategoryTitle" style={{borderBottom: '1px solid #f0f0f0', paddingBottom: '10px', marginBottom: '10px'}}>Rendezés</div>
+                    <select className="mobileSortSelect" value={currentSort} onChange={(e) => onSortSelect(e.target.value)}>
+                        <option value="default">Alapértelmezett</option>
+                        <option value="price_asc">Ár szerint növekvő</option>
+                        <option value="price_desc">Ár szerint csökkenő</option>
+                        <option value="rating_desc">Értékelés szerint csökkenő</option>
+                        <option value="rating_asc">Értékelés szerint növekvő</option>
+                    </select>
                 </div>
 
-                <ul id="mobileCategoriesList">
+                <div className="mobileCategoryTitle" style={{borderBottom: '1px solid #f0f0f0', backgroundColor: '#fcfcfc'}}>Kategóriák</div>
+
+                <ul className="mobileMainCategories">
                     {Object.entries(menuItems).map(([mainCategoryName, categoryGroupData]) => (
-                        <li key={categoryGroupData.id} className="mobileMainCategory">
-                            <div 
-                                className="mobileCategoryHeader"
-                                onClick={() => {
-                                    if(categoryGroupData.subCategories.length > 0){
-                                        toggleCategory(mainCategoryName);
-                                    } else {
-                                        onCategorySelect(categoryGroupData.id);
-                                        onClose();
-                                    }
-                                }}
-                            >
+                        <li key={categoryGroupData.id}>
+                            <div className="mobileCategoryHeader" onClick={() => toggleCategory(mainCategoryName)}>
                                 <span 
                                     className="mobileCategoryTitle"
                                     onClick={(e) => {
@@ -75,7 +77,6 @@ export default function MobileCategoryMenu({ onClose, onCategorySelect, isClosin
                                 >
                                     {mainCategoryName}
                                 </span>
-                                
                                 {categoryGroupData.subCategories.length > 0 && (
                                     <div className="mobileCategoryToggle">
                                         <span className="mobileCatArrow">

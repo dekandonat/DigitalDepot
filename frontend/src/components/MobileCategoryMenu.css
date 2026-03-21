@@ -41,59 +41,15 @@
     to {transform: translateX(-100%);}
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-}
-
-#mobileMenuHeader{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #eee;
-    background-color: #f8f9fa;
-}
-
-#mobileMenuHeader h2{
-    margin: 0;
-    font-size: 1.5rem;
-    color: #333;
-    display: flex;
-    align-items: center;
-}
-
-#mobileMenuCloseBtn{
-    background: none;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: #666;
-    line-height: 1;
-    padding: 0 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    -webkit-tap-highlight-color: transparent;
-}
-
-#mobileMenuCloseBtn:hover{
-    color: black;
-}
-
-#mobileCategoriesList{
+.mobileMainCategories {
     list-style: none;
     padding: 0;
     margin: 0;
     overflow-y: auto;
+    flex-grow: 1;
 }
 
-.mobileMainCategory{
+.mobileMainCategories > li {
     border-bottom: 1px solid #f0f0f0;
 }
 
@@ -140,31 +96,48 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 30px;
+    height: 100%;
 }
 
-.mobileSubCategories{
+.mobileSubCategories {
     list-style: none;
     padding: 0;
-    background-color: #fcfcfc;
+    margin: 0;
+    background-color: #f9f9f9;
     border-top: 1px solid #f0f0f0;
 }
 
-.mobileSubCategories li{
-    padding: 12px 20px 12px 35px;
-    color: #555;
-    border-bottom: 1px solid #f5f5f5;
-    cursor: pointer;
+.mobileSubCategories li {
+    padding: 15px 20px 15px 40px;
     font-size: 0.95rem;
+    color: #555;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
 
-.mobileSubCategories li:hover{
-    color: #007bff;
-    background-color: #f0f8ff;
+.mobileSubCategories li:last-child {
+    border-bottom: none;
 }
 
-@media(min-width: 768px) {
-    #mobileMenuBackground {
-        bottom: 0;
-    }
+.mobileSubCategories li:active {
+    color: #007bff;
+    background-color: #f0f0f0;
+}
+
+.mobileSortSection {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.mobileSortSelect {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    background-color: white;
 }

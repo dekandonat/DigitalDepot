@@ -126,6 +126,20 @@ export default function App() {
     handleCloseMobileMenu();
   };
 
+  const handleSortSelect = (sortType) => {
+    const currentSearchParams = new URLSearchParams(location.search);
+    if (sortType === 'default') {
+        currentSearchParams.delete('sort');
+    } else {
+        currentSearchParams.set('sort', sortType);
+    }
+    navigate({
+        pathname: location.pathname,
+        search: currentSearchParams.toString()
+    });
+    handleCloseMobileMenu();
+  };
+
   const handleProfileUpdate = () => {
     setRefreshTrigger((prev) => prev + 1);
   };
@@ -260,6 +274,7 @@ export default function App() {
         <MobileCategoryMenu 
             onClose={handleCloseMobileMenu}
             onCategorySelect={handleCategorySelect}
+            onSortSelect={handleSortSelect}
             isClosing={isMobileMenuClosing}
         />
       )}

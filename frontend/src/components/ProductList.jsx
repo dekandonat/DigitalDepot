@@ -109,8 +109,9 @@ export default function ProductList() {
   const navigate = useNavigate();
 
   const { categoryId } = useParams();
-  const [queryParams] = useSearchParams();
+  const [queryParams, setQueryParams] = useSearchParams();
   const searchText = queryParams.get('q');
+  const sortType = queryParams.get('sort') || 'default';
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -182,9 +183,35 @@ export default function ProductList() {
     fetchProducts();
   }, [categoryId, searchText, allCategories]);
 
+  const handleSortChange = (e) => {
+    const newSort = e.target.value;
+    if (newSort === 'default') {
+      queryParams.delete('sort');
+    } else {
+      queryParams.set('sort', newSort);
+    }
+    setQueryParams(queryParams);
+  };
+
+  const getSortedProducts = () => {
+    let sorted = [...products];
+    if (sortType === 'price_asc') {
+      sorted.sort((a, b) => parseInt(a.productPrice) - parseInt(b.productPrice));
+    } else if (sortType === 'price_desc') {
+      sorted.sort((a, b) => parseInt(b.productPrice) - parseInt(a.productPrice));
+    } else if (sortType === 'rating_asc') {
+      sorted.sort((a, b) => parseFloat(a.avgRating) - parseFloat(b.avgRating));
+    } else if (sortType === 'rating_desc') {
+      sorted.sort((a, b) => parseFloat(b.avgRating) - parseFloat(a.avgRating));
+    }
+    return sorted;
+  };
+
   const clearFilter = () => {
     navigate('/');
   };
+
+  const displayedProducts = getSortedProducts();
 
   return (
     <div id="productListContainer">
@@ -194,24 +221,42 @@ export default function ProductList() {
         </div>
       )}
 
-      {(categoryId || searchText) && (
-        <div id="activeFilterContainer">
-          <span id="activeFilterName">{currentCategoryName}</span>
-          <button
-            id="clearFilterButton"
-            onClick={clearFilter}
-            title="Szűrés törlése"
-          >
-            &times;
-          </button>
+      <div id="productListHeader">
+        <div id="filterAndTitleArea">
+          {(categoryId || searchText) && (
+            <div id="activeFilterContainer">
+              <span id="activeFilterName">{currentCategoryName}</span>
+              <button
+                id="clearFilterButton"
+                onClick={clearFilter}
+                title="Szűrés törlése"
+              >
+                &times;
+              </button>
+            </div>
+          )}
         </div>
-      )}
 
-      {products.length === 0 ? (
+        <div className="desktopSortContainer">
+          <select
+            value={sortType}
+            onChange={handleSortChange}
+            className="desktopSortSelect"
+          >
+            <option value="default">Rendezés: Alapértelmezett</option>
+            <option value="price_asc">Ár szerint növekvő</option>
+            <option value="price_desc">Ár szerint csökkenő</option>
+            <option value="rating_desc">Értékelés szerint csökkenő</option>
+            <option value="rating_asc">Értékelés szerint növekvő</option>
+          </select>
+        </div>
+      </div>
+
+      {displayedProducts.length === 0 ? (
         <p>Nincs találat ebben a kategóriában.</p>
       ) : (
         <div id="productGrid">
-          {products.map((product) => (
+          {displayedProducts.map((product) => (
             <ProductCard
               key={product.prodId}
               product={product}
