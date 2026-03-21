@@ -25,11 +25,13 @@ import { apiFetch } from './assets/util/fetch';
 import ProductPage from './components/ProductPage';
 
 export default function App() {
+  const [newsData, setNewsData] = useState([]);
+
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   const [isMobileMenuClosing, setIsMobileMenuClosing] = useState(false);
   const [isCartClosing, setIsCartClosing] = useState(false);
 
@@ -47,6 +49,16 @@ export default function App() {
   useEffect(() => {
     isChatOpenRef.current = isChatOpen;
   }, [isChatOpen]);
+
+  useEffect(() => {
+    apiFetch('/news')
+      .then((data) => {
+        setNewsData(data.data);
+      })
+      .catch((err) => {
+        console.error(err.message);
+      });
+  }, []);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -103,8 +115,8 @@ export default function App() {
     if (isMobileMenuClosing) return;
     setIsMobileMenuClosing(true);
     setTimeout(() => {
-        setIsMobileMenuOpen(false);
-        setIsMobileMenuClosing(false);
+      setIsMobileMenuOpen(false);
+      setIsMobileMenuClosing(false);
     }, 300);
   };
 
@@ -112,8 +124,8 @@ export default function App() {
     if (isCartClosing) return;
     setIsCartClosing(true);
     setTimeout(() => {
-        setIsCartOpen(false);
-        setIsCartClosing(false);
+      setIsCartOpen(false);
+      setIsCartClosing(false);
     }, 300);
   };
 
@@ -133,7 +145,7 @@ export default function App() {
   const handleChatOpen = async () => {
     const token = localStorage.getItem('token');
     if (!token) return;
-    
+
     apiFetch('/user/readmessages', {
       method: 'POST',
       headers: {
@@ -156,18 +168,18 @@ export default function App() {
   const toggleMobileMenuFromNav = () => {
     if (isCartOpen) handleCloseCart();
     if (isMobileMenuOpen) {
-        handleCloseMobileMenu();
+      handleCloseMobileMenu();
     } else {
-        setIsMobileMenuOpen(true);
+      setIsMobileMenuOpen(true);
     }
   };
 
   const toggleCartFromNav = () => {
     if (isMobileMenuOpen) handleCloseMobileMenu();
     if (isCartOpen) {
-        handleCloseCart();
+      handleCloseCart();
     } else {
-        setIsCartOpen(true);
+      setIsCartOpen(true);
     }
   };
 
@@ -182,7 +194,7 @@ export default function App() {
         isLoggedIn={isLoggedIn}
       />
 
-      {location.pathname === '/' && <MainPageGallery data={slides || []} />}
+      {location.pathname === '/' && <MainPageGallery data={newsData || []} />}
 
       {!isAdminRoute &&
         location.pathname !== '/checkout' &&
@@ -250,32 +262,29 @@ export default function App() {
       </Routes>
 
       {!isAdminRoute && (
-        <MobileBottomNav 
-          onOpenCategories={toggleMobileMenuFromNav} 
-          onOpenCart={toggleCartFromNav} 
+        <MobileBottomNav
+          onOpenCategories={toggleMobileMenuFromNav}
+          onOpenCart={toggleCartFromNav}
         />
       )}
 
       {isMobileMenuOpen && (
-        <MobileCategoryMenu 
-            onClose={handleCloseMobileMenu}
-            onCategorySelect={handleCategorySelect}
-            isClosing={isMobileMenuClosing}
+        <MobileCategoryMenu
+          onClose={handleCloseMobileMenu}
+          onCategorySelect={handleCategorySelect}
+          isClosing={isMobileMenuClosing}
         />
       )}
 
       {isLoginOpen && (
-        <LoginForm 
-          onClose={() => setIsLoginOpen(false)} 
-          setIsLoggedIn={setIsLoggedIn} 
+        <LoginForm
+          onClose={() => setIsLoginOpen(false)}
+          setIsLoggedIn={setIsLoggedIn}
         />
       )}
-      
+
       {isCartOpen && (
-        <Cart 
-            onClose={handleCloseCart}
-            isClosing={isCartClosing}
-        />
+        <Cart onClose={handleCloseCart} isClosing={isCartClosing} />
       )}
 
       {isProfileOpen && (

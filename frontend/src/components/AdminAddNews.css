@@ -1,0 +1,96 @@
+.adminFormHeader {
+  margin-bottom: 25px;
+}
+
+.adminFormHeader h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-align: left;
+}
+
+.adminNewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.adminNewsList > div {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.adminNewsList img {
+  width: 120px;
+  height: 100px;
+  object-fit: contain;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.adminNewsList h3 {
+  flex-grow: 1;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.adminAddNews {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.adminAddNews form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.adminAddNews label {
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: -8px;
+}
+
+.adminAddNews input[type='text'] {
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.adminAddNews input[type='text']:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.adminAddNews button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.adminAddNews button:hover {
+  background-color: #2563eb;
+}

@@ -31,7 +31,7 @@ export default function AdminAddProduct() {
     setToast(msg);
     setTimeout(() => setToast(''), 3000);
   };
-  
+
   const closeModal = () => setModal({ ...modal, isOpen: false });
 
   const handleNameChange = (e) => setName(e.target.value);
@@ -50,13 +50,14 @@ export default function AdminAddProduct() {
     }
 
     const formData = new FormData();
-    formData.append('productName', name);
-    formData.append('productDescription', description);
-    formData.append('productPrice', price);
-    if (selectRef.current) formData.append('categoryId', selectRef.current.value);
+    formData.append('prodName', name);
+    formData.append('prodDescription', description);
+    formData.append('prodPrice', price);
+    if (selectRef.current)
+      formData.append('categoryId', selectRef.current.value);
     formData.append('file', img);
 
-    apiFetch('/products', {
+    apiFetch('/adminRoute/addProduct', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -156,7 +157,11 @@ export default function AdminAddProduct() {
             />
           </div>
 
-          <button type="button" onClick={handleAddProduct} className="adminSubmitBtn">
+          <button
+            type="button"
+            onClick={handleAddProduct}
+            className="adminSubmitBtn"
+          >
             Termék Feltöltése
           </button>
         </form>

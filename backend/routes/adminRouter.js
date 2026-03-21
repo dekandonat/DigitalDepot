@@ -5,6 +5,9 @@ const db = require('../util/database');
 const User = require('../models/user');
 const Order = require('../models/order');
 const Products = require('../models/products');
+const News = require('../models/news');
+const upload = require('../util/multer');
+const uploadNews = require('../util/multer2');
 
 const groupMessagesByUser = (messages) => {
   const groupMap = {};
@@ -194,7 +197,10 @@ router.patch('/orders/:orderId/status', async (req, res) => {
   try {
     const orderId = req.params.orderId;
     const { status } = req.body;
-    await db.execute('UPDATE orders SET status = ? WHERE orderId = ?', [status, orderId]);
+    await db.execute('UPDATE orders SET status = ? WHERE orderId = ?', [
+      status,
+      orderId,
+    ]);
     res.status(200).json({ result: 'success' });
   } catch (err) {
     console.log(err);
@@ -271,7 +277,7 @@ router.get('/messages', async (req, res) => {
        WHERE users.role = 'user' 
        ORDER BY messages.id ASC`
     );
-    
+
     const messageList = groupMessagesByUser(rows);
     res.status(200).json({ result: 'success', data: messageList });
   } catch (err) {
@@ -349,6 +355,106 @@ router.post('/', async (req, res) => {
     res.status(201).json({ result: 'success', insertId: result.insertId });
   } catch (err) {
     res.status(500).json({ result: 'fail', message: err.message });
+  }
+});
+
+router.post('/addProduct', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ result: 'fail', message: 'missing file' });
+    }
+
+    const img = `uploads/products/${req.file.filename}`;
+
+    const priceNum = Number(req.body.prodPrice);
+    const cateogryNum = Number(req.body.categoryId);
+
+    if (!Number.isInteger(priceNum)) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'price must be a number' });
+    }
+
+    if (!Number.isInteger(cateogryNum)) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'invalid category' });
+    }
+
+    if (
+      req.body.prodName.trim() === '' ||
+      req.body.prodDescription.trim() === '' ||
+      priceNum <= 0 ||
+      cateogryNum <= 0
+    ) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'missing parameters' });
+    }
+
+    const product = new Products(
+      req.body.prodName,
+      req.body.prodDescription,
+      priceNum,
+      img,
+      cateogryNum
+    );
+    const result = await product.save();
+    if (result.result === 'success') {
+      res.status(201).json(result);
+    } else {
+      return res.status(500).json(result);
+    }
+  } catch (err) {
+    return res.status(400).json({ result: 'fail', message: 'invalid input' });
+  }
+});
+
+router.post('/news', uploadNews.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ result: 'fail', message: 'missing file' });
+    }
+
+    if (!req.body.alt) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'missing description' });
+    }
+    const imgPath = `uploads/news/${req.file.filename}`;
+    const result = await News.Upload(imgPath, req.body.alt);
+
+    if (result.result == 'success') {
+      res.status(200).json(result);
+    } else {
+      res.status(500).json(result);
+    }
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ result: 'fail', message: 'server error' });
+  }
+});
+
+router.delete('/news/:id', async (req, res) => {
+  try {
+    const numId = Number(req.params.id);
+
+    if (!Number.isInteger(numId) || numId <= 0) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'id must be a positive integer' });
+    }
+
+    const result = await News.Delete(numId);
+
+    if (result.result == 'success') {
+      res.status(200).json(result);
+    } else {
+      res.status(500).json(result);
+    }
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ result: 'fail', message: 'server error' });
   }
 });
 

@@ -30,6 +30,7 @@ const adminRouter = require('./routes/adminRouter');
 const orderRouter = require('./routes/orderRouter');
 const usedProductRouter = require('./routes/usedProductRouter');
 const reviewRouter = require('./routes/reviewRouter');
+const newsRouter = require('./routes/newsRouter');
 
 const IP = process.env.IP;
 const PORT = process.env.PORT;
@@ -59,6 +60,7 @@ app.use('/order', orderRouter);
 app.use('/adminRoute', verifyAdmin, adminRouter);
 app.use('/used-products', verifyToken, usedProductRouter);
 app.use('/reviews', reviewRouter);
+app.use('/news', newsRouter);
 
 server.listen(PORT, IP, () => {
   console.log(`Server running on: http://${IP}:${PORT}`);

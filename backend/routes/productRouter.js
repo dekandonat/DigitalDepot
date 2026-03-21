@@ -4,58 +4,6 @@ const router = express.Router();
 const Products = require('../models/products');
 const upload = require('../util/multer');
 
-router.post('/', upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ result: 'fail', message: 'missing file' });
-    }
-
-    const img = `uploads/products/${req.file.filename}`;
-
-    const priceNum = Number(req.body.prodPrice);
-    const cateogryNum = Number(req.body.categoryId);
-
-    if (!Number.isInteger(priceNum)) {
-      return res
-        .status(400)
-        .json({ result: 'fail', message: 'price must be a number' });
-    }
-
-    if (!Number.isInteger(cateogryNum)) {
-      return res
-        .status(400)
-        .json({ result: 'fail', message: 'invalid category' });
-    }
-
-    if (
-      req.body.prodName.trim() === '' ||
-      req.body.prodDescription.trim() === '' ||
-      priceNum <= 0 ||
-      cateogryNum <= 0
-    ) {
-      return res
-        .status(400)
-        .json({ result: 'fail', message: 'missing parameters' });
-    }
-
-    const product = new Products(
-      req.body.prodName,
-      req.body.prodDescription,
-      priceNum,
-      img,
-      cateogryNum
-    );
-    const result = await product.save();
-    if (result.result === 'success') {
-      res.status(201).json(result);
-    } else {
-      return res.status(500).json(result);
-    }
-  } catch (err) {
-    return res.status(400).json({ result: 'fail', message: 'invalid input' });
-  }
-});
-
 router.get('/search/:string', async (req, res) => {
   try {
     const string = req.params.string;
