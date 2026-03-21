@@ -8,6 +8,26 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
   const [isReset, setIsReset] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [toast, setToast] = useState({ message: '', type: '' });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [password2, setPassword2] = useState('');
+  const [userName, setUsername] = useState('');
+
+  const handleUserNameChange = (e) => {
+    setUsername(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const handlePassword2Change = (e) => {
+    setPassword2(e.target.value);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -25,12 +45,6 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
   const submit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
-
-    let form = e.target;
-    let email = form.email.value.trim();
-    let password = form.password.value.trim();
-    let userName = form.userName?.value.trim();
-    let password2 = form.password2?.value.trim();
 
     if (!isLogin && password !== password2) {
       setErrorMsg('A két jelszó nem egyezik!');
@@ -67,7 +81,10 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
       } else {
         showToast('Sikeres regisztráció!', 'success');
         setIsLogin(true);
-        form.reset();
+        setUsername('');
+        setPassword('');
+        setPassword2('');
+        setEmail('');
       }
     } catch (error) {
       console.error('Hiba történt: ', error);
@@ -102,40 +119,48 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
                 <div className="formItems">
                   <label htmlFor="userNameInput">Felhasználónév</label>
                   <input
+                    onChange={handleUserNameChange}
                     type="text"
                     name="userName"
                     id="userNameInput"
                     required
+                    value={userName}
                   />
                 </div>
               )}
               <div className="formItems">
                 <label htmlFor="userEmailInput">E-mail cím</label>
                 <input
+                  onChange={handleEmailChange}
                   type="email"
                   name="email"
                   id="userEmailInput"
                   placeholder="pelda@gmail.com"
                   required
+                  value={email}
                 />
               </div>
               <div className="formItems">
                 <label htmlFor="userPassword">Jelszó</label>
                 <input
+                  onChange={handlePasswordChange}
                   type="password"
                   name="password"
                   id="userPassword"
                   required
+                  value={password}
                 />
               </div>
               {!isLogin && (
                 <div className="formItems">
                   <label htmlFor="userPassword2">Jelszó megerősítése</label>
                   <input
+                    onChange={handlePassword2Change}
                     type="password"
                     name="password2"
                     id="userPassword2"
                     required
+                    value={password2}
                   />
                 </div>
               )}

@@ -206,7 +206,7 @@ describe('Order Routes', () => {
       .send({
         paymentMethod: 'Utánvét',
       })
-      .expect(500);
+      .expect(400);
 
     expect(response.body.result).toBe('fail');
   });
@@ -227,7 +227,7 @@ describe('Order Routes', () => {
       .send({
         shippingAddress: 'Budapest, Main St',
       })
-      .expect(500);
+      .expect(400);
 
     expect(response.body.result).toBe('fail');
   });
