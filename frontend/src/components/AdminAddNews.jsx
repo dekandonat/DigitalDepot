@@ -1,11 +1,15 @@
 import './AdminAddNews.css';
 import { apiFetch } from '../assets/util/fetch';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import CustomModal from './CustomModal';
 
 export default function AdminAddNews() {
   const [images, setImages] = useState([]);
   const [img, setImg] = useState(null);
   const [alt, setAlt] = useState('');
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+
+  const fileInputRef = useRef();
 
   useEffect(() => {
     apiFetch('/news')
@@ -13,9 +17,11 @@ export default function AdminAddNews() {
         setImages(data.data);
       })
       .catch((err) => {
-        console.error(err.message);
+        setModal({ isOpen: true, title: 'Hiba', message: err.message });
       });
   }, []);
+
+  const closeModal = () => setModal({ ...modal, isOpen: false });
 
   const handleUpload = () => {
     const formdata = new FormData();
@@ -24,30 +30,38 @@ export default function AdminAddNews() {
     apiFetch('/adminRoute/news', {
       method: 'POST',
       body: formdata,
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('token'),
-      },
     })
       .then((data) => {
-        console.log(data);
+        setAlt('');
+        fileInputRef.current.value = '';
+        apiFetch('/news')
+          .then((data) => {
+            setImages(data.data);
+          })
+          .catch((err) => {
+            setModal({ isOpen: true, title: 'Hiba', message: err.message });
+          });
       })
       .catch((err) => {
-        console.error(err.message);
+        setModal({ isOpen: true, title: 'Hiba', message: err.message });
       });
   };
 
   const handleDelete = (id) => {
     apiFetch(`/adminRoute/news/${id}`, {
       method: 'DELETE',
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('token'),
-      },
     })
       .then((data) => {
-        console.log(data);
+        apiFetch('/news')
+          .then((data) => {
+            setImages(data.data);
+          })
+          .catch((err) => {
+            setModal({ isOpen: true, title: 'Hiba', message: err.message });
+          });
       })
       .catch((err) => {
-        console.error(err.message);
+        setModal({ isOpen: true, title: 'Hiba', message: err.message });
       });
   };
 
@@ -61,6 +75,13 @@ export default function AdminAddNews() {
 
   return (
     <>
+      <CustomModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={closeModal}
+        type="alert"
+      />
       <div className="adminFormHeader">
         <h2>Hírek kezelése</h2>
       </div>
@@ -93,6 +114,7 @@ export default function AdminAddNews() {
           <br></br>
           <label htmlFor="imgFile">Kép: </label>
           <input
+            ref={fileInputRef}
             type="file"
             name="imgFile"
             id="imgFile"
