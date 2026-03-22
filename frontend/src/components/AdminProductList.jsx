@@ -36,6 +36,7 @@ export default function AdminProductList() {
               key={product.prodId}
               img={product.productImg}
               condition={product.conditionState}
+              soldQuantity={product.soldQuantity}
             />
           );
         })}

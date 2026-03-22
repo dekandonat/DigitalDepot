@@ -112,6 +112,8 @@ export default function ProductList() {
   const [queryParams, setQueryParams] = useSearchParams();
   const searchText = queryParams.get('q');
   const sortType = queryParams.get('sort') || 'default';
+  
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -181,7 +183,11 @@ export default function ProductList() {
     };
 
     fetchProducts();
-  }, [categoryId, searchText, allCategories]);
+  }, [categoryId, searchText, allCategories, refreshTrigger]);
+
+  const triggerRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
 
   const handleSortChange = (e) => {
     const newSort = e.target.value;
@@ -203,6 +209,10 @@ export default function ProductList() {
       sorted.sort((a, b) => parseFloat(a.avgRating) - parseFloat(b.avgRating));
     } else if (sortType === 'rating_desc') {
       sorted.sort((a, b) => parseFloat(b.avgRating) - parseFloat(a.avgRating));
+    } else if (sortType === 'sold_desc') {
+      sorted.sort((a, b) => parseInt(b.soldQuantity || 0) - parseInt(a.soldQuantity || 0));
+    } else if (sortType === 'sold_asc') {
+      sorted.sort((a, b) => parseInt(a.soldQuantity || 0) - parseInt(b.soldQuantity || 0));
     }
     return sorted;
   };
@@ -244,6 +254,8 @@ export default function ProductList() {
             className="desktopSortSelect"
           >
             <option value="default">Rendezés: Alapértelmezett</option>
+            <option value="sold_desc">Eladások szerint csökkenő</option>
+            <option value="sold_asc">Eladások szerint növekvő</option>
             <option value="price_asc">Ár szerint növekvő</option>
             <option value="price_desc">Ár szerint csökkenő</option>
             <option value="rating_desc">Értékelés szerint csökkenő</option>
@@ -271,6 +283,7 @@ export default function ProductList() {
         <ReviewModal
           product={selectedProductForReview}
           onClose={() => setSelectedProductForReview(null)}
+          refreshParentData={triggerRefresh}
         />
       )}
     </div>

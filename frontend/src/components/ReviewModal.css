@@ -44,8 +44,8 @@
     margin-bottom: 15px;
 }
 
-.starInput {
-    font-size: 2rem;
+.ratingSelector {
+    font-size: 1.5rem;
     cursor: pointer;
     margin-bottom: 10px;
     display: flex;
@@ -74,6 +74,12 @@
     font-size: 1rem;
 }
 
+.reviewActionButtons {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
 .submitReviewBtn {
     background-color: #007bff;
     color: white;
@@ -82,12 +88,29 @@
     border-radius: 5px;
     cursor: pointer;
     font-weight: 600;
-    width: 100%; 
+    flex: 1;
     font-size: 1rem;
 }
 
 .submitReviewBtn:hover {
     background-color: #0056b3;
+}
+
+.deleteReviewBtn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    flex: 1;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.deleteReviewBtn:hover {
+    background-color: #c82333;
 }
 
 .reviewsList {
@@ -99,43 +122,46 @@
     padding: 12px;
     border-radius: 8px;
     margin-bottom: 10px;
-    border: 1px solid #eee;
 }
 
 .reviewHeader {
     display: flex;
     justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.reviewUser {
     font-weight: bold;
-    margin-bottom: 5px;
-    font-size: 0.9rem;
+    color: #333;
 }
 
 .reviewStars {
     color: #ffc107;
+    letter-spacing: 2px;
+}
+
+.reviewText {
+    margin: 0 0 5px 0;
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.4;
 }
 
 .reviewDate {
-    color: #888;
-    font-size: 0.75rem;
-    display: block;
-    margin-top: 5px;
-    text-align: right;
+    color: #999;
+    font-size: 0.8rem;
 }
 
 .errorMsg {
-    color: red;
-    font-size: 0.9rem;
+    color: #dc3545;
     margin-top: 10px;
-    text-align: center;
+    font-size: 0.9rem;
+    font-weight: bold;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 600px) {
     .reviewModalContent {
-        width: 500px; 
+        width: 500px;
         padding: 25px;
-    }
-
-    .submitReviewBtn {
-        width: auto; 
     }
 }

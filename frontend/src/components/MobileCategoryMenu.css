@@ -8,7 +8,6 @@
     display: flex;
     justify-content: flex-start;
     z-index: 2000;
-    backdrop-filter: blur(3px);
     animation: fadeIn 0.3s ease-out;
 }
 

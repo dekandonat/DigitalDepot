@@ -54,6 +54,8 @@ export default function MobileCategoryMenu({ onClose, onCategorySelect, onSortSe
                     <div className="mobileCategoryTitle" style={{borderBottom: '1px solid #f0f0f0', paddingBottom: '10px', marginBottom: '10px'}}>Rendezés</div>
                     <select className="mobileSortSelect" value={currentSort} onChange={(e) => onSortSelect(e.target.value)}>
                         <option value="default">Alapértelmezett</option>
+                        <option value="sold_desc">Eladások szerint csökkenő</option>
+                        <option value="sold_asc">Eladások szerint növekvő</option>
                         <option value="price_asc">Ár szerint növekvő</option>
                         <option value="price_desc">Ár szerint csökkenő</option>
                         <option value="rating_desc">Értékelés szerint csökkenő</option>
