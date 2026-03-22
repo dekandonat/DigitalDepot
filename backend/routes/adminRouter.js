@@ -6,8 +6,8 @@ const User = require('../models/user');
 const Order = require('../models/order');
 const Products = require('../models/products');
 const News = require('../models/news');
-const upload = require('../util/multer');
-const uploadNews = require('../util/multer2');
+const upload = require('../util/upload');
+const validateImage = require('../util/validateImage');
 
 const groupMessagesByUser = (messages) => {
   const groupMap = {};
@@ -358,12 +358,11 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/addProduct', async (req, res) => {
-  upload.single('file')(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({ result: 'fail', message: err.message });
-    }
-
+router.post(
+  '/addProduct',
+  upload.uploadMiddleware,
+  validateImage,
+  async (req, res) => {
     try {
       if (!req.file) {
         return res
@@ -415,18 +414,14 @@ router.post('/addProduct', async (req, res) => {
     } catch (err) {
       return res.status(400).json({ result: 'fail', message: 'invalid input' });
     }
-  });
-});
+  }
+);
 
-router.post('/news', (req, res) => {
-  uploadNews.single('file')(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({
-        result: 'fail',
-        message: err.message,
-      });
-    }
-
+router.post(
+  '/news',
+  upload.uploadNewsMiddleware,
+  validateImage,
+  async (req, res) => {
     try {
       if (!req.file) {
         return res
@@ -452,8 +447,8 @@ router.post('/news', (req, res) => {
       console.log(err.message);
       res.status(500).json({ result: 'fail', message: 'server error' });
     }
-  });
-});
+  }
+);
 
 router.delete('/news/:id', async (req, res) => {
   try {
