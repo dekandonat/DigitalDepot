@@ -358,81 +358,101 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/addProduct', upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ result: 'fail', message: 'missing file' });
+router.post('/addProduct', async (req, res) => {
+  upload.single('file')(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ result: 'fail', message: err.message });
     }
 
-    const img = `uploads/products/${req.file.filename}`;
+    try {
+      if (!req.file) {
+        return res
+          .status(400)
+          .json({ result: 'fail', message: 'missing file' });
+      }
 
-    const priceNum = Number(req.body.prodPrice);
-    const cateogryNum = Number(req.body.categoryId);
+      const img = `uploads/products/${req.file.filename}`;
 
-    if (!Number.isInteger(priceNum)) {
-      return res
-        .status(400)
-        .json({ result: 'fail', message: 'price must be a number' });
+      const priceNum = Number(req.body.prodPrice);
+      const cateogryNum = Number(req.body.categoryId);
+
+      if (!Number.isInteger(priceNum)) {
+        return res
+          .status(400)
+          .json({ result: 'fail', message: 'price must be a number' });
+      }
+
+      if (!Number.isInteger(cateogryNum)) {
+        return res
+          .status(400)
+          .json({ result: 'fail', message: 'invalid category' });
+      }
+
+      if (
+        req.body.prodName.trim() === '' ||
+        req.body.prodDescription.trim() === '' ||
+        priceNum <= 0 ||
+        cateogryNum <= 0
+      ) {
+        return res
+          .status(400)
+          .json({ result: 'fail', message: 'missing parameters' });
+      }
+
+      const product = new Products(
+        req.body.prodName,
+        req.body.prodDescription,
+        priceNum,
+        img,
+        cateogryNum
+      );
+      const result = await product.save();
+      if (result.result === 'success') {
+        res.status(201).json(result);
+      } else {
+        return res.status(500).json(result);
+      }
+    } catch (err) {
+      return res.status(400).json({ result: 'fail', message: 'invalid input' });
     }
-
-    if (!Number.isInteger(cateogryNum)) {
-      return res
-        .status(400)
-        .json({ result: 'fail', message: 'invalid category' });
-    }
-
-    if (
-      req.body.prodName.trim() === '' ||
-      req.body.prodDescription.trim() === '' ||
-      priceNum <= 0 ||
-      cateogryNum <= 0
-    ) {
-      return res
-        .status(400)
-        .json({ result: 'fail', message: 'missing parameters' });
-    }
-
-    const product = new Products(
-      req.body.prodName,
-      req.body.prodDescription,
-      priceNum,
-      img,
-      cateogryNum
-    );
-    const result = await product.save();
-    if (result.result === 'success') {
-      res.status(201).json(result);
-    } else {
-      return res.status(500).json(result);
-    }
-  } catch (err) {
-    return res.status(400).json({ result: 'fail', message: 'invalid input' });
-  }
+  });
 });
 
-router.post('/news', uploadNews.single('file'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ result: 'fail', message: 'missing file' });
+router.post('/news', (req, res) => {
+  uploadNews.single('file')(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({
+        result: 'fail',
+        message: err.message,
+      });
     }
 
-    if (!req.body.alt) {
-      return res
-        .status(400)
-        .json({ result: 'fail', message: 'missing description' });
-    }
-    const imgPath = `uploads/news/${req.file.filename}`;
-    const result = await News.Upload(imgPath, req.body.alt);
+    try {
+      if (!req.file) {
+        return res
+          .status(400)
+          .json({ result: 'fail', message: 'missing file' });
+      }
 
-    if (result.result == 'success') {
-      res.status(200).json(result);
-    } else {
-      res.status(500).json(result);
+      if (!req.body.alt) {
+        return res
+          .status(400)
+          .json({ result: 'fail', message: 'missing description' });
+      }
+
+      const imgPath = `uploads/news/${req.file.filename}`;
+      const result = await News.Upload(imgPath, req.body.alt);
+
+      if (result.result == 'success') {
+        res.status(200).json(result);
+      } else {
+        res.status(500).json(result);
+      }
+    } catch (err) {
+      console.log(err.message);
+      res.status(500).json({ result: 'fail', message: 'server error' });
     }
-  } catch (err) {
-    console.log(err.message);
-    res.status(500).json({ result: 'fail', message: 'server error' });
-  }
+  });
 });
 
 router.delete('/news/:id', async (req, res) => {
