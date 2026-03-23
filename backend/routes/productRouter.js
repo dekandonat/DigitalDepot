@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 
 const Products = require('../models/products');
-const upload = require('../util/multer');
 
 router.get('/search/:string', async (req, res) => {
   try {

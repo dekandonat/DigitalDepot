@@ -1,10 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../util/database');
-const jwt = require('jsonwebtoken');
-const { promisify } = require('util');
-
-const verifyAsync = promisify(jwt.verify);
 
 router.get('/', async (req, res) => {
   try {

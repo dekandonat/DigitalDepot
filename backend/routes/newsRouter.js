@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 
 const News = require('../models/news');
-const upload = require('../util/multer');
 
 router.get('/', async (req, res) => {
   try {

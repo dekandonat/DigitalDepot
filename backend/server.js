@@ -3,6 +3,7 @@ const http = require('http');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const helmet = require('helmet');
 const cookieparser = require('cookie-parser');
 const { rateLimit } = require('express-rate-limit');
 const socket = require('./util/socket');
@@ -35,6 +36,7 @@ const newsRouter = require('./routes/newsRouter');
 const IP = process.env.IP;
 const PORT = process.env.PORT;
 
+app.use(helmet());
 app.use(limiter);
 app.use(express.json());
 app.use(cookieparser());
@@ -51,7 +53,6 @@ app.use(
     maxAge: '1d',
   })
 );
-
 app.use('/products', productRouter);
 app.use('/user', userRouter);
 app.use('/category', categoryRouter);

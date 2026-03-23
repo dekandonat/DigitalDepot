@@ -12,7 +12,11 @@ const validateImage = async (req, res, next) => {
     next();
   } catch (err) {
     if (req.file) {
-      fs.unlink(req.file.path, () => {});
+      try {
+        await fs.unlink(req.file.path);
+      } catch (unlinkErr) {
+        console.error('File deletion error:', unlinkErr);
+      }
     }
 
     return res.status(400).json({
