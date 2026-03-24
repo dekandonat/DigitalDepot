@@ -5,15 +5,9 @@ const db = require('../util/database');
 router.get('/', async (req, res) => {
   try {
     const [rows] = await db.execute('SELECT * FROM categories');
-    if (rows.length > 0) {
-      res.status(200).json({ result: 'success', data: rows });
-    } else {
-      res.status(200).json({ result: 'success', data: 'no categories found' });
-    }
+    res.status(200).json({ result: 'success', data: rows });
   } catch (err) {
-    res
-      .status(500)
-      .json({ result: 'fail', message: 'error during database querry' });
+    res.status(500).json({ result: 'fail', message: 'Szerver hiba' });
   }
 });
 
@@ -26,7 +20,7 @@ router.get('/:categoryId', async (req, res) => {
     if (!Number.isInteger(categoryNum) || categoryNum <= 0) {
       return res
         .status(400)
-        .json({ result: 'fail', message: 'invalid category' });
+        .json({ result: 'fail', message: 'érvénytelen kategória' });
     }
 
     const sql = `
@@ -37,15 +31,9 @@ router.get('/:categoryId', async (req, res) => {
 
     const [rows] = await db.execute(sql, [categoryNum, categoryNum]);
 
-    if (rows.length > 0) {
-      res.status(200).json({ result: 'success', data: rows });
-    } else {
-      res.status(200).json({ result: 'success', data: 'no products found' });
-    }
+    res.status(200).json({ result: 'success', data: rows });
   } catch (err) {
-    res
-      .status(500)
-      .json({ result: 'fail', message: 'error during database query' });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 

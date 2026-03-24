@@ -11,33 +11,46 @@ router.get('/:productId', async (req, res) => {
     if (!Number.isInteger(numId) || numId <= 0) {
       return res
         .status(400)
-        .json({ result: 'fail', message: 'id must be a number' });
+        .json({ result: 'fail', message: 'Azonosítónak számnak kell lennie' });
     }
 
     const reviews = await Review.fetchByProductId(numId);
     res.status(200).json({ result: 'success', data: reviews });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'Szerver hiba' });
   }
 });
 
 router.post('/', verifyToken, async (req, res) => {
   try {
-    console.log(req.cookies);
     const userId = req.user.id;
     const { productId, rating, comment } = req.body;
 
     if (!productId || !rating || !comment) {
       return res
         .status(400)
-        .json({ result: 'fail', message: 'missing fields' });
+        .json({ result: 'fail', message: 'Hiányzó adatok' });
     }
 
     const numId = Number(productId);
     if (!Number.isInteger(numId) || numId <= 0) {
       return res
         .status(400)
-        .json({ result: 'fail', message: 'id must be a number' });
+        .json({ result: 'fail', message: 'Azonosítónak számnak kell lennie' });
+    }
+
+    const numRating = Number(rating);
+    if (!Number.isInteger(numRating) || numRating < 1 || numRating > 5) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'Nem megfelelő értékelés' });
+    }
+
+    if (comment.trim().length < 1 || comment.length > 250) {
+      return res.status(400).json({
+        result: 'fail',
+        message: 'A komment 1 és 250 karakter közötti hosszúságú lehet',
+      });
     }
 
     const review = new Review(userId, productId, rating, comment);
@@ -49,7 +62,7 @@ router.post('/', verifyToken, async (req, res) => {
       res.status(500).json(result);
     }
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: 'server error' });
+    res.status(500).json({ result: 'fail', message: 'Szerver hiba' });
   }
 });
 

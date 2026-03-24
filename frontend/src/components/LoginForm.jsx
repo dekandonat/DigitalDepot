@@ -70,7 +70,6 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
         credentials: 'include',
         body: dataValues,
       });
-
       if (isLogin) {
         localStorage.setItem('token', response.message.token);
         localStorage.setItem('user', response.message.userName);

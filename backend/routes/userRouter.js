@@ -3,13 +3,29 @@ const User = require('../models/user');
 const db = require('../util/database');
 const verifyToken = require('../util/tokenVerify');
 const router = express.Router();
+const validator = require('validator');
 
 router.post('/register', async (req, res) => {
   try {
     const { userName, password, email } = req.body;
 
     if (userName.trim() == '' || password.trim() == '' || email.trim() == '') {
-      return res.status(400).json({ result: 'fail', message: 'invalid data' });
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'hiányzó adatok' });
+    }
+
+    if (password.trim().length < 8) {
+      return res.status(400).json({
+        result: 'fail',
+        message: 'a jelszónak legalább 8 karakter hosszúnak kell lennie!',
+      });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'Érvénytelen email cím' });
     }
 
     const user = new User(userName, password, email, 'user');
@@ -22,7 +38,7 @@ router.post('/register', async (req, res) => {
       res.status(500).json(result);
     }
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'Szerver hiba' });
   }
 });
 
@@ -43,10 +59,10 @@ router.post('/login', async (req, res) => {
         .status(200)
         .json({ result: userData.result, message: userData.message });
     } else {
-      res.status(401).json(userData);
+      res.status(403).json(userData);
     }
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: 'server error' });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -71,7 +87,9 @@ router.post('/logout', async (req, res) => {
 router.post('/reset-code', async (req, res) => {
   const email = req.body.email;
   if (!email) {
-    return res.status(404).json({ result: 'fail', message: 'no email given' });
+    return res
+      .status(404)
+      .json({ result: 'fail', message: 'nincs megadott email' });
   }
   const response = await User.getCode(email);
   if (response.result == 'success') {
@@ -98,7 +116,7 @@ router.get('/refresh', async (req, res) => {
     if (!refreshToken) {
       return res
         .status(401)
-        .json({ result: 'fail', message: 'no refresh token' });
+        .json({ result: 'fail', message: 'nincs refresh token' });
     }
 
     const result = await User.refresh(refreshToken);
@@ -112,10 +130,10 @@ router.get('/refresh', async (req, res) => {
       });
       res.status(200).json({ result: result.result, data: result.data });
     } else {
-      res.status(500).json({ result: 'fail', message: 'token error' });
+      res.status(500).json({ result: 'fail', message: 'token hiba' });
     }
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: 'server error' });
+    res.status(500).json({ result: 'fail', message: 'Szerver error' });
   }
 });
 
@@ -156,7 +174,7 @@ router.get('/addresses', verifyToken, async (req, res) => {
     );
     res.status(200).json({ result: 'success', data: rows });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -166,7 +184,7 @@ router.post('/addresses', verifyToken, async (req, res) => {
     if (!zipCode || !city || !streetAddress) {
       return res
         .status(400)
-        .json({ result: 'fail', message: 'Missing fields' });
+        .json({ result: 'fail', message: 'Hiányzó adatok' });
     }
     await db.execute(
       'INSERT INTO user_addresses (userId, zipCode, city, streetAddress) VALUES (?, ?, ?, ?)',
@@ -174,7 +192,7 @@ router.post('/addresses', verifyToken, async (req, res) => {
     );
     res.status(201).json({ result: 'success' });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -187,7 +205,7 @@ router.delete('/addresses/:id', verifyToken, async (req, res) => {
     ]);
     res.status(200).json({ result: 'success' });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -200,7 +218,7 @@ router.patch('/chat-topic', verifyToken, async (req, res) => {
     ]);
     res.status(200).json({ result: 'success' });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -226,7 +244,7 @@ router.get('/messages', verifyToken, async (req, res) => {
       data: [{ messages: rows, chatTopic: chatTopic }],
     });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -240,7 +258,7 @@ router.post('/readmessages', verifyToken, async (req, res) => {
       .status(200)
       .json({ result: 'success', affectedRows: rows.affectedRows });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
