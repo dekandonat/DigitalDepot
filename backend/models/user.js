@@ -74,7 +74,7 @@ module.exports = class User {
         .createHash('sha256')
         .update(token)
         .digest('hex');
-      await db.execute('DELETE FROM refreshTokens WHERE tokenId = ?', [
+      await db.execute('DELETE FROM refreshtokens WHERE tokenId = ?', [
         hashedToken,
       ]);
       return { result: 'success' };
@@ -171,7 +171,7 @@ module.exports = class User {
   async register() {
     try {
       const [rows] = await db.execute(
-        'SELECT * FROM users WHERE email LIKE ?;',
+        'SELECT userId FROM users WHERE email LIKE ?;',
         [this.email]
       );
 
@@ -197,7 +197,7 @@ module.exports = class User {
   static async login(email, password) {
     try {
       const [rows] = await db.execute(
-        `SELECT * FROM users WHERE users.email LIKE ?`,
+        `SELECT userId, hashedPassword, email, userName, role FROM users WHERE email = ?`,
         [email]
       );
 
@@ -225,7 +225,7 @@ module.exports = class User {
           }
         );
 
-        await db.execute('DELETE FROM refreshTokens WHERE userId = ?', [
+        await db.execute('DELETE FROM refreshtokens WHERE userId = ?', [
           rows[0].userId,
         ]);
         const refreshtoken = crypto.randomBytes(64).toString('hex');
@@ -234,7 +234,7 @@ module.exports = class User {
           .update(refreshtoken)
           .digest('hex');
         await db.execute(
-          'INSERT INTO refreshTokens (tokenId, userId, createdAt ,expiresAt) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))',
+          'INSERT INTO refreshtokens (tokenId, userId, createdAt ,expiresAt) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))',
           [hashedToken, rows[0].userId]
         );
         return {
@@ -261,7 +261,7 @@ module.exports = class User {
         .update(token)
         .digest('hex');
       const [rows] = await db.execute(
-        'SELECT * FROM refreshtokens WHERE tokenId = ?',
+        'SELECT userId, expiresAt FROM refreshtokens WHERE tokenId = ?',
         [hashedToken]
       );
 
@@ -274,7 +274,7 @@ module.exports = class User {
       }
 
       const [userData] = await db.execute(
-        'SELECT * FROM users WHERE userId = ?',
+        'SELECT userId, role FROM users WHERE userId = ?',
         [rows[0].userId]
       );
 
@@ -289,7 +289,7 @@ module.exports = class User {
         }
       );
 
-      await db.execute('DELETE FROM refreshTokens WHERE tokenId = ?', [
+      await db.execute('DELETE FROM refreshtokens WHERE tokenId = ?', [
         hashedToken,
       ]);
 
@@ -299,7 +299,7 @@ module.exports = class User {
         .update(refreshtoken)
         .digest('hex');
       await db.execute(
-        'INSERT INTO refreshTokens (tokenId, userId, createdAt ,expiresAt) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))',
+        'INSERT INTO refreshtokens (tokenId, userId, createdAt ,expiresAt) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))',
         [hashedRefreshtoken, rows[0].userId]
       );
 
