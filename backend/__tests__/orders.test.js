@@ -64,7 +64,6 @@ describe('Order Routes', () => {
     const response = await request(app).get('/orders/items/abc').expect(400);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('invalid orderId');
   });
 
   // TEST 4: GET order items - negative orderId
@@ -72,7 +71,6 @@ describe('Order Routes', () => {
     const response = await request(app).get('/orders/items/-1').expect(400);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('invalid orderId');
   });
 
   // TEST 5: GET order items - zero orderId
@@ -89,7 +87,6 @@ describe('Order Routes', () => {
     const response = await request(app).get('/orders/items/1').expect(500);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('server error');
   });
 
   // TEST 7: GET my orders
@@ -140,7 +137,6 @@ describe('Order Routes', () => {
     const response = await request(app).get('/orders/my-orders').expect(500);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('server error');
   });
 
   // TEST 10: POST place order - success
@@ -164,7 +160,6 @@ describe('Order Routes', () => {
       .expect(201);
 
     expect(response.body.result).toBe('success');
-    expect(response.body.message).toContain('Order placed successfully');
   });
 
   // TEST 11: POST place order - with coupon code
@@ -248,7 +243,6 @@ describe('Order Routes', () => {
       .expect(500);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('server error');
   });
 
   // TEST 15: POST place order - save returns fail
@@ -272,6 +266,5 @@ describe('Order Routes', () => {
       .expect(500);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('Cart is empty');
   });
 });

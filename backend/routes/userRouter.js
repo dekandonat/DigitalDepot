@@ -155,7 +155,34 @@ router.get('/profile', verifyToken, async (req, res) => {
 
 router.patch('/bank-account', verifyToken, async (req, res) => {
   try {
-    const { bankAccountNumber } = req.body;
+    let { bankAccountNumber } = req.body;
+
+    if (!bankAccountNumber.includes('HU')) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'nem megfelelő formátum' });
+    }
+
+    bankAccountNumber = bankAccountNumber.split(' ')[1];
+
+    if (!bankAccountNumber || bankAccountNumber.trim() == '') {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'nem adott meg bankszámlaszámot' });
+    }
+
+    if (!/^\d+$/.test(bankAccountNumber.trim())) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'nem megfelelő formátum' });
+    }
+
+    if (bankAccountNumber.trim().length !== 24) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'nem megfelelő hossz' });
+    }
+
     await db.execute(
       'UPDATE users SET bankAccountNumber = ? WHERE userId = ?',
       [bankAccountNumber, req.user.id]
