@@ -1,434 +1,384 @@
-.usedProductPageWrapper {
-    width: 100%;
-    padding: 10px;
-    box-sizing: border-box;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
+#usedProductPageContainer {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: transparent; 
+  min-height: 80vh;
 }
 
-.tabHeader {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0;
-    margin-bottom: -1px; 
-    position: relative;
-    z-index: 10;
-    padding-left: 0;
+.pageHeader {
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
-.tabButton {
-    flex: 1;
-    background-color: #e9ecef; 
-    border: 1px solid #999;
-    border-bottom: none;
-    padding: 12px 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: #555;
-    border-radius: 6px 6px 0 0;
-    transition: all 0.2s;
-    margin-right: -1px;
-    text-align: center;
-    white-space: nowrap;
+.pageHeader h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 1.6rem;
 }
 
-.tabButton:hover {
-    background-color: #dee2e6;
+.pageHeader p {
+  text-align: center;
+  color: #666;
+  margin-bottom: 0;
+  font-size: 1rem;
 }
 
-.tabButton.active {
-    background-color: white;
-    color: #007bff;
-    border-bottom: 1px solid white;
-    z-index: 11;
+.tabsNav {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0;
+  flex-wrap: wrap;
 }
 
-.usedProductContainer {
-    background-color: white;
-    border: 1px solid #999;
-    border-radius: 0 0 8px 8px;
-    padding: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-    min-height: 400px;
-    width: 100%;
-    box-sizing: border-box;
+.tabBtn {
+  background: none;
+  border: none;
+  padding: 10px 5px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  bottom: -2px; 
+  border-bottom: 3px solid transparent;
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
 }
 
-h2 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    color: #333;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 10px;
-    display: inline-block;
-    font-size: 1.5rem;
+.tabBtn:hover {
+  color: #007bff;
 }
 
-.submissionForm {
-    width: 100%;
-    margin: 0;
+.tabBtn.active {
+  color: #007bff;
+  border-bottom: 3px solid #007bff;
 }
 
-.formGroup {
-    margin-bottom: 15px;
+#submissionFormSection {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #eee;
 }
 
-.formGroup label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #222; 
-    font-size: 1rem;
+#usedProductSubmitForm {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.formGroup input[type="text"],
-.formGroup input[type="email"],
-.formGroup textarea,
-.formGroup select {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #ccc; 
-    border-radius: 6px;
-    box-sizing: border-box;
-    background-color: #fff;
-    font-size: 1rem;
-    color: #000;
+#submissionFormSection h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  font-size: 1.3rem;
 }
 
-.formGroup input:focus,
-.formGroup textarea:focus,
-.formGroup select:focus {
-    border-color: #007bff;
-    outline: none;
+.formInputField,
+.formTextareaField,
+#conditionSelectField {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #333;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
 }
 
-.formGroup textarea {
-    height: 120px;
-    resize: vertical;
+.formInputField:focus,
+.formTextareaField:focus,
+#conditionSelectField:focus {
+  border-color: #007bff;
+  outline: none;
 }
 
-.fileHelperText {
-    color: #666;
-    font-style: italic;
-    display: block;
-    margin-top: 5px;
-    font-size: 0.9rem;
+.formTextareaField {
+  resize: vertical;
 }
 
-.loadingText {
-    text-align: center;
-    margin-top: 50px;
-    font-size: 1.1rem;
-    color: #555;
+.formFieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.submitBtn {
-    background-color: #007bff;
-    color: white;
-    padding: 14px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    font-weight: bold;
-    width: 100%;
-    margin-top: 10px;
-    transition: background-color 0.2s;
+.fileInputLabel {
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px dashed #ced4da;
+  padding: 12px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
 }
 
-.submitBtn:hover {
-    background-color: #0056b3;
+.fileInputLabel:hover {
+  background-color: #e2e6ea;
+  border-color: #adb5bd;
 }
 
-.statusMessage {
-    margin-top: 20px;
-    font-weight: bold;
-    color: #008000;
-    text-align: center;
-    font-size: 1rem;
-    background-color: #e8f5e9;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #c8e6c9;
+.fileInputField {
+  display: none;
 }
 
-.warningBox {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 2px solid #ffeeba;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
+.submissionImagePreview {
+  width: 100%;
+  max-width: 150px;
+  height: auto;
+  margin: 10px auto;
+  border-radius: 6px;
+  display: block;
+  border: 1px solid #eee;
 }
 
-.goToProfileBtn {
-    background-color: #856404;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 15px;
-    font-weight: bold;
-    font-size: 1rem;
-    width: 100%;
+.formSubmitButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
 }
 
-.goToProfileBtn:hover {
-    background-color: #6d5203;
+.formSubmitButton:hover {
+  background-color: #0056b3;
 }
 
-.cardsGrid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.formSubmitButton:active {
+  transform: scale(0.98);
 }
 
-.mySubmissionCard {
-    background-color: white;
-    border: 2px solid #ddd;
-    padding: 15px;
-    border-radius: 8px;
-    transition: transform 0.2s, box-shadow 0.2s;
+.formSubmitButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
-.mySubmissionCard:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border-color: #bbb;
+.loadingMsg {
+  text-align: center;
+  color: #666;
+  padding: 20px;
 }
 
-.cardHeader {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    gap: 5px;
+.noDataMsg {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #666;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
 }
 
-.cardHeader h4 {
-    margin: 0;
-    font-size: 1.2rem;
-    color: #007bff;
+#userSubmissionsSection {
+  padding: 10px 0;
 }
 
-.cardDate {
-    color: #666;
-    font-size: 0.85rem;
+.submissionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
 }
 
-.cardStatusRow {
-    font-size: 1rem;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+.submissionCard {
+  background-color: white;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.submissionCard:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border-color: #d1d5db;
+}
+
+.submissionCardImg {
+  width: 100%;
+  height: 200px;
+  object-fit: contain; 
+  background-color: #f9fafb;
+  display: block;
+  border-bottom: 1px solid #eee;
+}
+
+.conditionBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 8px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 5;
+}
+
+.conditionBadge.bontatlan {
+  background-color: rgba(16, 185, 129, 0.9);
+}
+.conditionBadge.felbontott {
+  background-color: rgba(245, 158, 11, 0.9);
+}
+.conditionBadge.használt {
+  background-color: rgba(239, 68, 68, 0.9);
+}
+.conditionBadge.hibás {
+  background-color: rgba(108, 117, 125, 0.9);
+}
+
+.submissionCardContent {
+  padding: 15px;
+}
+
+.submissionCardContent h3 {
+  font-size: 1.1rem;
+  margin: 0 0 5px 0;
+  color: #111827;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.submissionCardDesc {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+  height: 2.8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.submissionCardContent p {
+  font-size: 0.85rem;
+  color: #555;
+  margin: 0 0 5px 0;
 }
 
 .statusLabel {
-    font-weight: bold;
-    padding: 6px 10px;
-    border-radius: 4px;
-    display: inline-block;
-    text-align: center;
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  margin-top: 8px;
+  text-transform: capitalize;
 }
 
-.statusLabel.pending { 
-    color: #856404; 
-    background-color: #fff3cd; 
-    border: 1px solid #ffeeba;
+.statusLabel.pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
 }
 
-.statusLabel.accepted { 
-    color: #004085; 
-    background-color: #cce5ff; 
-    border: 1px solid #b8daff;
+.statusLabel.accepted {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
 }
 
-.statusLabel.rejected { 
-    color: #721c24; 
-    background-color: #f8d7da; 
-    border: 1px solid #f5c6cb;
+.statusLabel.rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
 .statusLabel.offer_accepted {
-    color: #155724; 
-    background-color: #d4edda; 
-    border: 1px solid #c3e6cb;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
 .statusLabel.offer_rejected {
-    color: #721c24; 
-    background-color: #f8d7da; 
-    border: 1px solid #f5c6cb;
+  background-color: #dc3545;
+  color: white;
+  border: 1px solid #bd2130;
 }
 
-.offerBox {
-    background-color: #f0f8ff;
-    padding: 15px;
-    border-radius: 6px;
-    border: 2px solid #cce5ff;
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.statusLabel.listed {
+  background-color: #c3e6cb;
+  color: #155724;
+  border: 1px solid #a3cfbb;
 }
 
 .offerPrice {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: #0056b3;
-}
-
-.userDecisionButtons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.userAcceptBtn, .userRejectBtn {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 1rem;
-    color: white;
-}
-
-.userAcceptBtn {
-    background-color: #28a745;
-}
-
-.userAcceptBtn:hover {
-    background-color: #218838;
-}
-
-.userRejectBtn {
-    background-color: #dc3545;
-}
-
-.userRejectBtn:hover {
-    background-color: #c82333;
-}
-
-
-.addressPickerContainer {
-    margin-top: 15px;
-    padding: 15px;
-    background-color: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-}
-
-.addressPickerTitle {
-    margin: 0 0 10px 0;
-    font-size: 1rem;
-    color: #333;
-}
-
-.addressInputGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.addressInputRow {
-    display: flex;
-    gap: 8px;
-}
-
-.addressInput {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.addressInputFlex1 {
-    flex: 1;
-}
-
-.addressInputFlex2 {
-    flex: 2;
-}
-
-.decisionButtonRow {
-    display: flex;
-    gap: 10px;
-}
-
-.decisionButtonRow .userAcceptBtn,
-.decisionButtonRow .userRejectBtn {
-    flex: 1;
-    margin-top: 0;
-}
-
-.userRejectBtn.cancelBtn {
-    background-color: #6c757d;
-}
-
-.userRejectBtn.cancelBtn:hover {
-    background-color: #5a6268;
-}
-
-.tabContent {
-    padding-top: 25px;
+  margin-top: 12px !important;
+  font-size: 1rem !important;
+  font-weight: 700;
+  color: #007bff !important;
+  background-color: #eef7ff;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
 }
 
 @media (min-width: 768px) {
-    .usedProductPageWrapper {
-        max-width: 850px;
-        padding: 0 20px;
-        margin: 40px auto;
-    }
+  #usedProductPageContainer {
+    padding: 20px;
+  }
 
-    .tabButton {
-        flex: none;
-        padding: 10px 20px;
-    }
+  .pageHeader {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
 
-    .usedProductContainer {
-        padding: 30px;
-        border-radius: 0 8px 8px 8px;
-    }
+  .pageHeader h1 {
+    font-size: 2rem;
+  }
 
-    .submissionForm {
-        max-width: 600px;
-    }
+  .pageHeader p {
+    font-size: 1.1rem;
+  }
 
-    .cardHeader {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
+  .tabsNav {
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: nowrap;
+  }
 
-    .cardStatusRow {
-        flex-direction: row;
-        align-items: center;
-    }
+  .tabBtn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    flex: none;
+  }
 
-    .statusLabel {
-        margin-left: 10px;
-    }
+  #submissionFormSection {
+    padding: 30px;
+    margin-bottom: 30px;
+  }
 
-    .goToProfileBtn {
-        width: auto;
-    }
-
-    .userDecisionButtons {
-        flex-direction: row;
-    }
-
-    .userAcceptBtn, .userRejectBtn {
-        flex: 1;
-        width: auto;
-    }
+  #submissionFormSection h2 {
+    font-size: 1.4rem;
+  }
 }

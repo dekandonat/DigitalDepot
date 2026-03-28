@@ -50,62 +50,71 @@ export default function MobileCategoryMenu({ onClose, onCategorySelect, onSortSe
         <div id="mobileMenuBackground" className={isClosing ? 'closing' : ''} onClick={onClose}>
             <div id="mobileMenuContent" onClick={(e) => e.stopPropagation()}>
                 
-                <div className="mobileSortSection">
-                    <div className="mobileCategoryTitle" style={{borderBottom: '1px solid #f0f0f0', paddingBottom: '10px', marginBottom: '10px'}}>Rendezés</div>
-                    <select className="mobileSortSelect" value={currentSort} onChange={(e) => onSortSelect(e.target.value)}>
-                        <option value="default">Alapértelmezett</option>
-                        <option value="sold_desc">Eladások szerint csökkenő</option>
-                        <option value="sold_asc">Eladások szerint növekvő</option>
-                        <option value="price_asc">Ár szerint növekvő</option>
-                        <option value="price_desc">Ár szerint csökkenő</option>
-                        <option value="rating_desc">Értékelés szerint csökkenő</option>
-                        <option value="rating_asc">Értékelés szerint növekvő</option>
-                    </select>
+                <div className="mobileMenuHeaderTitle">Kategóriák</div>
+
+                <div className="mobileMenuScrollArea">
+                    <ul className="mobileMainCategories">
+                        {Object.entries(menuItems).map(([mainCategoryName, categoryGroupData]) => (
+                            <li key={categoryGroupData.id}>
+                                <div className="mobileCategoryHeader" onClick={() => toggleCategory(mainCategoryName)}>
+                                    <span 
+                                        className="mobileCategoryTitle"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onCategorySelect(categoryGroupData.id);
+                                            onClose();
+                                        }}
+                                    >
+                                        {mainCategoryName}
+                                    </span>
+                                    {categoryGroupData.subCategories.length > 0 && (
+                                        <div className="mobileCategoryToggle">
+                                            <span className="mobileCatArrow">
+                                                {expandedCategories[mainCategoryName] ? '▲' : '▼'}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {expandedCategories[mainCategoryName] && categoryGroupData.subCategories.length > 0 && (
+                                    <ul className="mobileSubCategories">
+                                        {categoryGroupData.subCategories.map(sub => (
+                                            <li 
+                                                key={sub.categoryId}
+                                                onClick={() => {
+                                                    onCategorySelect(sub.categoryId);
+                                                    onClose();
+                                                }}
+                                            >
+                                                {sub.categoryName}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+
+                    <div className="mobileSortSection">
+                        <label className="mobileSortLabel">Rendezés:</label>
+                        <select 
+                            className="mobileSortSelect" 
+                            value={currentSort} 
+                            onChange={(e) => {
+                                onSortSelect(e.target.value);
+                            }}
+                        >
+                            <option value="default">Alapértelmezett</option>
+                            <option value="sold_desc">Eladások szerint csökkenő</option>
+                            <option value="sold_asc">Eladások szerint növekvő</option>
+                            <option value="price_asc">Ár szerint növekvő</option>
+                            <option value="price_desc">Ár szerint csökkenő</option>
+                            <option value="rating_desc">Értékelés szerint csökkenő</option>
+                            <option value="rating_asc">Értékelés szerint növekvő</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div className="mobileCategoryTitle" style={{borderBottom: '1px solid #f0f0f0', backgroundColor: '#fcfcfc'}}>Kategóriák</div>
-
-                <ul className="mobileMainCategories">
-                    {Object.entries(menuItems).map(([mainCategoryName, categoryGroupData]) => (
-                        <li key={categoryGroupData.id}>
-                            <div className="mobileCategoryHeader" onClick={() => toggleCategory(mainCategoryName)}>
-                                <span 
-                                    className="mobileCategoryTitle"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onCategorySelect(categoryGroupData.id);
-                                        onClose();
-                                    }}
-                                >
-                                    {mainCategoryName}
-                                </span>
-                                {categoryGroupData.subCategories.length > 0 && (
-                                    <div className="mobileCategoryToggle">
-                                        <span className="mobileCatArrow">
-                                            {expandedCategories[mainCategoryName] ? '▲' : '▼'}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {expandedCategories[mainCategoryName] && categoryGroupData.subCategories.length > 0 && (
-                                <ul className="mobileSubCategories">
-                                    {categoryGroupData.subCategories.map(sub => (
-                                        <li 
-                                            key={sub.categoryId}
-                                            onClick={() => {
-                                                onCategorySelect(sub.categoryId);
-                                                onClose();
-                                            }}
-                                        >
-                                            {sub.categoryName}
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </li>
-                    ))}
-                </ul>
             </div>
         </div>
     );
