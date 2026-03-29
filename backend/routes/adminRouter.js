@@ -281,10 +281,46 @@ router.patch('/products/:prodId', async (req, res) => {
   }
 });
 
+router.get('/messages/:id', async (req, res) => {
+  try {
+    const numId = Number(req.params.id);
+    if (!Number.isInteger(numId) || numId <= 0) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'érvénytelen azonosító' });
+    }
+
+    const [rows] = await db.execute(
+      `SELECT messages.message, 
+        messages.sender, 
+        messages.recipientId, 
+        messages.sentAt,
+        users.userName, 
+        users.chatTopic 
+       FROM messages 
+       LEFT JOIN users ON (users.userId = messages.sender OR users.userId = messages.recipientId) 
+       WHERE users.userID = ? 
+       ORDER BY messages.id ASC`,
+      [numId]
+    );
+
+    const messageList = groupMessagesByUser(rows);
+    res.status(200).json({ result: 'success', data: messageList });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
+  }
+});
+
 router.get('/messages', async (req, res) => {
   try {
     const [rows] = await db.execute(
-      `SELECT messages.*, users.userName, users.chatTopic 
+      `SELECT messages.message, 
+        messages.sender, 
+        messages.recipientId, 
+        messages.sentAt,
+        users.userName, 
+        users.chatTopic 
        FROM messages 
        LEFT JOIN users ON (users.userId = messages.sender OR users.userId = messages.recipientId) 
        WHERE users.role = 'user' 
