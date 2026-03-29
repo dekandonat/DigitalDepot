@@ -162,6 +162,8 @@ export default function App() {
     const decoded = jwtDecode(token);
     if (decoded.role == 'user') {
       setIsChatOpen((prev) => !prev);
+    } else {
+      navigate('/adminChat');
     }
   };
 
