@@ -1,0 +1,60 @@
+.adminAddCouponDiv {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  max-width: 500px;
+  margin: 20px 0;
+  border: 1px solid #f0f0f0;
+  text-align: left;
+}
+
+.adminAddCouponDiv form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.adminAddCouponDiv label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: -10px;
+  font-size: 0.9rem;
+}
+
+.adminAddCouponDiv input {
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.adminAddCouponDiv input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.adminAddCouponDiv button {
+  background-color: #3b82f6;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+}
+
+.adminAddCouponDiv button:hover {
+  background-color: #2563eb;
+}
+
+.adminAddCouponDiv button:active {
+  transform: translateY(1px);
+}
