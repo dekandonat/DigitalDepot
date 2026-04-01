@@ -21,4 +21,21 @@ module.exports = class Coupon {
       return { result: 'fail' };
     }
   }
+
+  static async check(code) {
+    try {
+      const [rows] = await db.execute(
+        'SELECT value FROM coupons WHERE code = ? AND coupons.usedAt IS NULL;',
+        [code]
+      );
+
+      if (rows.length > 1) {
+        return { result: 'fail', message: 'érvénytelen kód' };
+      }
+
+      return { result: 'success', data: rows[0] };
+    } catch (err) {
+      return { result: 'fail', message: 'Szerver hiba' };
+    }
+  }
 };

@@ -58,3 +58,18 @@
 .adminAddCouponDiv button:active {
   transform: translateY(1px);
 }
+
+.toastMessage {
+  position: fixed;
+  top: 80px;
+  right: 25px;
+  background-color: rgba(16, 185, 129, 0.9);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+  z-index: 3000;
+  font-weight: 600;
+  font-size: 0.95rem;
+  animation: slideInRight 0.3s ease-out forwards, fadeOut 0.3s ease-in 2.7s forwards;
+}

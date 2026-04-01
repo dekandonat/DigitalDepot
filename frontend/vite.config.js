@@ -25,6 +25,7 @@ export default defineConfig({
       '/order': backendProxy,
       '/used-products': backendProxy,
       '/news': backendProxy,
+      '/coupon': backendProxy,
     },
   },
 });

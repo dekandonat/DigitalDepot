@@ -7,6 +7,7 @@ export default function AdminCoupon() {
   const [currentCode, setCurrentCode] = useState('');
   const [currentPrice, setCurrentPrice] = useState('');
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+  const [toast, setToast] = useState('');
 
   const closeModal = () => setModal({ ...modal, isOpen: false });
 
@@ -16,6 +17,11 @@ export default function AdminCoupon() {
 
   const handlePriceChange = (e) => {
     setCurrentPrice(e.target.value);
+  };
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
   };
 
   const handleCouponAdd = () => {
@@ -29,6 +35,9 @@ export default function AdminCoupon() {
       .then((data) => {
         setCurrentCode('');
         setCurrentPrice('');
+        if(data.result == 'success'){
+          showToast('Sikeres hozzáadás');
+        }
       })
       .catch((err) => {
         setModal({ isOpen: true, title: 'Hiba', message: err.message });
@@ -44,6 +53,7 @@ export default function AdminCoupon() {
         onConfirm={closeModal}
         type="alert"
       />
+      {toast && <div className="toastMessage">{toast}</div>}
       <h2>Kupon kezelő</h2>
       <div class="adminAddCouponDiv">
         <form>
