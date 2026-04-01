@@ -35,7 +35,7 @@ export default function AdminCoupon() {
       .then((data) => {
         setCurrentCode('');
         setCurrentPrice('');
-        if(data.result == 'success'){
+        if (data.result == 'success') {
           showToast('Sikeres hozzáadás');
         }
       })

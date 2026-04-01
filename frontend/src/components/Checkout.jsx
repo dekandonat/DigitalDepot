@@ -10,6 +10,8 @@ export default function Checkout() {
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState('new');
   const [currentCoupon, setCurrentCoupon] = useState('');
+  const [currentCouponState, setCurrentCouponState] = useState(null);
+  const [currentDiscount, setCurrentDiscount] = useState(null);
   const [toast, setToast] = useState('');
   const [modal, setModal] = useState({
     isOpen: false,
@@ -113,6 +115,8 @@ export default function Checkout() {
   };
 
   const handleCouponChange = (e) => {
+    setCurrentCouponState(null);
+    setCurrentDiscount(null);
     setCurrentCoupon(e.target.value);
   };
 
@@ -133,10 +137,14 @@ export default function Checkout() {
       },
     })
       .then((data) => {
-        showToast('Sikeres kupon ellenőrzés');
+        if (data.result == 'success') {
+          showToast('Sikeres kupon ellenőrzés');
+          setCurrentCouponState('success');
+          setCurrentDiscount(data.data.value);
+        }
       })
       .catch((err) => {
-        console.error(err.message);
+        setCurrentCouponState('fail');
       });
   };
 
@@ -200,19 +208,23 @@ export default function Checkout() {
             <input
               type="text"
               name="couponCode"
-              className="couponInput"
+              className={`couponInput ${currentCouponState}`}
               placeholder="Írd be a kuponkódot"
               value={currentCoupon}
               onChange={handleCouponChange}
+              disabled={currentCouponState === 'success'}
             />
             <button
               type="button"
               className="payButton couponButton"
-              onClick={handleCouponCheck}
+              onClick={
+                currentCouponState != 'success' ? handleCouponCheck : null
+              }
             >
               Beváltás
             </button>
           </div>
+          {currentDiscount ? <h4>Kedvezmény: {currentDiscount} Ft</h4> : null}
         </div>
 
         <h3>Fizetési mód</h3>

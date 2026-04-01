@@ -1,5 +1,6 @@
 const db = require('../util/database');
 const nodemailer = require('nodemailer');
+const Coupon = require('./coupon');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -21,6 +22,7 @@ module.exports = class Order {
 
   async save() {
     let connection;
+    let couponResult;
     try {
       connection = await db.getConnection();
       //Start transaction
@@ -54,6 +56,17 @@ module.exports = class Order {
         totalAmount += item.productPrice * item.quantity;
       });
 
+      if (this.couponCode != '') {
+        couponResult = await Coupon.check(this.couponCode);
+        if (couponResult.result == 'success') {
+          totalAmount = totalAmount - couponResult.data.value;
+
+          if (totalAmount < 0) {
+            totalAmount = 0;
+          }
+        }
+      }
+
       const [orderResult] = await connection.execute(
         `INSERT INTO orders (userId, totalAmount, shippingAddress, paymentMethod, couponCode, orderDate) 
          VALUES (?, ?, ?, ?, ?, NOW())`,
@@ -78,6 +91,13 @@ module.exports = class Order {
         await connection.execute(
           `UPDATE products SET quantity = quantity - ? WHERE prodId = ?`,
           [item.quantity, item.prodId]
+        );
+      }
+
+      if (couponResult && couponResult.result == 'success') {
+        await connection.execute(
+          'UPDATE coupons SET coupons.usedAt = NOW(), coupons.orderId=? WHERE coupons.code = ?;',
+          [orderId, this.couponCode]
         );
       }
 

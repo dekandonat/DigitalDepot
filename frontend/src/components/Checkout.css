@@ -122,6 +122,18 @@
   margin-bottom: 10px;
 }
 
+.couponInput.success {
+  color: green;
+}
+
+.couponInput.fail {
+  color: red;
+}
+
+.couponSection h4 {
+  color: #5a5b5c;
+}
+
 .couponButton {
   width: 100%;
   padding: 12px;
@@ -158,6 +170,7 @@
   z-index: 3000;
   font-weight: 600;
   font-size: 0.95rem;
-  animation: slideInRight 0.3s ease-out forwards,
+  animation:
+    slideInRight 0.3s ease-out forwards,
     fadeOut 0.3s ease-in 2.7s forwards;
 }

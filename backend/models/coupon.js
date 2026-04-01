@@ -29,7 +29,7 @@ module.exports = class Coupon {
         [code]
       );
 
-      if (rows.length > 1) {
+      if (rows.length < 1) {
         return { result: 'fail', message: 'érvénytelen kód' };
       }
 
