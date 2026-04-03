@@ -8,6 +8,7 @@ import AdminInventory from './AdminInventory';
 import AdminUsedProducts from './AdminUsedProducts';
 import AdminUsersList from './AdminUsersList';
 import AdminAddNews from './AdminAddNews';
+import AdminStatistics from './AdminStatistics';
 import './AdminPage.css';
 
 export default function AdminPage({ toggleChat }) {
@@ -54,6 +55,7 @@ export default function AdminPage({ toggleChat }) {
           >
             Termékek listája
           </button>
+          
           <button
             onClick={() => setCurrentPage('news')}
             className={
@@ -102,6 +104,14 @@ export default function AdminPage({ toggleChat }) {
           {userRole === 'owner' && (
             <>
               <button
+                onClick={() => setCurrentPage('statistics')}
+                className={
+                  currentPage === 'statistics' ? 'adminNavBtn active' : 'adminNavBtn'
+                }
+              >
+                Statisztika
+              </button>
+              <button
                 onClick={() => setCurrentPage('usersList')}
                 className={
                   currentPage === 'usersList'
@@ -134,6 +144,9 @@ export default function AdminPage({ toggleChat }) {
           {currentPage === 'inventory' && <AdminInventory />}
           {currentPage === 'ordersList' && <AdminOrdersList />}
           {currentPage === 'usedProducts' && <AdminUsedProducts />}
+          {currentPage === 'statistics' && userRole === 'owner' && (
+            <AdminStatistics />
+          )}
           {currentPage === 'usersList' && userRole === 'owner' && (
             <AdminUsersList />
           )}
@@ -189,6 +202,7 @@ export default function AdminPage({ toggleChat }) {
               >
                 Termékek listája
               </button>
+              
               <button
                 onClick={() => handlePageChange('news')}
                 className={
@@ -242,6 +256,16 @@ export default function AdminPage({ toggleChat }) {
 
               {userRole === 'owner' && (
                 <>
+                  <button
+                    onClick={() => handlePageChange('statistics')}
+                    className={
+                      currentPage === 'statistics'
+                        ? 'adminMobileNavBtn active'
+                        : 'adminMobileNavBtn'
+                    }
+                  >
+                    Statisztika
+                  </button>
                   <button
                     onClick={() => handlePageChange('usersList')}
                     className={

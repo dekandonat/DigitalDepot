@@ -40,6 +40,36 @@ const groupMessagesByUser = (messages) => {
   return Object.values(groupMap);
 };
 
+router.get('/statistics', async (req, res) => {
+  try {
+    if (req.user.role !== 'owner') {
+      return res.status(403).json({
+        result: 'fail',
+        message: 'Csak a tulajdonosnak engedélyezett',
+      });
+    }
+
+    const [users] = await db.execute('SELECT COUNT(userId) as count FROM users');
+    const [orders] = await db.execute('SELECT COUNT(orderId) as count FROM orders');
+    const [revenue] = await db.execute('SELECT SUM(totalAmount) as total FROM orders WHERE status != "Törölve"');
+    const [soldProducts] = await db.execute('SELECT SUM(quantity) as total FROM order_items');
+    const [purchasedUsed] = await db.execute('SELECT COUNT(submissionId) as count FROM used_product_submissions WHERE status IN ("offer_accepted", "listed")');
+
+    res.status(200).json({
+      result: 'success',
+      data: {
+        totalUsers: users[0].count || 0,
+        totalOrders: orders[0].count || 0,
+        totalRevenue: revenue[0].total || 0,
+        soldProducts: soldProducts[0].total || 0,
+        successfulBuybacks: purchasedUsed[0].count || 0
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
+  }
+});
+
 router.post('/register', async (req, res) => {
   try {
     if (req.user.role !== 'owner') {
