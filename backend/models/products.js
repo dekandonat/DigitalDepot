@@ -13,11 +13,17 @@ module.exports = class Products {
     try {
       await db.execute(
         `INSERT INTO products (productName, productDescription, productPrice, productImg, categoryId) VALUES (?, ?, ?, ?, ?)`,
-        [this.prodName, this.prodDescription, this.prodPrice, this.prodImg, this.categoryId]
+        [
+          this.prodName,
+          this.prodDescription,
+          this.prodPrice,
+          this.prodImg,
+          this.categoryId,
+        ]
       );
       return { result: 'success' };
     } catch (err) {
-      return { result: 'fail', message: err.message };
+      return { result: 'fail', message: 'Szerver hiba' };
     }
   }
 
@@ -79,7 +85,7 @@ module.exports = class Products {
       );
       return { result: 'success' };
     } catch (err) {
-      return { result: 'fail', message: err.message };
+      return { result: 'fail', message: 'szerver hiba' };
     }
   }
 
@@ -88,7 +94,7 @@ module.exports = class Products {
       if (!Number.isInteger(quantity) || quantity <= 0) {
         return {
           result: 'fail',
-          message: 'quantity must be a positive integer',
+          message: 'A mennyiségnek pozitív egész számnak kell lennie',
         };
       }
 
@@ -97,13 +103,15 @@ module.exports = class Products {
         [quantity, id]
       );
 
-      if (result.affectedRows === 0) {
-        return { result: 'fail', message: 'product not found' };
+      if (result.affectedRows == 0) {
+        return { result: 'fail', message: 'nincs találat' };
+      } else {
+        return { result: 'success', message: 'mennyiség frissítve' };
       }
 
       return { result: 'success' };
     } catch (err) {
-      return { result: 'fail', message: err.message };
+      return { result: 'fail', message: 'szerver hiba' };
     }
   }
 };

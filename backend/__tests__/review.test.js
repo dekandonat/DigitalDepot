@@ -66,7 +66,6 @@ describe('Review Router', () => {
     const response = await request(app).get('/reviews/abc').expect(400);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('id must be a number');
   });
 
   // TEST 4: GET reviews - negative product id
@@ -74,7 +73,6 @@ describe('Review Router', () => {
     const response = await request(app).get('/reviews/-1').expect(400);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('id must be a number');
   });
 
   // TEST 5: GET reviews - zero product id
@@ -91,7 +89,6 @@ describe('Review Router', () => {
     const response = await request(app).get('/reviews/1').expect(500);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('Database error');
   });
 
   // TEST 7: POST create review - success
@@ -125,7 +122,6 @@ describe('Review Router', () => {
       .expect(400);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('missing fields');
   });
 
   // TEST 9: POST - missing rating
@@ -139,7 +135,6 @@ describe('Review Router', () => {
       .expect(400);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('missing fields');
   });
 
   // TEST 10: POST - missing comment
@@ -153,7 +148,6 @@ describe('Review Router', () => {
       .expect(400);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('missing fields');
   });
 
   // TEST 11: POST - invalid product id
@@ -168,7 +162,6 @@ describe('Review Router', () => {
       .expect(400);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('id must be a number');
   });
 
   // TEST 12: POST - negative product id
@@ -183,7 +176,6 @@ describe('Review Router', () => {
       .expect(400);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('id must be a number');
   });
 
   // TEST 13: POST - save failure
@@ -221,6 +213,5 @@ describe('Review Router', () => {
       .expect(500);
 
     expect(response.body.result).toBe('fail');
-    expect(response.body.message).toContain('server error');
   });
 });

@@ -1,11 +1,7 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const { promisify } = require('util');
 const db = require('../util/database');
 
 const router = express.Router();
-
-const verifyAsync = promisify(jwt.verify);
 
 router.get('/', async (req, res) => {
   try {
@@ -20,8 +16,7 @@ router.get('/', async (req, res) => {
     );
     res.status(200).json({ result: 'success', data: { items, total } });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ result: 'fail', message: 'server error' });
+    res.status(500).json({ result: 'fail', message: 'Szerver hiba' });
   }
 });
 
@@ -33,13 +28,16 @@ router.post('/add/:id/:quantity', async (req, res) => {
   const quantityNum = Number(quantity);
 
   if (!Number.isInteger(idNum) || idNum <= 0) {
-    return res.status(400).json({ result: 'fail', message: 'invalid id' });
+    return res
+      .status(400)
+      .json({ result: 'fail', message: 'érvénytelen azonosító' });
   }
 
   if (!Number.isInteger(quantityNum) || quantityNum <= 0) {
-    return res
-      .status(400)
-      .json({ result: 'fail', message: 'quantity must be a number' });
+    return res.status(400).json({
+      result: 'fail',
+      message: 'mennyiségnek egész számnak kell lennie',
+    });
   }
 
   try {
@@ -50,8 +48,7 @@ router.post('/add/:id/:quantity', async (req, res) => {
     );
     res.status(201).json({ result: 'success' });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ result: 'fail', message: 'server error' });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -65,13 +62,16 @@ router.patch('/:id', async (req, res) => {
     const amountNum = Number(amount);
 
     if (!Number.isInteger(productNum) || productNum <= 0) {
-      return res.status(400).json({ result: 'fail', message: 'invalid id' });
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'érvénytelen azonosító' });
     }
 
     if (!Number.isInteger(amountNum)) {
-      return res
-        .status(400)
-        .json({ result: 'fail', message: 'quantity must be a number' });
+      return res.status(400).json({
+        result: 'fail',
+        message: 'mennyiségek egész számnak kell lennie',
+      });
     }
 
     if (amount != 0) {
@@ -84,11 +84,10 @@ router.patch('/:id', async (req, res) => {
       }
       res.status(200).json({ result: 'success' });
     } else {
-      res.status(200).json({ result: 'success', message: 'nothing changed' });
+      res.status(200).json({ result: 'success' });
     }
   } catch (err) {
-    console.log(err.message);
-    res.status(500).json({ result: 'server error' });
+    res.status(500).json({ result: 'szerver hiba' });
   }
 });
 

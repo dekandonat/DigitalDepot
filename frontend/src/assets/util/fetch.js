@@ -58,9 +58,8 @@ export async function apiFetch(url, options = {}) {
         response = await fetch(url, newOptions);
       } else {
         localStorage.clear();
-        window.location.href = '/';
-        location.reload();
-        return;
+        window.location.replace('/');
+        throw new Error('A munkamenet lejárt, kérjük jelentkezzen be újra');
       }
     }
 

@@ -11,15 +11,16 @@ router.get('/items/:orderId', async (req, res) => {
   const idNum = Number(orderId);
 
   if (!Number.isInteger(idNum) || idNum <= 0) {
-    return res.status(400).json({ result: 'fail', message: 'invalid orderId' });
+    return res
+      .status(400)
+      .json({ result: 'fail', message: 'érvénytelen rendelésazonosító' });
   }
 
   try {
     const items = await Order.getOrderItems(orderId);
     res.status(200).json({ result: 'success', data: items });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ result: 'fail', message: 'server error' });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -31,8 +32,7 @@ router.get('/my-orders', verifyToken, async (req, res) => {
 
     res.status(200).json({ result: 'success', data: orders });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ result: 'fail', message: 'server error' });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -45,7 +45,7 @@ router.post('/place-order', verifyToken, async (req, res) => {
     if (!shippingAddress || !paymentMethod) {
       return res
         .status(400)
-        .json({ result: 'fail', message: 'missing parameters' });
+        .json({ result: 'fail', message: 'hiányzó adatok' });
     }
 
     const order = new Order(userId, shippingAddress, paymentMethod, couponCode);
@@ -53,15 +53,12 @@ router.post('/place-order', verifyToken, async (req, res) => {
     const result = await order.save();
 
     if (result.result === 'success') {
-      res
-        .status(201)
-        .json({ result: 'success', message: 'Order placed successfully' });
+      res.status(201).json({ result: 'success', message: 'Sikeres rendelés' });
     } else {
       res.status(500).json(result);
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ result: 'fail', message: 'server error' });
+    res.status(500).json({ result: 'fail', message: 'Szerver hiba' });
   }
 });
 

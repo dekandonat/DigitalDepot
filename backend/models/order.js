@@ -131,7 +131,7 @@ module.exports = class Order {
   static async fetchByUserId(userId) {
     try {
       const [rows] = await db.execute(
-        `SELECT * FROM orders WHERE userId = ? ORDER BY orderId DESC`,
+        `SELECT orderId, totalAmount, shippingAddress, orderDate, paymentMethod, status FROM orders WHERE userId = ? ORDER BY orderId DESC;`,
         [userId]
       );
       return rows;

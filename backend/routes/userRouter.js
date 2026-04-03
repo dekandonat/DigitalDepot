@@ -1,18 +1,31 @@
 const express = require('express');
 const User = require('../models/user');
 const db = require('../util/database');
-const jwt = require('jsonwebtoken');
-const { promisify } = require('util');
-const verifyAsync = promisify(jwt.verify);
 const verifyToken = require('../util/tokenVerify');
 const router = express.Router();
+const validator = require('validator');
 
 router.post('/register', async (req, res) => {
   try {
     const { userName, password, email } = req.body;
 
     if (userName.trim() == '' || password.trim() == '' || email.trim() == '') {
-      return res.status(400).json({ result: 'fail', message: 'invalid data' });
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'hiányzó adatok' });
+    }
+
+    if (password.trim().length < 8) {
+      return res.status(400).json({
+        result: 'fail',
+        message: 'a jelszónak legalább 8 karakter hosszúnak kell lennie!',
+      });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'Érvénytelen email cím' });
     }
 
     const user = new User(userName, password, email, 'user');
@@ -25,7 +38,7 @@ router.post('/register', async (req, res) => {
       res.status(500).json(result);
     }
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'Szerver hiba' });
   }
 });
 
@@ -46,10 +59,10 @@ router.post('/login', async (req, res) => {
         .status(200)
         .json({ result: userData.result, message: userData.message });
     } else {
-      res.status(401).json(userData);
+      res.status(403).json(userData);
     }
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: 'server error' });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -74,7 +87,9 @@ router.post('/logout', async (req, res) => {
 router.post('/reset-code', async (req, res) => {
   const email = req.body.email;
   if (!email) {
-    return res.status(404).json({ result: 'fail', message: 'no email given' });
+    return res
+      .status(404)
+      .json({ result: 'fail', message: 'nincs megadott email' });
   }
   const response = await User.getCode(email);
   if (response.result == 'success') {
@@ -101,7 +116,7 @@ router.get('/refresh', async (req, res) => {
     if (!refreshToken) {
       return res
         .status(401)
-        .json({ result: 'fail', message: 'no refresh token' });
+        .json({ result: 'fail', message: 'nincs refresh token' });
     }
 
     const result = await User.refresh(refreshToken);
@@ -115,10 +130,10 @@ router.get('/refresh', async (req, res) => {
       });
       res.status(200).json({ result: result.result, data: result.data });
     } else {
-      res.status(500).json({ result: 'fail', message: 'token error' });
+      res.status(500).json({ result: 'fail', message: 'token hiba' });
     }
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: 'server error' });
+    res.status(500).json({ result: 'fail', message: 'Szerver error' });
   }
 });
 
@@ -140,7 +155,34 @@ router.get('/profile', verifyToken, async (req, res) => {
 
 router.patch('/bank-account', verifyToken, async (req, res) => {
   try {
-    const { bankAccountNumber } = req.body;
+    let { bankAccountNumber } = req.body;
+
+    if (!bankAccountNumber.includes('HU')) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'nem megfelelő formátum' });
+    }
+
+    bankAccountNumber = bankAccountNumber.split(' ')[1];
+
+    if (!bankAccountNumber || bankAccountNumber.trim() == '') {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'nem adott meg bankszámlaszámot' });
+    }
+
+    if (!/^\d+$/.test(bankAccountNumber.trim())) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'nem megfelelő formátum' });
+    }
+
+    if (bankAccountNumber.trim().length !== 24) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'nem megfelelő hossz' });
+    }
+
     await db.execute(
       'UPDATE users SET bankAccountNumber = ? WHERE userId = ?',
       [bankAccountNumber, req.user.id]
@@ -159,7 +201,7 @@ router.get('/addresses', verifyToken, async (req, res) => {
     );
     res.status(200).json({ result: 'success', data: rows });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -167,7 +209,9 @@ router.post('/addresses', verifyToken, async (req, res) => {
   try {
     const { zipCode, city, streetAddress } = req.body;
     if (!zipCode || !city || !streetAddress) {
-      return res.status(400).json({ result: 'fail', message: 'Missing fields' });
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'Hiányzó adatok' });
     }
     await db.execute(
       'INSERT INTO user_addresses (userId, zipCode, city, streetAddress) VALUES (?, ?, ?, ?)',
@@ -175,33 +219,33 @@ router.post('/addresses', verifyToken, async (req, res) => {
     );
     res.status(201).json({ result: 'success' });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
 router.delete('/addresses/:id', verifyToken, async (req, res) => {
   try {
     const addressId = req.params.id;
-    await db.execute(
-      'DELETE FROM user_addresses WHERE id = ? AND userId = ?',
-      [addressId, req.user.id]
-    );
+    await db.execute('DELETE FROM user_addresses WHERE id = ? AND userId = ?', [
+      addressId,
+      req.user.id,
+    ]);
     res.status(200).json({ result: 'success' });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
 router.patch('/chat-topic', verifyToken, async (req, res) => {
   try {
     const { topic } = req.body;
-    await db.execute(
-      'UPDATE users SET chatTopic = ? WHERE userId = ?',
-      [topic, req.user.id]
-    );
+    await db.execute('UPDATE users SET chatTopic = ? WHERE userId = ?', [
+      topic,
+      req.user.id,
+    ]);
     res.status(200).json({ result: 'success' });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -211,23 +255,23 @@ router.get('/messages', verifyToken, async (req, res) => {
       'SELECT * FROM messages WHERE messages.sender = ? OR messages.recipientId = ? ORDER BY id ASC;',
       [req.user.id, req.user.id]
     );
-    
+
     const [userRows] = await db.execute(
       'SELECT chatTopic FROM users WHERE userId = ?',
       [req.user.id]
     );
-    
+
     let chatTopic = 'Egyéb';
-    if(userRows.length > 0 && userRows[0].chatTopic) {
-        chatTopic = userRows[0].chatTopic;
+    if (userRows.length > 0 && userRows[0].chatTopic) {
+      chatTopic = userRows[0].chatTopic;
     }
 
-    res.status(200).json({ 
-      result: 'success', 
-      data: [{ messages: rows, chatTopic: chatTopic }] 
+    res.status(200).json({
+      result: 'success',
+      data: [{ messages: rows, chatTopic: chatTopic }],
     });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 
@@ -237,9 +281,11 @@ router.post('/readmessages', verifyToken, async (req, res) => {
       'UPDATE messages SET unread = 0 WHERE recipientId = ? AND unread = 1;',
       [req.user.id]
     );
-    res.status(200).json({ result: 'success', affectedRows: rows.affectedRows });
+    res
+      .status(200)
+      .json({ result: 'success', affectedRows: rows.affectedRows });
   } catch (err) {
-    res.status(500).json({ result: 'fail', message: err.message });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 

@@ -8,7 +8,7 @@ const backendProxy = {
     if (req.headers.accept?.includes('text/html')) {
       return '/index.html';
     }
-  }
+  },
 };
 
 export default defineConfig({
@@ -23,7 +23,8 @@ export default defineConfig({
       '/uploads': backendProxy,
       '/reviews': backendProxy,
       '/order': backendProxy,
-      '/used-products': backendProxy
+      '/used-products': backendProxy,
+      '/news': backendProxy,
     },
   },
 });

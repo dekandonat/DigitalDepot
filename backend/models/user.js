@@ -52,7 +52,7 @@ module.exports = class User {
       await db.execute('DELETE FROM users WHERE userId = ?', [userId]);
       return { result: 'success' };
     } catch (err) {
-      return { result: 'fail', message: err.message };
+      return { result: 'fail', message: 'Szerver hiba' };
     }
   }
 
@@ -64,7 +64,7 @@ module.exports = class User {
       ]);
       return { result: 'success' };
     } catch (err) {
-      return { result: 'fail', message: err.message };
+      return { result: 'fail', message: 'Szerver hiba' };
     }
   }
 
@@ -74,7 +74,7 @@ module.exports = class User {
         .createHash('sha256')
         .update(token)
         .digest('hex');
-      await db.execute('DELETE FROM refreshTokens WHERE tokenId = ?', [
+      await db.execute('DELETE FROM refreshtokens WHERE tokenId = ?', [
         hashedToken,
       ]);
       return { result: 'success' };
@@ -91,7 +91,7 @@ module.exports = class User {
       );
 
       if (rows.length == 0) {
-        return { result: 'fail', message: 'no such account' };
+        return { result: 'fail', message: 'hibás email vagy kód' };
       }
 
       const userId = rows[0].userId;
@@ -100,7 +100,7 @@ module.exports = class User {
       if (!recoveryCode) {
         return {
           result: 'fail',
-          message: 'no code for account',
+          message: 'hibás email vagy kód',
         };
       }
 
@@ -116,18 +116,16 @@ module.exports = class User {
             recoveryCodes = recoveryCodes.filter((code) => code.id != userId);
             return { result: 'success' };
           } catch (err) {
-            console.log(err);
-            return { result: 'fail', message: 'server error' };
+            return { result: 'fail', message: 'Szerver hiba' };
           }
         } else {
-          return { result: 'fail', message: 'code doesnt match' };
+          return { result: 'fail', message: 'hibás email vagy kód' };
         }
       } else {
-        return { result: 'fail', message: 'code expired' };
+        return { result: 'fail', message: 'hibás email vagy kód' };
       }
     } catch (err) {
-      console.log(err);
-      return { result: 'fail', message: 'server error' };
+      return { result: 'fail', message: 'szerver hiba' };
     }
   }
 
@@ -138,8 +136,8 @@ module.exports = class User {
         [email]
       );
 
-      if (rows.length > 0) {
-        const code = Math.floor(100000 + Math.random() * 900000);
+      if (rows.length >= 1) {
+        const code = crypto.randomInt(100000, 999999);
 
         recoveryCodes = recoveryCodes.filter(
           (code) => code.expiresAt > Date.now()
@@ -161,26 +159,24 @@ module.exports = class User {
           subject: 'Helyreállító Kód',
           text: `Ezt a kódot tudja használni a helyreállításhoz: ${code}`,
         });
-
-        return { result: 'success' };
-      } else {
-        return { result: 'fail', message: 'no email found' };
       }
+
+      return { result: 'success' };
     } catch (err) {
       console.log(err);
-      return { result: 'fail', message: 'server error' };
+      return { result: 'fail', message: 'Szerver hiba' };
     }
   }
 
   async register() {
     try {
       const [rows] = await db.execute(
-        'SELECT * FROM users WHERE email LIKE ?;',
+        'SELECT userId FROM users WHERE email LIKE ?;',
         [this.email]
       );
 
       if (rows.length >= 1) {
-        return { result: 'fail', message: 'email already in use' };
+        return { result: 'fail', message: 'Ez az email már használatban van' };
       }
 
       const hashedPassword = await bcrypt.hash(this.password, 10);
@@ -201,12 +197,12 @@ module.exports = class User {
   static async login(email, password) {
     try {
       const [rows] = await db.execute(
-        `SELECT * FROM users WHERE users.email LIKE ?`,
+        `SELECT userId, hashedPassword, email, userName, role FROM users WHERE email = ?`,
         [email]
       );
 
       if (rows.length == 0) {
-        return { result: 'fail', message: 'nem létezik ez a felhasználó' };
+        return { result: 'fail', message: 'Hibás email vagy jelszó' };
       }
 
       const hashedPassword = rows[0].hashedPassword;
@@ -229,7 +225,7 @@ module.exports = class User {
           }
         );
 
-        await db.execute('DELETE FROM refreshTokens WHERE userId = ?', [
+        await db.execute('DELETE FROM refreshtokens WHERE userId = ?', [
           rows[0].userId,
         ]);
         const refreshtoken = crypto.randomBytes(64).toString('hex');
@@ -238,7 +234,7 @@ module.exports = class User {
           .update(refreshtoken)
           .digest('hex');
         await db.execute(
-          'INSERT INTO refreshTokens (tokenId, userId, createdAt ,expiresAt) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))',
+          'INSERT INTO refreshtokens (tokenId, userId, createdAt ,expiresAt) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))',
           [hashedToken, rows[0].userId]
         );
         return {
@@ -251,10 +247,10 @@ module.exports = class User {
           refreshToken: refreshtoken,
         };
       } else {
-        return { result: 'fail', message: 'helytelen jelszó' };
+        return { result: 'fail', message: 'hibás email vagy jelszó' };
       }
     } catch (err) {
-      return { result: 'fail', message: 'server error' };
+      return { result: 'fail', message: 'Szerver hiba' };
     }
   }
 
@@ -265,20 +261,20 @@ module.exports = class User {
         .update(token)
         .digest('hex');
       const [rows] = await db.execute(
-        'SELECT * FROM refreshtokens WHERE tokenId = ?',
+        'SELECT userId, expiresAt FROM refreshtokens WHERE tokenId = ?',
         [hashedToken]
       );
 
       if (rows.length == 0) {
-        return { result: 'fail', message: 'no token found' };
+        return { result: 'fail', message: 'nincs token' };
       }
 
       if (new Date(rows[0].expiresAt) <= new Date()) {
-        return { result: 'fail', message: 'expired token' };
+        return { result: 'fail', message: 'lejárt a token' };
       }
 
       const [userData] = await db.execute(
-        'SELECT * FROM users WHERE userId = ?',
+        'SELECT userId, role FROM users WHERE userId = ?',
         [rows[0].userId]
       );
 
@@ -293,7 +289,7 @@ module.exports = class User {
         }
       );
 
-      await db.execute('DELETE FROM refreshTokens WHERE tokenId = ?', [
+      await db.execute('DELETE FROM refreshtokens WHERE tokenId = ?', [
         hashedToken,
       ]);
 
@@ -303,7 +299,7 @@ module.exports = class User {
         .update(refreshtoken)
         .digest('hex');
       await db.execute(
-        'INSERT INTO refreshTokens (tokenId, userId, createdAt ,expiresAt) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))',
+        'INSERT INTO refreshtokens (tokenId, userId, createdAt ,expiresAt) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))',
         [hashedRefreshtoken, rows[0].userId]
       );
 
@@ -313,8 +309,7 @@ module.exports = class User {
         refreshToken: refreshtoken,
       };
     } catch (err) {
-      console.log('Hiba: ' + err.message);
-      return { result: 'fail', message: 'server error' };
+      return { result: 'fail', message: 'Szerver hiba' };
     }
   }
 };

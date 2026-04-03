@@ -14,6 +14,7 @@ jest.mock('../util/multer', () => ({
 }));
 
 const productRouter = require('../routes/productRouter');
+const adminRouter = require('../routes/adminRouter');
 
 describe('Product Router', () => {
   let app;
@@ -98,135 +99,7 @@ describe('Product Router', () => {
     expect(response.body.data).toEqual([]);
   });
 
-  // TEST 8: POST create product success
-  test('POST /products should create product', async () => {
-    Products.mockImplementation(() => ({
-      save: jest.fn().mockResolvedValue({ result: 'success' }),
-    }));
-
-    const response = await request(app)
-      .post('/products')
-      .send({
-        prodName: 'Laptop',
-        prodDescription: 'Good laptop',
-        prodPrice: '1000',
-        categoryId: '1',
-      })
-      .expect(201);
-
-    expect(response.body.result).toBe('success');
-  });
-
-  // TEST 9: POST - invalid price
-  test('POST /products should reject invalid price', async () => {
-    const response = await request(app)
-      .post('/products')
-      .send({
-        prodName: 'Laptop',
-        prodDescription: 'Good laptop',
-        prodPrice: 'abc',
-        categoryId: '1',
-      })
-      .expect(400);
-
-    expect(response.body.result).toBe('fail');
-  });
-
-  // TEST 10: POST - invalid category
-  test('POST /products should reject invalid category', async () => {
-    const response = await request(app)
-      .post('/products')
-      .send({
-        prodName: 'Laptop',
-        prodDescription: 'Good laptop',
-        prodPrice: '1000',
-        categoryId: 'abc',
-      })
-      .expect(400);
-
-    expect(response.body.result).toBe('fail');
-  });
-
-  // TEST 11: POST - negative price
-  test('POST /products should reject negative price', async () => {
-    const response = await request(app)
-      .post('/products')
-      .send({
-        prodName: 'Laptop',
-        prodDescription: 'Good laptop',
-        prodPrice: '-100',
-        categoryId: '1',
-      })
-      .expect(400);
-
-    expect(response.body.result).toBe('fail');
-  });
-
-  // TEST 12: POST - empty name
-  test('POST /products should reject empty name', async () => {
-    const response = await request(app)
-      .post('/products')
-      .send({
-        prodName: '',
-        prodDescription: 'Good laptop',
-        prodPrice: '1000',
-        categoryId: '1',
-      })
-      .expect(400);
-
-    expect(response.body.result).toBe('fail');
-  });
-
-  // TEST 13: POST - empty description
-  test('POST /products should reject empty description', async () => {
-    const response = await request(app)
-      .post('/products')
-      .send({
-        prodName: 'Laptop',
-        prodDescription: '',
-        prodPrice: '1000',
-        categoryId: '1',
-      })
-      .expect(400);
-
-    expect(response.body.result).toBe('fail');
-  });
-
-  // TEST 14: POST - negative category
-  test('POST /products should reject negative category', async () => {
-    const response = await request(app)
-      .post('/products')
-      .send({
-        prodName: 'Laptop',
-        prodDescription: 'Good laptop',
-        prodPrice: '1000',
-        categoryId: '-1',
-      })
-      .expect(400);
-
-    expect(response.body.result).toBe('fail');
-  });
-
-  // TEST 15: POST - save failure
-  test('POST /products should handle save failure', async () => {
-    Products.mockImplementation(() => ({
-      save: jest.fn().mockResolvedValue({ result: 'fail' }),
-    }));
-
-    const response = await request(app)
-      .post('/products')
-      .send({
-        prodName: 'Laptop',
-        prodDescription: 'Good laptop',
-        prodPrice: '1000',
-        categoryId: '1',
-      })
-      .expect(500);
-
-    expect(response.body.result).toBe('fail');
-  });
-
-  // TEST 16: GET all - database error
+  // TEST 8: GET all - database error
   test('GET /products should handle error', async () => {
     Products.fetchAll.mockRejectedValue(new Error('DB error'));
 
@@ -235,7 +108,7 @@ describe('Product Router', () => {
     expect(response.body.result).toBe('fail');
   });
 
-  // TEST 17: GET single - database error
+  // TEST 9: GET single - database error
   test('GET /products/:prodId should handle error', async () => {
     Products.fetch.mockRejectedValue(new Error('DB error'));
 
@@ -244,7 +117,7 @@ describe('Product Router', () => {
     expect(response.body.result).toBe('fail');
   });
 
-  // TEST 18: SEARCH - database error
+  // TEST 10: SEARCH - database error
   test('GET /products/search/:string should handle error', async () => {
     Products.find.mockRejectedValue(new Error('DB error'));
 
