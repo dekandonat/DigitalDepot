@@ -128,6 +128,7 @@ export default function AdminProductCard(props) {
               )}
             </div>
             <p className="productCardDesc">{description}</p>
+            <p className="productCardDesc">Eladott: {props.soldQuantity || 0} db</p>
           </>
         )}
       </div>

@@ -31,11 +31,10 @@ module.exports = class Products {
     try {
       const sql = `
         SELECT p.*, 
-        COALESCE(AVG(r.rating), 0) as avgRating, 
-        COUNT(r.reviewId) as reviewCount 
-        FROM products p 
-        LEFT JOIN reviews r ON p.prodId = r.productId 
-        GROUP BY p.prodId
+        (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE productId = p.prodId) as avgRating, 
+        (SELECT COUNT(reviewId) FROM reviews WHERE productId = p.prodId) as reviewCount,
+        (SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE productId = p.prodId) as soldQuantity
+        FROM products p
       `;
       const [rows] = await db.execute(sql);
       return rows;
@@ -48,12 +47,11 @@ module.exports = class Products {
     try {
       const sql = `
         SELECT p.*, 
-        COALESCE(AVG(r.rating), 0) as avgRating, 
-        COUNT(r.reviewId) as reviewCount 
+        (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE productId = p.prodId) as avgRating, 
+        (SELECT COUNT(reviewId) FROM reviews WHERE productId = p.prodId) as reviewCount,
+        (SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE productId = p.prodId) as soldQuantity
         FROM products p 
-        LEFT JOIN reviews r ON p.prodId = r.productId 
         WHERE p.prodId = ?
-        GROUP BY p.prodId
       `;
       const [rows] = await db.execute(sql, [id]);
       return rows;
@@ -66,12 +64,11 @@ module.exports = class Products {
     try {
       const sql = `
         SELECT p.*, 
-        COALESCE(AVG(r.rating), 0) as avgRating, 
-        COUNT(r.reviewId) as reviewCount 
+        (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE productId = p.prodId) as avgRating, 
+        (SELECT COUNT(reviewId) FROM reviews WHERE productId = p.prodId) as reviewCount,
+        (SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE productId = p.prodId) as soldQuantity
         FROM products p 
-        LEFT JOIN reviews r ON p.prodId = r.productId 
         WHERE p.productName LIKE ? OR p.productDescription LIKE ?
-        GROUP BY p.prodId
       `;
       const [rows] = await db.execute(sql, [`%${string}%`, `%${string}%`]);
       return rows;
@@ -111,6 +108,8 @@ module.exports = class Products {
       } else {
         return { result: 'success', message: 'mennyiség frissítve' };
       }
+
+      return { result: 'success' };
     } catch (err) {
       return { result: 'fail', message: 'szerver hiba' };
     }
