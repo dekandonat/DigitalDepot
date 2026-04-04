@@ -1,6 +1,5 @@
 const express = require('express');
 const db = require('../util/database');
-
 const router = express.Router();
 
 router.get('/', async (req, res) => {
@@ -28,20 +27,37 @@ router.post('/add/:id/:quantity', async (req, res) => {
   const quantityNum = Number(quantity);
 
   if (!Number.isInteger(idNum) || idNum <= 0) {
-    return res
-      .status(400)
-      .json({ result: 'fail', message: 'érvénytelen azonosító' });
-  }
-
-  if (!Number.isInteger(quantityNum) || quantityNum <= 0) {
-    return res.status(400).json({
-      result: 'fail',
-      message: 'mennyiségnek egész számnak kell lennie',
-    });
+    return res.status(400).json({ result: 'fail', message: 'érvénytelen azonosító' });
   }
 
   try {
     const userId = req.user.id;
+
+    const [productRows] = await db.execute(
+        'SELECT quantity FROM products WHERE prodId = ?',
+        [idNum]
+    );
+
+    if (productRows.length === 0) {
+        return res.status(404).json({ result: 'fail', message: 'Termék nem található' });
+    }
+
+    const stock = productRows[0].quantity;
+
+    const [cartRows] = await db.execute(
+        'SELECT quantity FROM carts WHERE userId = ? AND productId = ?',
+        [userId, idNum]
+    );
+
+    const currentInCart = cartRows.length > 0 ? cartRows[0].quantity : 0;
+
+    if (currentInCart + quantityNum > stock) {
+        return res.status(400).json({ 
+            result: 'fail', 
+            message: `Sajnáljuk, csak ${stock} darab van készleten, és már van ${currentInCart} a kosaradban.` 
+        });
+    }
+
     await db.execute(
       `INSERT INTO carts (userId, productId, quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE quantity = quantity + ?;`,
       [userId, idNum, quantityNum, quantityNum]
@@ -62,32 +78,30 @@ router.patch('/:id', async (req, res) => {
     const amountNum = Number(amount);
 
     if (!Number.isInteger(productNum) || productNum <= 0) {
-      return res
-        .status(400)
-        .json({ result: 'fail', message: 'érvénytelen azonosító' });
-    }
-
-    if (!Number.isInteger(amountNum)) {
-      return res.status(400).json({
-        result: 'fail',
-        message: 'mennyiségek egész számnak kell lennie',
-      });
+      return res.status(400).json({ result: 'fail', message: 'érvénytelen azonosító' });
     }
 
     if (amount != 0) {
+      const [productRows] = await db.execute('SELECT quantity FROM products WHERE prodId = ?', [productNum]);
+      const [cartRows] = await db.execute('SELECT quantity FROM carts WHERE userId = ? AND productId = ?', [userId, productNum]);
+      
+      if (amountNum > 0 && cartRows[0].quantity + amountNum > productRows[0].quantity) {
+          return res.status(400).json({ result: 'fail', message: 'Nincs több készleten' });
+      }
+
       await db.execute(
         `UPDATE carts SET quantity = quantity + ? WHERE userId = ? AND productId = ?`,
-        [amount, userId, productId]
+        [amountNum, userId, productNum]
       );
-      if (amount < 0) {
-        await db.execute('DELETE FROM carts WHERE quantity <= 0;');
-      }
-      res.status(200).json({ result: 'success' });
     } else {
-      res.status(200).json({ result: 'success' });
+      await db.execute(`DELETE FROM carts WHERE userId = ? AND productId = ?`, [
+        userId,
+        productNum,
+      ]);
     }
+    res.status(200).json({ result: 'success' });
   } catch (err) {
-    res.status(500).json({ result: 'szerver hiba' });
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
 

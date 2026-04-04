@@ -4,20 +4,67 @@
     animation: fadeIn 0.3s ease-out;
 }
 
-.adminStatsWrapper h2 {
-    margin-top: 0;
-    margin-bottom: 20px;
+.adminStatsHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.adminStatsHeader h2 {
+    margin: 0;
     color: #333;
     border-bottom: 2px solid #007bff;
     padding-bottom: 10px;
     display: inline-block;
     font-size: 1.5rem;
+    align-self: flex-start;
+}
+
+.statsFilterGroup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    background-color: white;
+    padding: 5px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.statsFilterBtn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.statsFilterBtn:hover {
+    color: #0f172a;
+    background-color: #f8fafc;
+}
+
+.statsFilterBtn.active {
+    background-color: #007bff;
+    color: white;
 }
 
 .statsGrid {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    transition: opacity 0.2s;
+}
+
+.statsGrid.updating {
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .statCard {
@@ -76,6 +123,20 @@
 }
 
 @media (min-width: 768px) {
+    .adminStatsHeader {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .statsFilterGroup {
+        flex-wrap: nowrap;
+    }
+
+    .statsFilterBtn {
+        flex: none;
+    }
+
     .statsGrid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

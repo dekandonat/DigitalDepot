@@ -79,7 +79,7 @@ export default function Checkout() {
                 setModal({ isOpen: true, title: 'Hiba', message: data.message || 'Hiba történt a rendelés során.', redirect: null });
             }
         } catch (error) {
-            setModal({ isOpen: true, title: 'Hiba', message: 'Nem sikerült csatlakozni a szerverhez.', redirect: null });
+            setModal({ isOpen: true, title: 'Hiba', message: error.message || 'Hálózati hiba történt.', redirect: null });
         }
     };
 

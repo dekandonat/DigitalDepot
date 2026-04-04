@@ -49,11 +49,26 @@ router.get('/statistics', async (req, res) => {
       });
     }
 
+    const period = req.query.period || 'all';
+    let orderDateCond = '';
+    let submissionDateCond = '';
+
+    if (period === '7d') {
+      orderDateCond = ' AND orderDate >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+      submissionDateCond = ' AND submissionDate >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+    } else if (period === '1m') {
+      orderDateCond = ' AND orderDate >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+      submissionDateCond = ' AND submissionDate >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+    } else if (period === '1y') {
+      orderDateCond = ' AND orderDate >= DATE_SUB(NOW(), INTERVAL 1 YEAR)';
+      submissionDateCond = ' AND submissionDate >= DATE_SUB(NOW(), INTERVAL 1 YEAR)';
+    }
+
     const [users] = await db.execute('SELECT COUNT(userId) as count FROM users');
-    const [orders] = await db.execute('SELECT COUNT(orderId) as count FROM orders');
-    const [revenue] = await db.execute('SELECT SUM(totalAmount) as total FROM orders WHERE status != "Törölve"');
-    const [soldProducts] = await db.execute('SELECT SUM(quantity) as total FROM order_items');
-    const [purchasedUsed] = await db.execute('SELECT COUNT(submissionId) as count FROM used_product_submissions WHERE status IN ("offer_accepted", "listed")');
+    const [orders] = await db.execute(`SELECT COUNT(orderId) as count FROM orders WHERE 1=1${orderDateCond}`);
+    const [revenue] = await db.execute(`SELECT SUM(totalAmount) as total FROM orders WHERE status != "Törölve"${orderDateCond}`);
+    const [soldProducts] = await db.execute(`SELECT SUM(order_items.quantity) as total FROM order_items JOIN orders ON order_items.orderId = orders.orderId WHERE orders.status != "Törölve"${orderDateCond}`);
+    const [purchasedUsed] = await db.execute(`SELECT COUNT(submissionId) as count FROM used_product_submissions WHERE status IN ("offer_accepted", "listed")${submissionDateCond}`);
 
     res.status(200).json({
       result: 'success',
@@ -96,7 +111,6 @@ router.post('/register', async (req, res) => {
       res.status(500).json(result);
     }
   } catch (err) {
-    console.log(err);
     res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
@@ -189,7 +203,6 @@ router.get('/orders', async (req, res) => {
     );
     return res.status(200).json({ result: 'success', data: rows });
   } catch (err) {
-    console.log(err);
     return res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
@@ -232,7 +245,6 @@ router.delete('/orders/:orderId', async (req, res) => {
       res.status(500).json(result);
     }
   } catch (err) {
-    console.log(err);
     res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
@@ -247,7 +259,6 @@ router.patch('/orders/:orderId/status', async (req, res) => {
     ]);
     res.status(200).json({ result: 'success' });
   } catch (err) {
-    console.log(err);
     res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
@@ -337,7 +348,6 @@ router.get('/messages/:id', async (req, res) => {
     const messageList = groupMessagesByUser(rows);
     res.status(200).json({ result: 'success', data: messageList });
   } catch (err) {
-    console.log(err.message);
     res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });
@@ -360,7 +370,6 @@ router.get('/messages', async (req, res) => {
     const messageList = groupMessagesByUser(rows);
     res.status(200).json({ result: 'success', data: messageList });
   } catch (err) {
-    console.log(err.message);
     res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
 });

@@ -145,7 +145,6 @@
   letter-spacing: 0.5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 5;
-  backdrop-filter: blur(4px);
 }
 
 .conditionBadge.bontatlan {
@@ -282,21 +281,19 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   z-index: 3000;
   font-weight: bold;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   animation:
     slideInRight 0.3s ease-out,
     fadeOut 0.3s ease-in 2.7s forwards;
 }
 
 .toast-success {
-  background-color: rgba(46, 204, 113, 0.15);
+  background-color: rgba(223, 246, 233, 0.95);
   border: 1px solid rgba(46, 204, 113, 0.4);
   color: #1e8449;
 }
 
 .toast-error {
-  background-color: rgba(231, 76, 60, 0.15);
+  background-color: rgba(250, 227, 225, 0.95);
   border: 1px solid rgba(231, 76, 60, 0.4);
   color: #c0392b;
 }
