@@ -182,7 +182,7 @@ module.exports = class User {
       const hashedPassword = await bcrypt.hash(this.password, 10);
       this.password = hashedPassword;
       await db.execute(
-        `INSERT INTO users (userName, hashedPassword, email, verified, role) VALUES (?, ?, ?, FALSE, ?);`,
+        `INSERT INTO users (userName, hashedPassword, email, role) VALUES (?, ?, ?, ?);`,
         [this.userName, this.password, this.email, this.role]
       );
       return {

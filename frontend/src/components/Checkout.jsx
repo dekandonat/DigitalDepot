@@ -12,6 +12,7 @@ export default function Checkout() {
   const [currentCoupon, setCurrentCoupon] = useState('');
   const [currentCouponState, setCurrentCouponState] = useState(null);
   const [currentDiscount, setCurrentDiscount] = useState(null);
+  const [currentPrice, setCurrentPrice] = useState(null);
   const [toast, setToast] = useState('');
   const [modal, setModal] = useState({
     isOpen: false,
@@ -38,6 +39,16 @@ export default function Checkout() {
       }
     };
     fetchAddresses();
+  }, []);
+
+  useEffect(() => {
+    apiFetch('/cart')
+      .then((data) => {
+        setCurrentPrice(data.data.total[0].total);
+      })
+      .catch((err) => {
+        console.error(err.message);
+      });
   }, []);
 
   const closeModal = () => {
@@ -244,7 +255,9 @@ export default function Checkout() {
             Sajnáljuk, a bankkártyás fizetés jelenleg nem elérhető.
           </p>
         </div>
-
+        <h3>
+          Végösszeg: {currentPrice ? currentPrice - currentDiscount : 0} Ft
+        </h3>
         <button type="submit" className="payButton">
           Rendelés leadása (Utánvét)
         </button>
