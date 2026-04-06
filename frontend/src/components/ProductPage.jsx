@@ -14,36 +14,45 @@ export default function ProductPage() {
   const [averageRating, setAverageRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  useEffect(() => {
-    const fetchProductData = async () => {
-      try {
-        const productResponse = await apiFetch(`/products/${productId}`);
-        if (productResponse.result === 'success') {
-          setProduct(productResponse.data);
+  const fetchProductData = async () => {
+    try {
+      const productResponse = await apiFetch(`/products/${productId}`);
+      if (productResponse.result === 'success') {
+        setProduct(productResponse.data);
 
-          const reviewsResponse = await apiFetch(`/reviews/${productId}`);
-          if (reviewsResponse.result === 'success') {
-            setReviews(reviewsResponse.data);
-            if (reviewsResponse.data.length > 0) {
-              const totalRating = reviewsResponse.data.reduce(
-                (accumulator, currentReview) =>
-                  accumulator + currentReview.rating,
-                0
-              );
-              setAverageRating(totalRating / reviewsResponse.data.length);
-              setReviewCount(reviewsResponse.data.length);
-            }
+        const reviewsResponse = await apiFetch(`/reviews/${productId}`);
+        if (reviewsResponse.result === 'success') {
+          setReviews(reviewsResponse.data);
+          if (reviewsResponse.data.length > 0) {
+            const totalRating = reviewsResponse.data.reduce(
+              (accumulator, currentReview) =>
+                accumulator + currentReview.rating,
+              0
+            );
+            setAverageRating(totalRating / reviewsResponse.data.length);
+            setReviewCount(reviewsResponse.data.length);
+          } else {
+            setAverageRating(0);
+            setReviewCount(0);
           }
         }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
       }
-    };
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchProductData();
-  }, [productId]);
+  }, [productId, refreshTrigger]);
+
+  const triggerRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
 
   const addToCart = async () => {
     const userToken = localStorage.getItem('token');
@@ -133,6 +142,9 @@ export default function ProductPage() {
                 {formatPrice(product.productPrice)} Ft
               </span>
               <span className="vatInfo">Bruttó ár, 27% ÁFA-t tartalmaz</span>
+              <p className="salesInfo">
+                Eladott: <strong>{product.soldQuantity || 0} db</strong>
+              </p>
             </div>
 
             <div className="availabilityBlock">
@@ -274,6 +286,7 @@ export default function ProductPage() {
           <ReviewModal
             product={product}
             onClose={() => setShowReviewModal(false)}
+            refreshParentData={triggerRefresh}
           />
         )}
       </div>

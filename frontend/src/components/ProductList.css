@@ -6,6 +6,20 @@
   box-sizing: border-box;
 }
 
+#productListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+#filterAndTitleArea {
+  display: flex;
+  align-items: center;
+}
+
 #activeFilterContainer {
   display: inline-flex;
   align-items: center;
@@ -13,7 +27,7 @@
   border: 1px solid #dee2e6;
   padding: 6px 12px;
   border-radius: 50px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   color: #495057;
   gap: 10px;
   font-weight: 500;
@@ -35,6 +49,33 @@
   line-height: 1;
   display: flex;
   align-items: center;
+}
+
+.desktopSortContainer {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktopSortContainer {
+    display: block;
+  }
+}
+
+.desktopSortSelect {
+  padding: 8px 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 20px;
+  background-color: white;
+  font-size: 0.9rem;
+  color: #495057;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.desktopSortSelect:hover,
+.desktopSortSelect:focus {
+  border-color: #007bff;
 }
 
 #productGrid {

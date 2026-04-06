@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { apiFetch } from '../assets/util/fetch';
 import './ReviewModal.css';
 
-export default function ReviewModal({ product, onClose }) {
+export default function ReviewModal({ product, onClose, refreshParentData }) {
   const [reviews, setReviews] = useState([]);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [hoverRating, setHoverRating] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
+  const [existingReviewId, setExistingReviewId] = useState(null);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -20,7 +21,25 @@ export default function ReviewModal({ product, onClose }) {
             console.error(err);
         }
     };
+
+    const fetchMyReview = async () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const data = await apiFetch(`/reviews/my-review/${product.prodId}`);
+                if (data.result === 'success' && data.data) {
+                    setRating(data.data.rating);
+                    setComment(data.data.comment || '');
+                    setExistingReviewId(data.data.reviewId);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
+
     fetchReviews();
+    fetchMyReview();
   }, [product.prodId]);
 
   const handleSubmit = async (e) => {
@@ -33,32 +52,57 @@ export default function ReviewModal({ product, onClose }) {
     }
 
     try {
-      const result = await apiFetch('/reviews/', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: {
-          productId: product.prodId,
-          rating: rating,
-          comment: comment,
-        },
-      });
-
-      if (result.result === 'success') {
-        setComment('');
-        
-        const newData = await apiFetch(`/reviews/${product.prodId}`);
-        if(newData.data) {
-            setReviews(newData.data);
+      if (existingReviewId) {
+        const result = await apiFetch(`/reviews/${existingReviewId}`, {
+          method: 'PATCH',
+          body: {
+            rating: rating,
+            comment: comment,
+          },
+        });
+        if (result.result === 'success') {
+          if (refreshParentData) refreshParentData();
+          onClose();
+        } else {
+          setErrorMessage(result.message || 'Hiba történt');
         }
-        setErrorMessage('');
       } else {
-        setErrorMessage('Hiba történt a mentéskor.');
+        const result = await apiFetch('/reviews/', {
+          method: 'POST',
+          body: {
+            productId: product.prodId,
+            rating: rating,
+            comment: comment,
+          },
+        });
+        if (result.result === 'success') {
+          if (refreshParentData) refreshParentData();
+          onClose();
+        } else {
+          setErrorMessage(result.message || 'Hiba történt');
+        }
       }
-    } catch (error) {
-      console.error(error);
-      setErrorMessage(error.message || 'Szerver hiba.');
+    } catch (err) {
+      setErrorMessage('Hálózati hiba történt');
+    }
+  };
+
+  const handleDelete = async () => {
+    const token = localStorage.getItem('token');
+    if (!token || !existingReviewId) return;
+
+    try {
+      const result = await apiFetch(`/reviews/${existingReviewId}`, {
+        method: 'DELETE',
+      });
+      if (result.result === 'success') {
+        if (refreshParentData) refreshParentData();
+        onClose();
+      } else {
+        setErrorMessage(result.message || 'Hiba történt a törlés során');
+      }
+    } catch (err) {
+      setErrorMessage('Hálózati hiba történt');
     }
   };
 
@@ -68,11 +112,11 @@ export default function ReviewModal({ product, onClose }) {
         <button className="closeModalBtn" onClick={onClose}>
           &times;
         </button>
-        <h2>Vélemények: {product.productName}</h2>
+        <h2>Értékelések - {product.productName}</h2>
 
         <div className="addReviewSection">
-          <h3>Írj véleményt!</h3>
-          <div className="starInput">
+          <h3>{existingReviewId ? 'Értékelés módosítása' : 'Írd meg a véleményed'}</h3>
+          <div className="ratingSelector">
             {[1, 2, 3, 4, 5].map((star) => (
               <span
                 key={star}
@@ -91,9 +135,16 @@ export default function ReviewModal({ product, onClose }) {
             value={comment}
             onChange={(e) => setComment(e.target.value)}
           />
-          <button onClick={handleSubmit} className="submitReviewBtn">
-            Küldés
-          </button>
+          <div className="reviewActionButtons">
+            <button onClick={handleSubmit} className="submitReviewBtn">
+              {existingReviewId ? 'Módosítás' : 'Küldés'}
+            </button>
+            {existingReviewId && (
+              <button onClick={handleDelete} className="deleteReviewBtn">
+                Törlés
+              </button>
+            )}
+          </div>
           {errorMessage && <p className="errorMsg">{errorMessage}</p>}
         </div>
 

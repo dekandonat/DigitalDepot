@@ -157,6 +157,10 @@
   color: #888;
 }
 
+.salesInfo{
+  font-size: 0.9rem;
+}
+
 .availabilityBlock {
   margin-bottom: 20px;
 }

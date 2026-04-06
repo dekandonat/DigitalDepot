@@ -38,6 +38,17 @@ export default function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const [userRole, setUserRole] = useState(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        return jwtDecode(token).role;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
   const [unreadMessages, setUnreadMessages] = useState(0);
   const isChatOpenRef = useRef(isChatOpen);
 
@@ -61,6 +72,17 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (isLoggedIn && token) {
+      try {
+        setUserRole(jwtDecode(token).role);
+      } catch (e) {
+        setUserRole(null);
+      }
+    } else {
+      setUserRole(null);
+    }
+
     if (!isLoggedIn) return;
     if (isChatOpen) {
       setUnreadMessages(0);
@@ -135,6 +157,20 @@ export default function App() {
     } else {
       navigate('/');
     }
+    handleCloseMobileMenu();
+  };
+
+  const handleSortSelect = (sortType) => {
+    const currentSearchParams = new URLSearchParams(location.search);
+    if (sortType === 'default') {
+        currentSearchParams.delete('sort');
+    } else {
+        currentSearchParams.set('sort', sortType);
+    }
+    navigate({
+        pathname: location.pathname,
+        search: currentSearchParams.toString()
+    });
     handleCloseMobileMenu();
   };
 
@@ -271,9 +307,10 @@ export default function App() {
       )}
 
       {isMobileMenuOpen && (
-        <MobileCategoryMenu
+        <MobileCategoryMenu 
           onClose={handleCloseMobileMenu}
           onCategorySelect={handleCategorySelect}
+          onSortSelect={handleSortSelect}
           isClosing={isMobileMenuClosing}
         />
       )}
@@ -301,6 +338,7 @@ export default function App() {
             localStorage.removeItem('token');
             localStorage.removeItem('email');
             setIsLoggedIn(false);
+            setUserRole(null);
             setIsProfileOpen(false);
             socket.disconnect();
             navigate('/');
@@ -308,7 +346,7 @@ export default function App() {
         />
       )}
 
-      {!isAdminRoute && (
+      {!isAdminRoute && userRole !== 'admin' && userRole !== 'owner' && (
         <div className="chatWrapper">
           {isChatOpen ? (
             <ChatPanel changeIsOpen={setIsChatOpen} />

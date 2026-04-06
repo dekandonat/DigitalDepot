@@ -7,364 +7,261 @@ const formatPrice = (price) => {
     return parseInt(price).toLocaleString('hu-HU').replaceAll(',', ' ');
 };
 
-export default function UsedProductPage(props) {
-    const [activeTab, setActiveTab] = useState('form');
-    const [productName, setProductName] = useState('');
-    const [productDescription, setProductDescription] = useState('');
-    const [conditionState, setConditionState] = useState('használt');
-    const [image, setImage] = useState(null);
-    const [email, setEmail] = useState('');
-    const [message, setMessage] = useState('');
-    const [hasBankAccount, setHasBankAccount] = useState(null);
-    const [mySubmissions, setMySubmissions] = useState([]);
-    const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'alert', onConfirm: null, onCancel: null });
+function UserSubmissions({ activeTab, refreshTrigger }) {
+  const [submissions, setSubmissions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem('token');
 
-    const [savedAddresses, setSavedAddresses] = useState([]);
-    const [selectedAddressId, setSelectedAddressId] = useState('new');
-    const [newAddress, setNewAddress] = useState({ zip: '', city: '', address: '' });
-    const [acceptingOfferId, setAcceptingOfferId] = useState(null);
+  useEffect(() => {
+    async function fetchUserSubmissions() {
+      if (!token) {
+          setLoading(false);
+          return;
+      }
+      try {
+        const result = await apiFetch('/used-products/my-submissions');
+        if (result.result === 'success') {
+          setSubmissions(result.data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUserSubmissions();
+  }, [refreshTrigger, token]);
+
+  if (loading) return <p className="loadingMsg">Beküldéseid betöltése...</p>;
+
+  const filteredSubmissions = submissions.filter((sub) => {
+    if (activeTab === 'inProgress') return ['pending', 'accepted'].includes(sub.status);
+    if (activeTab === 'closed') return ['rejected', 'offer_accepted', 'offer_rejected', 'listed'].includes(sub.status);
+    return false;
+  });
+
+  if (activeTab === 'form') return null;
+
+  return (
+    <div id="userSubmissionsSection">
+      <div className="submissionGrid">
+        {filteredSubmissions.length === 0 ? (
+          <p className="noDataMsg">Nincs találat ebben a kategóriában.</p>
+        ) : (
+          filteredSubmissions.map((submission) => (
+            <div key={submission.submissionId} className={`submissionCard status-${submission.status}`}>
+              {submission.productImage && (
+                  <img
+                    src={submission.productImage.startsWith('/') ? submission.productImage : `/${submission.productImage}`}
+                    alt={submission.productName}
+                    className="submissionCardImg"
+                  />
+              )}
+              <span className={`conditionBadge ${submission.conditionState}`}>
+                {submission.conditionState}
+              </span>
+              <div className="submissionCardContent">
+                <h3>{submission.productName}</h3>
+                <p className="submissionCardDesc">{submission.productDescription}</p>
+                <p>Beküldve: <strong>{new Date(submission.submissionDate).toLocaleDateString()}</strong></p>
+                <span className={`statusLabel ${submission.status}`}>
+                  {submission.status === 'pending' ? 'Értékelés alatt' :
+                   submission.status === 'accepted' ? 'Ajánlat kiküldve' :
+                   submission.status === 'rejected' ? 'Elutasítva' :
+                   submission.status === 'offer_accepted' ? 'Ajánlat elfogadva' :
+                   submission.status === 'offer_rejected' ? 'Ajánlat elutasítva' : 'Publikálva'}
+                </span>
+                {(submission.status === 'accepted' || submission.status === 'offer_accepted' || submission.status === 'listed') && submission.adminOfferPrice && (
+                  <p className="offerPrice">Ajánlott ár: <strong>{formatPrice(submission.adminOfferPrice)} Ft</strong></p>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SubmissionForm({ onSubmissionSuccess }) {
+  const [productName, setProductName] = useState('');
+  const [productDescription, setProductDescription] = useState('');
+  const [conditionState, setConditionState] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'alert' });
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
     const token = localStorage.getItem('token');
-    const userEmail = localStorage.getItem('email');
+    if (!token) {
+        setModal({ isOpen: true, title: 'Hiba', message: 'Kérjük, jelentkezz be a termék leadásához!', type: 'alert' });
+        setLoading(false);
+        return;
+    }
 
-    useEffect(() => {
-        if(userEmail) setEmail(userEmail);
-        checkUserProfile();
-        fetchMySubmissions();
-        fetchAddresses();
-    }, [props.refreshTrigger]);
+    if (!conditionState) {
+        setModal({ isOpen: true, title: 'Hiba', message: 'Válassz állapotot!', type: 'alert' });
+        setLoading(false);
+        return;
+    }
 
-    const fetchAddresses = async () => {
-        if (token) {
-            try {
-                const data = await apiFetch('/user/addresses');
-                if (data.result === 'success') {
-                    setSavedAddresses(data.data);
-                    if (data.data.length > 0) {
-                        setSelectedAddressId(data.data[0].id.toString());
-                    }
-                }
-            } catch (err) {
-                console.error(err);
+    if (!imageFile) {
+        setModal({ isOpen: true, title: 'Hiba', message: 'Kérlek tölts fel egy képet a termékről!', type: 'alert' });
+        setLoading(false);
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('productName', productName);
+    formData.append('productDescription', productDescription);
+    formData.append('conditionState', conditionState);
+    formData.append('file', imageFile);
+
+    try {
+      const result = await apiFetch('/used-products/submit', {
+        method: 'POST',
+        body: formData,
+        isFormData: true
+      });
+
+      if (result.result === 'success') {
+        setModal({ 
+            isOpen: true, 
+            title: 'Siker', 
+            message: 'Termék sikeresen beküldve! Az adminisztrátor hamarosan értékeli.', 
+            type: 'alert',
+            onConfirm: () => {
+                setModal({ ...modal, isOpen: false });
+                setProductName('');
+                setProductDescription('');
+                setConditionState('');
+                setImageFile(null);
+                setImagePreview(null);
+                if (onSubmissionSuccess) onSubmissionSuccess();
             }
-        }
-    };
-
-    const checkUserProfile = async () => {
-        if(!token) return;
-        try {
-            const data = await apiFetch('/user/profile');
-            if(data.result === 'success') {
-                setHasBankAccount(!!data.data.bankAccountNumber);
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const fetchMySubmissions = async () => {
-        if(!token) return;
-        try {
-            const data = await apiFetch('/used-products/my-submissions');
-            if(data.result === 'success') {
-                setMySubmissions(data.data);
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    function handleProductNameChange(event) {
-        setProductName(event.target.value);
+        });
+      } else {
+         setModal({ isOpen: true, title: 'Hiba', message: result.message || 'Hiba történt a beküldés során.', type: 'alert' });
+      }
+    } catch (err) {
+      console.error(err);
+      setModal({ isOpen: true, title: 'Hiba', message: 'Hálózati hiba történt.', type: 'alert' });
+    } finally {
+      setLoading(false);
     }
+  };
 
-    function handleProductDescriptionChange(event) {
-        setProductDescription(event.target.value);
-    }
-
-    function handleConditionStateChange(event) {
-        setConditionState(event.target.value);
-    }
-
-    function handleImageChange(event) {
-        setImage(event.target.files[0]);
-    }
-
-    function handleEmailChange(event) {
-        setEmail(event.target.value);
-    }
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+  return (
+    <div id="submissionFormSection">
+      <CustomModal 
+          isOpen={modal.isOpen} 
+          title={modal.title} 
+          message={modal.message} 
+          type={modal.type}
+          onConfirm={modal.onConfirm || (() => setModal({ ...modal, isOpen: false }))}
+      />
+      <h2>Új termék beküldése felvásárlásra</h2>
+      <form onSubmit={handleSubmit} id="usedProductSubmitForm">
+        <input
+          type="text"
+          placeholder="Termék neve (pl. iPhone 13 Pro 128GB)"
+          value={productName}
+          onChange={(e) => setProductName(e.target.value)}
+          required
+          className="formInputField"
+        />
+        <textarea
+          placeholder="Részletes leírás (pl. állapot, tartozékok, hálózati zár, akku százalék, esztétikai hibák)"
+          value={productDescription}
+          onChange={(e) => setProductDescription(e.target.value)}
+          rows="5"
+          required
+          className="formTextareaField"
+        />
         
-        if (!token) {
-            setModal({ isOpen: true, title: 'Hiba', message: 'Kérjük, jelentkezz be a termék leadásához!', type: 'alert', onConfirm: () => setModal({...modal, isOpen: false}) });
-            return;
-        }
-
-        if (hasBankAccount === false) {
-            setModal({ isOpen: true, title: 'Hiányzó adat', message: 'Kérjük, a profilodban add meg a bankszámlaszámodat a leadás előtt (ide utaljuk majd az összeget).', type: 'alert', onConfirm: () => setModal({...modal, isOpen: false}) });
-            return;
-        }
-
-        if (!image) {
-            setModal({ isOpen: true, title: 'Hiba', message: 'Kérlek tölts fel egy képet a termékről!', type: 'alert', onConfirm: () => setModal({...modal, isOpen: false}) });
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('productName', productName);
-        formData.append('productDescription', productDescription);
-        formData.append('conditionState', conditionState);
-        formData.append('file', image);
-
-        try {
-            const data = await apiFetch('/used-products/submit', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (data.result === 'success') {
-                setModal({ isOpen: true, title: 'Siker', message: 'Termék sikeresen beküldve! Hamarosan küldjük az ajánlatot.', type: 'alert', onConfirm: () => {
-                    setModal({...modal, isOpen: false});
-                    setProductName('');
-                    setProductDescription('');
-                    setImage(null);
-                    setActiveTab('offers');
-                    fetchMySubmissions();
-                }});
-            } else {
-                setModal({ isOpen: true, title: 'Hiba', message: data.message || 'Hiba történt a feltöltés során.', type: 'alert', onConfirm: () => setModal({...modal, isOpen: false}) });
-            }
-        } catch (error) {
-            setModal({ isOpen: true, title: 'Hiba', message: 'Hálózati hiba történt.', type: 'alert', onConfirm: () => setModal({...modal, isOpen: false}) });
-        }
-    };
-
-    const confirmDecision = async (submissionId, decision) => {
-        try {
-            const data = await apiFetch('/used-products/user-response', {
-                method: 'PATCH',
-                body: { submissionId, decision }
-            });
-            if (data.result === 'success') {
-                setModal({ isOpen: true, title: 'Siker', message: decision === 'accept' ? 'Ajánlat sikeresen elfogadva! A futárt hamarosan küldjük.' : 'Ajánlat elutasítva.', type: 'alert', onConfirm: () => {
-                    setModal({...modal, isOpen: false});
-                    setAcceptingOfferId(null);
-                    fetchMySubmissions();
-                }});
-            } else {
-                setModal({ isOpen: true, title: 'Hiba', message: 'Nem sikerült menteni a döntést.', type: 'alert', onConfirm: () => setModal({...modal, isOpen: false}) });
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const handleUserDecision = (submissionId, decision) => {
-        if (decision === 'accept') {
-            setAcceptingOfferId(submissionId);
-        } else {
-            setModal({
-                isOpen: true,
-                title: 'Elutasítás megerősítése',
-                message: 'Biztosan elutasítod ezt az ajánlatot?',
-                type: 'confirm',
-                onConfirm: () => confirmDecision(submissionId, 'reject'),
-                onCancel: () => setModal({...modal, isOpen: false})
-            });
-        }
-    };
-
-    const submitAcceptanceWithAddress = () => {
-        let pickupAddress = '';
-        if (selectedAddressId === 'new') {
-            if(!newAddress.zip || !newAddress.city || !newAddress.address) {
-                setModal({ isOpen: true, title: 'Hiba', message: 'Kérlek tölts ki minden cím mezőt!', type: 'alert', onConfirm: () => setModal({...modal, isOpen: false}) });
-                return;
-            }
-            pickupAddress = `${newAddress.zip} ${newAddress.city}, ${newAddress.address}`;
-        } else {
-            const selected = savedAddresses.find(a => a.id.toString() === selectedAddressId);
-            if (selected) {
-                pickupAddress = `${selected.zipCode} ${selected.city}, ${selected.streetAddress}`;
-            }
-        }
-        confirmDecision(acceptingOfferId, 'accept');
-    };
-
-    const activeOffers = mySubmissions.filter(sub => sub.status === 'pending' || sub.status === 'accepted');
-    const pastOffers = mySubmissions.filter(sub => sub.status !== 'pending' && sub.status !== 'accepted');
-
-    const renderCard = (sub) => (
-        <div key={sub.submissionId} className="mySubmissionCard">
-            <div className="cardHeader">
-                <span className="cardDate">{new Date(sub.submissionDate).toLocaleDateString()}</span>
-                <span className={`statusLabel ${sub.status}`}>
-                    {sub.status === 'pending' ? 'Értékelés alatt' : 
-                     sub.status === 'accepted' ? 'Ajánlat érkezett' : 
-                     sub.status === 'offer_accepted' ? 'Elfogadva' : 
-                     sub.status === 'listed' ? 'Piacra dobva' : 'Elutasítva'}
-                </span>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
-                {sub.productImage && (
-                    <div style={{ flexShrink: 0 }}>
-                        <img src={`/${sub.productImage}`} alt={sub.productName} style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #ddd' }} />
-                    </div>
-                )}
-                
-                <div style={{ flexGrow: 1 }}>
-                    <h3 style={{ margin: '0 0 5px 0', fontSize: '1.2rem', color: '#333' }}>{sub.productName}</h3>
-                    <p style={{ margin: 0, color: '#666' }}>{sub.conditionState}</p>
-                    
-                    {sub.adminOfferPrice && (
-                        <div className="offerBox">
-                            <span>Ajánlatunk: </span>
-                            <strong className="offerPrice">{formatPrice(sub.adminOfferPrice)} Ft</strong>
-                        </div>
-                    )}
-
-                    {activeTab === 'history' && (
-                        <div style={{ 
-                            marginTop: '10px', 
-                            fontSize: '1.05rem', 
-                            fontWeight: 'bold', 
-                            color: (sub.status === 'offer_accepted' || sub.status === 'listed') ? '#28a745' : '#dc3545' 
-                        }}>
-                            {sub.status === 'offer_accepted' || sub.status === 'listed' ? 'Elfogadva' : 'Elutasítva'}
-                        </div>
-                    )}
-                    
-                    {sub.status === 'accepted' && acceptingOfferId !== sub.submissionId && (
-                        <div className="userDecisionButtons">
-                            <button className="userAcceptBtn" onClick={() => handleUserDecision(sub.submissionId, 'accept')}>Elfogadom az ajánlatot</button>
-                            <button className="userRejectBtn" onClick={() => handleUserDecision(sub.submissionId, 'reject')}>Nem fogadom el</button>
-                        </div>
-                    )}
-
-                    {acceptingOfferId === sub.submissionId && (
-                        <div className="addressPickerContainer">
-                            <h4 className="addressPickerTitle">Futár küldése - Cím kiválasztása</h4>
-                            {savedAddresses.length > 0 && (
-                                <select 
-                                    className="addressInput"
-                                    style={{ marginBottom: '10px' }}
-                                    value={selectedAddressId} 
-                                    onChange={(e) => setSelectedAddressId(e.target.value)}
-                                >
-                                    {savedAddresses.map(addr => (
-                                        <option key={addr.id} value={addr.id}>
-                                            {addr.zipCode} {addr.city}, {addr.streetAddress}
-                                        </option>
-                                    ))}
-                                    <option value="new">+ Új cím megadása</option>
-                                </select>
-                            )}
-
-                            {(selectedAddressId === 'new' || savedAddresses.length === 0) && (
-                                <div className="addressInputGroup">
-                                    <div className="addressInputRow">
-                                        <input type="text" placeholder="Irányítószám" className="addressInput addressInputFlex1" value={newAddress.zip} onChange={e => setNewAddress({...newAddress, zip: e.target.value})} />
-                                        <input type="text" placeholder="Város" className="addressInput addressInputFlex2" value={newAddress.city} onChange={e => setNewAddress({...newAddress, city: e.target.value})} />
-                                    </div>
-                                    <input type="text" placeholder="Utca, házszám" className="addressInput" value={newAddress.address} onChange={e => setNewAddress({...newAddress, address: e.target.value})} />
-                                </div>
-                            )}
-                            
-                            <div className="decisionButtonRow">
-                                <button className="userAcceptBtn" onClick={submitAcceptanceWithAddress}>Megerősítés</button>
-                                <button className="userRejectBtn cancelBtn" onClick={() => setAcceptingOfferId(null)}>Mégse</button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
+        <div className="formFieldGroup">
+          <select value={conditionState} onChange={e => setConditionState(e.target.value)} id="conditionSelectField" required>
+            <option value="">-- Válassz állapotot --</option>
+            <option value="bontatlan">Bontatlan (Új)</option>
+            <option value="felbontott">Felbontott</option>
+            <option value="használt">Használt, kifogástalan</option>
+            <option value="hibás">Hibás / Alkatrésznek</option>
+          </select>
         </div>
-    );
 
-    return (
-        <div className="usedProductPageWrapper">
-            <CustomModal 
-                isOpen={modal.isOpen} 
-                title={modal.title} 
-                message={modal.message} 
-                type={modal.type}
-                onConfirm={modal.onConfirm}
-                onCancel={modal.onCancel}
-            />
-
-            <div className="tabHeader">
-                <button className={`tabButton ${activeTab == 'form' ? 'active' : ''}`} onClick={() => setActiveTab('form')}>
-                    Termék leadása
-                </button>
-                <button className={`tabButton ${activeTab == 'offers' ? 'active' : ''}`} onClick={() => setActiveTab('offers')}>
-                    Aktív ajánlatok
-                </button>
-                <button className={`tabButton ${activeTab == 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
-                    Korábbi leadások
-                </button>
-            </div>
-
-            <div className="tabContent">
-                {activeTab == 'form' && (
-                    <div className="usedProductFormContainer">
-                        <h2>Adj el nekünk!</h2>
-                        <p>Töltsd ki az alábbi űrlapot a használt terméked adataival, és mi hamarosan küldünk egy árajánlatot.</p>
-                        <form className="usedProductForm" onSubmit={handleSubmit}>
-                            <div className="formGroup">
-                                <label>Termék neve:</label>
-                                <input type="text" value={productName} onChange={handleProductNameChange} required />
-                            </div>
-                            <div className="formGroup">
-                                <label>Leírás és hibák (ha vannak):</label>
-                                <textarea rows="4" value={productDescription} onChange={handleProductDescriptionChange} required></textarea>
-                            </div>
-                            <div className="formGroup">
-                                <label>Állapot:</label>
-                                <select value={conditionState} onChange={handleConditionStateChange}>
-                                    <option value="újszerű">Újszerű</option>
-                                    <option value="használt">Használt</option>
-                                    <option value="hibás">Hibás / Alkatrésznek</option>
-                                </select>
-                            </div>
-                            <div className="formGroup">
-                                <label>Kép feltöltése:</label>
-                                <input type="file" accept="image/*" onChange={handleImageChange} required />
-                            </div>
-                            <div className="formGroup">
-                                <label>E-mail cím értesítéshez:</label>
-                                <input type="email" value={email} onChange={handleEmailChange} required />
-                            </div>
-                            <button type="submit" className="submitBtn">Beküldés</button>
-                        </form>
-                        {message && <p className="statusMessage">{message}</p>}
-                    </div>
-                )}
-
-                {activeTab == 'offers' && (
-                    <div className="mySubmissionsList">
-                        <h2>Aktív ajánlatok</h2>
-                        {activeOffers.length == 0 ? <p>Jelenleg nincsenek folyamatban lévő ajánlataid.</p> : (
-                            <div className="cardsGrid">
-                                {activeOffers.map(renderCard)}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {activeTab == 'history' && (
-                    <div className="mySubmissionsList">
-                        <h2>Korábbi leadások</h2>
-                        {pastOffers.length == 0 ? <p>Még nincsenek lezárt leadásaid.</p> : (
-                            <div className="cardsGrid">
-                                {pastOffers.map(renderCard)}
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
+        <div className="formFieldGroup">
+          <label htmlFor="imageFile" className="fileInputLabel">
+            {imageFile ? 'Kép feltöltve' : 'Tölts fel egy képet a termékről'}
+          </label>
+          <input
+            type="file"
+            id="imageFile"
+            accept="image/*"
+            onChange={handleImageChange}
+            required={!imagePreview}
+            className="fileInputField"
+          />
         </div>
-    );
+
+        {imagePreview && (
+          <img
+            src={imagePreview}
+            alt="Termék előnézet"
+            className="submissionImagePreview"
+          />
+        )}
+
+        <button type="submit" disabled={loading} className="formSubmitButton">
+          {loading ? 'Beküldés...' : 'Termék Beküldése'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export default function UsedProductPage() {
+  const [submissionCount, setSubmissionCount] = useState(0);
+  const [activeTab, setActiveTab] = useState('form');
+
+  const handleSubmissionSuccess = () => {
+    setSubmissionCount(prev => prev + 1);
+    setActiveTab('inProgress');
+  };
+
+  return (
+    <div id="usedProductPageContainer">
+      <div className="pageHeader">
+          <h1>Használt Termék Felvásárlás</h1>
+          <p>Add el régi elektronikai eszközeidet! Küldd be az adatokat, és hamarosan ajánlatot teszünk.</p>
+      </div>
+
+      <div className="tabsNav">
+        <button className={`tabBtn ${activeTab === 'form' ? 'active' : ''}`} onClick={() => setActiveTab('form')}>Új beküldések</button>
+        <button className={`tabBtn ${activeTab === 'inProgress' ? 'active' : ''}`} onClick={() => setActiveTab('inProgress')}>Folyamatban lévők</button>
+        <button className={`tabBtn ${activeTab === 'closed' ? 'active' : ''}`} onClick={() => setActiveTab('closed')}>Lezárt ügyek</button>
+      </div>
+
+      {activeTab === 'form' && (
+        <SubmissionForm onSubmissionSuccess={handleSubmissionSuccess} />
+      )}
+
+      <UserSubmissions activeTab={activeTab} refreshTrigger={submissionCount} />
+    </div>
+  );
 }
