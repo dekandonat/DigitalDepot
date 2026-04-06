@@ -54,8 +54,11 @@ router.post('/place-order', verifyToken, async (req, res) => {
 
     if (result.result === 'success') {
       res.status(201).json({ result: 'success', message: 'Sikeres rendelés' });
-    } else {
+    } else if (result.message == 'Szerver hiba') {
+      console.log(result);
       res.status(500).json(result);
+    } else {
+      res.status(400).json(result);
     }
   } catch (err) {
     res.status(500).json({ result: 'fail', message: 'Szerver hiba' });

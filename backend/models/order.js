@@ -38,7 +38,7 @@ module.exports = class Order {
 
       if (cartItems.length === 0) {
         await connection.rollback();
-        return { result: 'fail', message: 'Cart is empty' };
+        return { result: 'fail', message: 'Üres a kosár' };
       }
 
       for (const product of cartItems) {
@@ -144,7 +144,7 @@ module.exports = class Order {
         await connection.release();
       }
       console.log(err.message);
-      return { result: 'fail', message: err.message };
+      return { result: 'fail', message: 'Szerver hiba' };
     }
   }
 
@@ -181,7 +181,7 @@ module.exports = class Order {
       await db.execute(`DELETE FROM orders WHERE orderId = ?`, [id]);
       return { result: 'success' };
     } catch (err) {
-      return { result: 'fail', message: err.message };
+      return { result: 'fail', message: 'Szerver hiba' };
     }
   }
 };

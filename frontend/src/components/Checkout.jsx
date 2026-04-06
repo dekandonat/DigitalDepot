@@ -119,7 +119,7 @@ export default function Checkout() {
       setModal({
         isOpen: true,
         title: 'Hiba',
-        message: 'Nem sikerült csatlakozni a szerverhez.',
+        message: error.message,
         redirect: null,
       });
     }
@@ -157,6 +157,12 @@ export default function Checkout() {
       .catch((err) => {
         setCurrentCouponState('fail');
       });
+  };
+
+  const handleCouponCancel = () => {
+    setCurrentCoupon('');
+    setCurrentCouponState(null);
+    setCurrentDiscount(null);
   };
 
   return (
@@ -225,15 +231,19 @@ export default function Checkout() {
               onChange={handleCouponChange}
               disabled={currentCouponState === 'success'}
             />
-            <button
-              type="button"
-              className="payButton couponButton"
-              onClick={
-                currentCouponState != 'success' ? handleCouponCheck : null
-              }
-            >
-              Beváltás
-            </button>
+            {currentCouponState == 'success' ? (
+              <button onClick={handleCouponCancel} className="cancelCoupon">
+                Mégse
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="payButton couponButton"
+                onClick={handleCouponCheck}
+              >
+                Beváltás
+              </button>
+            )}
           </div>
           {currentDiscount ? <h4>Kedvezmény: {currentDiscount} Ft</h4> : null}
         </div>
