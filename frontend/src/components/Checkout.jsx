@@ -266,7 +266,8 @@ export default function Checkout() {
           </p>
         </div>
         <h3>
-          Végösszeg: {currentPrice ? currentPrice - currentDiscount : 0} Ft
+          Végösszeg:{' '}
+          {Math.max(0, currentPrice ? currentPrice - currentDiscount : 0)} Ft
         </h3>
         <button type="submit" className="payButton">
           Rendelés leadása (Utánvét)
