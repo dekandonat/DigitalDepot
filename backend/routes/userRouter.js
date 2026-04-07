@@ -104,8 +104,10 @@ router.post('/reset-password', async (req, res) => {
   const response = await User.resetPassword(email, code, password);
   if (response.result == 'success') {
     return res.status(200).json(response);
-  } else {
+  } else if (response.message == 'hibás email vagy kód') {
     return res.status(400).json(response);
+  } else {
+    return res.status(500).json(response);
   }
 });
 
