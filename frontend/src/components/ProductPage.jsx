@@ -10,7 +10,7 @@ export default function ProductPage() {
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [loginMessage, setLoginMessage] = useState('');
+  const [toast, setToast] = useState({ show: false, message: '', type: '', key: 0 });
   const [averageRating, setAverageRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -54,11 +54,27 @@ export default function ProductPage() {
     setRefreshTrigger((prev) => prev + 1);
   };
 
+  const showToast = (message, type) => {
+    setToast({ show: true, message, type, key: Date.now() });
+    setTimeout(() => {
+      setToast((prev) => {
+        if (prev.key <= Date.now() - 3000) {
+          return { ...prev, show: false };
+        }
+        return prev;
+      });
+    }, 3000);
+  };
+
   const addToCart = async () => {
     const userToken = localStorage.getItem('token');
     if (!userToken) {
-      setLoginMessage('A vásárláshoz jelentkezzen be!');
-      setTimeout(() => setLoginMessage(''), 3000);
+      showToast('A vásárláshoz jelentkezzen be!', 'error');
+      return;
+    }
+
+    if (product.quantity <= 0) {
+      showToast('Sajnáljuk, a termék jelenleg nincs készleten!', 'error');
       return;
     }
 
@@ -66,11 +82,9 @@ export default function ProductPage() {
       await apiFetch(`/cart/add/${product.prodId}/1`, {
         method: 'POST',
       });
-      setLoginMessage('Termék a kosárba került! ✅');
-      setTimeout(() => setLoginMessage(''), 3000);
+      showToast('Termék a kosárba került! ✅', 'success');
     } catch (error) {
-      setLoginMessage('Hiba történt a kosárba helyezéskor.');
-      setTimeout(() => setLoginMessage(''), 3000);
+      showToast('Hiba történt a kosárba helyezéskor.', 'error');
     }
   };
 
@@ -96,6 +110,12 @@ export default function ProductPage() {
 
   return (
     <div className="pageWrapper">
+      {toast.show && (
+        <div key={toast.key} className={`toastMessage toast-${toast.type}`}>
+          {toast.message}
+        </div>
+      )}
+      
       <div className="productPageContainer">
         <button className="backButton" onClick={() => navigate(-1)}>
           &larr; Vissza
@@ -199,14 +219,6 @@ export default function ProductPage() {
                 Kosárba
               </button>
             </div>
-
-            {loginMessage && (
-              <div
-                className={`messageToast ${loginMessage.includes('✅') ? 'success' : 'error'}`}
-              >
-                {loginMessage}
-              </div>
-            )}
 
             <div className="descriptionContainer">
               <h3>Termékleírás</h3>

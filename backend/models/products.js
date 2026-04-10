@@ -30,11 +30,12 @@ module.exports = class Products {
   static async fetchAll() {
     try {
       const sql = `
-        SELECT p.*, 
+        SELECT p.*, c.categoryName,
         (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE productId = p.prodId) as avgRating, 
         (SELECT COUNT(reviewId) FROM reviews WHERE productId = p.prodId) as reviewCount,
         (SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE productId = p.prodId) as soldQuantity
         FROM products p
+        LEFT JOIN categories c ON p.categoryId = c.categoryId
       `;
       const [rows] = await db.execute(sql);
       return rows;
@@ -46,11 +47,12 @@ module.exports = class Products {
   static async fetch(id) {
     try {
       const sql = `
-        SELECT p.*, 
+        SELECT p.*, c.categoryName,
         (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE productId = p.prodId) as avgRating, 
         (SELECT COUNT(reviewId) FROM reviews WHERE productId = p.prodId) as reviewCount,
         (SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE productId = p.prodId) as soldQuantity
         FROM products p 
+        LEFT JOIN categories c ON p.categoryId = c.categoryId
         WHERE p.prodId = ?
       `;
       const [rows] = await db.execute(sql, [id]);
@@ -60,14 +62,37 @@ module.exports = class Products {
     }
   }
 
-  static async find(string) {
+  static async fetchByCategory(categoryId) {
     try {
+      const [catRows] = await db.execute('SELECT categoryName FROM categories WHERE categoryId = ?', [categoryId]);
+      const queriedCatName = catRows.length > 0 ? catRows[0].categoryName : '';
+
       const sql = `
         SELECT p.*, 
+        ? as categoryName,
         (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE productId = p.prodId) as avgRating, 
         (SELECT COUNT(reviewId) FROM reviews WHERE productId = p.prodId) as reviewCount,
         (SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE productId = p.prodId) as soldQuantity
         FROM products p 
+        LEFT JOIN categories c ON p.categoryId = c.categoryId
+        WHERE p.categoryId = ? OR c.parentId = ?
+      `;
+      const [rows] = await db.execute(sql, [queriedCatName, categoryId, categoryId]);
+      return rows;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  static async find(string) {
+    try {
+      const sql = `
+        SELECT p.*, c.categoryName,
+        (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE productId = p.prodId) as avgRating, 
+        (SELECT COUNT(reviewId) FROM reviews WHERE productId = p.prodId) as reviewCount,
+        (SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE productId = p.prodId) as soldQuantity
+        FROM products p 
+        LEFT JOIN categories c ON p.categoryId = c.categoryId
         WHERE p.productName LIKE ? OR p.productDescription LIKE ?
       `;
       const [rows] = await db.execute(sql, [`%${string}%`, `%${string}%`]);
@@ -108,8 +133,6 @@ module.exports = class Products {
       } else {
         return { result: 'success', message: 'mennyiség frissítve' };
       }
-
-      return { result: 'success' };
     } catch (err) {
       return { result: 'fail', message: 'szerver hiba' };
     }
