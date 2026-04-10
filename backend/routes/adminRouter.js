@@ -6,6 +6,7 @@ const User = require('../models/user');
 const Order = require('../models/order');
 const Products = require('../models/products');
 const News = require('../models/news');
+const Coupon = require('../models/coupon');
 const upload = require('../util/upload');
 const validateImage = require('../util/validateImage');
 
@@ -551,6 +552,34 @@ router.delete('/news/:id', async (req, res) => {
     }
   } catch (err) {
     return res.status(500).json({ result: 'fail', message: 'szerver hiba' });
+  }
+});
+
+router.post('/coupon', async (req, res) => {
+  try {
+    const { code, price } = req.body;
+    if (!code || !price) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'Hiányzó paraméter' });
+    }
+
+    const numPrice = Number(price);
+
+    if (!Number.isInteger(numPrice) || numPrice <= 0) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'nem megfelelő érték az árnak' });
+    }
+
+    const result = await Coupon.add(code, numPrice);
+    if (result.result == 'success') {
+      return res.status(200).json(result);
+    } else {
+      return res.status(400).json(result);
+    }
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: 'Szerver hiba' });
   }
 });
 

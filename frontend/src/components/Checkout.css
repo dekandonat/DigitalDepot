@@ -1,141 +1,192 @@
 .checkoutContainer {
-    width: 100%;
-    max-width: 500px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    border-radius: 10px;
-    box-sizing: border-box;
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-sizing: border-box;
 }
 
 .checkoutContainer h2 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
 }
 
 .checkoutForm {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.checkoutForm input, .paymentSelect {
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-    width: 100%;
-    box-sizing: border-box;
-    font-family: inherit;
-    outline: none;
-    transition: border-color 0.2s;
+.checkoutForm input,
+.paymentSelect {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
-.checkoutForm input:focus, .paymentSelect:focus {
-    border-color: #007bff;
+.checkoutForm input:focus,
+.paymentSelect:focus {
+  border-color: #007bff;
 }
 
 .paymentSelect {
-    background-color: #f8fafc;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 16px;
-    padding-right: 40px;
+  background-color: #f8fafc;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
 }
 
-.inputRow, .couponInputContainer {
-    display: flex;
-    flex-direction: column; 
-    gap: 10px;
+.inputRow,
+.couponInputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 @media (min-width: 600px) {
-    .inputRow, .couponInputContainer {
-        flex-direction: row;
-    }
-    
-    .checkoutContainer {
-        margin: 50px auto;
-        padding: 30px;
-    }
+  .inputRow,
+  .couponInputContainer {
+    flex-direction: row;
+  }
+
+  .checkoutContainer {
+    margin: 50px auto;
+    padding: 30px;
+  }
 }
 
-.inputRow input, .couponInput {
-    flex: 1;
+.inputRow input,
+.couponInput {
+  flex: 1;
 }
 
-.checkoutForm h3, .couponSectionTitle {
-    margin-top: 15px;
-    font-size: 1.1rem;
-    color: #555;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-    margin-bottom: 10px;
+.checkoutForm h3,
+.couponSectionTitle {
+  margin-top: 15px;
+  font-size: 1.1rem;
+  color: #555;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 .paymentMethodContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 20px;
 }
 
 .unavailableMessage {
-    margin: 0;
-    font-size: 0.85rem;
-    color: #94a3b8;
-    font-style: italic;
+  margin: 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-style: italic;
 }
 
 .payButton {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s;
-    width: 100%;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+  width: 100%;
 }
 
 .payButton:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .couponSection {
-    margin-top: 20px;
-    margin-bottom: 10px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.couponInput.success {
+  color: green;
+}
+
+.couponInput.fail {
+  color: red;
+}
+
+.couponSection h4 {
+  color: #5a5b5c;
 }
 
 .couponButton {
-    width: 100%;
-    padding: 12px;
-    margin: 0;
+  width: 100%;
+  padding: 12px;
+  margin: 0;
+}
+
+.cancelCoupon {
+  padding: 12px;
+  background-color: #ff0000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.cancelCoupon:hover {
+  background-color: #f81e1e;
 }
 
 .addressSelectionGroup {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .addressSelectionLabel {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #555;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #555;
 }
 
 @media (min-width: 600px) {
-    .couponButton {
-        width: auto;
-        padding: 0 20px;
-    }
+  .couponButton {
+    width: auto;
+    padding: 0 20px;
+  }
+}
+
+.toastMessage {
+  position: fixed;
+  top: 80px;
+  right: 25px;
+  background-color: rgba(16, 185, 129, 0.9);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+  z-index: 3000;
+  font-weight: 600;
+  font-size: 0.95rem;
+  animation:
+    slideInRight 0.3s ease-out forwards,
+    fadeOut 0.3s ease-in 2.7s forwards;
 }

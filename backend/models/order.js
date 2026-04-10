@@ -1,5 +1,6 @@
 const db = require('../util/database');
 const nodemailer = require('nodemailer');
+const Coupon = require('./coupon');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -21,6 +22,7 @@ module.exports = class Order {
 
   async save() {
     let connection;
+    let couponResult;
     try {
       connection = await db.getConnection();
       await connection.beginTransaction();
@@ -35,7 +37,7 @@ module.exports = class Order {
 
       if (cartItems.length === 0) {
         await connection.rollback();
-        return { result: 'fail', message: 'Cart is empty' };
+        return { result: 'fail', message: 'Üres a kosár' };
       }
 
       for (const product of cartItems) {
@@ -52,6 +54,17 @@ module.exports = class Order {
       cartItems.forEach((item) => {
         totalAmount += item.productPrice * item.quantity;
       });
+
+      if (this.couponCode != '') {
+        couponResult = await Coupon.check(this.couponCode);
+        if (couponResult.result == 'success') {
+          totalAmount = totalAmount - couponResult.data.value;
+
+          if (totalAmount < 0) {
+            totalAmount = 0;
+          }
+        }
+      }
 
       const [orderResult] = await connection.execute(
         `INSERT INTO orders (userId, totalAmount, shippingAddress, paymentMethod, couponCode, orderDate) 
@@ -80,9 +93,16 @@ module.exports = class Order {
         );
       }
 
-      try {
-        let email;
-        let ordered_products;
+      if (couponResult && couponResult.result == 'success') {
+        await connection.execute(
+          'UPDATE coupons SET coupons.usedAt = NOW(), coupons.orderId=? WHERE coupons.code = ?;',
+          [orderId, this.couponCode]
+        );
+      }
+
+      //E-mail küldése
+      let email;
+      let ordered_products;
 
         email = await connection.execute(
           'SELECT users.email FROM users WHERE userId = ?',
@@ -126,7 +146,7 @@ module.exports = class Order {
         await connection.release();
       }
       console.log(err.message);
-      return { result: 'fail', message: err.message };
+      return { result: 'fail', message: 'Szerver hiba' };
     }
   }
 
@@ -163,7 +183,7 @@ module.exports = class Order {
       await db.execute(`DELETE FROM orders WHERE orderId = ?`, [id]);
       return { result: 'success' };
     } catch (err) {
-      return { result: 'fail', message: err.message };
+      return { result: 'fail', message: 'Szerver hiba' };
     }
   }
 };

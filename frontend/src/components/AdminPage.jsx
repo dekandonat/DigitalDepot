@@ -9,6 +9,7 @@ import AdminUsedProducts from './AdminUsedProducts';
 import AdminUsersList from './AdminUsersList';
 import AdminAddNews from './AdminAddNews';
 import AdminStatistics from './AdminStatistics';
+import AdminCoupon from './AdminCoupon';
 import './AdminPage.css';
 
 export default function AdminPage({ toggleChat }) {
@@ -56,6 +57,14 @@ export default function AdminPage({ toggleChat }) {
             Termékek listája
           </button>
           
+          <button
+            onClick={() => setCurrentPage('coupon')}
+            className={
+              currentPage === 'coupon' ? 'adminNavBtn active' : 'adminNavBtn'
+            }
+          >
+            Kuponok
+          </button>
           <button
             onClick={() => setCurrentPage('news')}
             className={
@@ -139,6 +148,7 @@ export default function AdminPage({ toggleChat }) {
       <main className="adminMainContent">
         <div className="adminContentWrapper">
           {currentPage === 'list' && <AdminProductList />}
+          {currentPage === 'coupon' && <AdminCoupon />}
           {currentPage === 'news' && <AdminAddNews />}
           {currentPage === 'add' && <AdminAddProduct />}
           {currentPage === 'inventory' && <AdminInventory />}
@@ -203,6 +213,16 @@ export default function AdminPage({ toggleChat }) {
                 Termékek listája
               </button>
               
+              <button
+                onClick={() => handlePageChange('coupon')}
+                className={
+                  currentPage === 'coupon'
+                    ? 'adminMobileNavBtn active'
+                    : 'adminMobileNavBtn'
+                }
+              >
+                Kuponok
+              </button>
               <button
                 onClick={() => handlePageChange('news')}
                 className={
