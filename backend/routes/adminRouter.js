@@ -459,7 +459,42 @@ router.post(
         return res.status(500).json(result);
       }
     } catch (err) {
-      return res.status(400).json({ result: 'fail', message: 'szerver hiba' });
+      return res.status(500).json({ result: 'fail', message: 'szerver hiba' });
+    }
+  }
+);
+
+router.patch(
+  '/product/:prodId',
+  upload.uploadMiddleware,
+  validateImage,
+  async (req, res) => {
+    try {
+      const id = req.params.prodId;
+
+      const numId = Number(id);
+
+      if (!Number.isInteger(numId) || numId <= 0) {
+        return res
+          .status(400)
+          .json({ result: 'fail', message: 'nem megfelelő azonosító' });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ result: 'fail', message: 'hiányzó kép' });
+      }
+
+      const img = `uploads/products/${req.file.filename}`;
+
+      const result = await Products.updateImg(numId, img);
+
+      if (result.result == 'success') {
+        res.status(200).json(result);
+      } else {
+        res.status(500).json({ result: 'fail', message: 'szerver hiba' });
+      }
+    } catch (err) {
+      res.status(500).json({ result: 'fail', message: 'szerver hiba' });
     }
   }
 );

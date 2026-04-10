@@ -92,6 +92,38 @@
   text-overflow: ellipsis;
 }
 
+.deleteUserChatBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  color: #999;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  opacity: 0.4;
+}
+
+.adminChatUser:hover .deleteUserChatBtn {
+  opacity: 1;
+}
+
+.deleteUserChatBtn:hover {
+  background-color: #ff4d4d;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .unreadBadge {
   background: #dc3545;
   color: white;
@@ -132,7 +164,8 @@
   align-items: flex-start;
 }
 
-.sentMessageAdmin, .receivedMessageAdmin {
+.sentMessageAdmin,
+.receivedMessageAdmin {
   max-width: 70%;
   padding: 10px 15px;
   border-radius: 15px;
@@ -230,7 +263,7 @@
     top: 0;
     height: 100%;
     transition: left 0.3s ease;
-    box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
   }
 
   .adminChatList.open {
