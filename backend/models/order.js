@@ -100,10 +100,10 @@ module.exports = class Order {
         );
       }
 
-      //E-mail küldése
       let email;
       let ordered_products;
 
+      try {
         email = await connection.execute(
           'SELECT users.email FROM users WHERE userId = ?',
           [this.userId]
