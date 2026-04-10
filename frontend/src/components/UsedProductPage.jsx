@@ -10,6 +10,7 @@ const formatPrice = (price) => {
 function UserSubmissions({ activeTab, refreshTrigger }) {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [localTrigger, setLocalTrigger] = useState(0);
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -24,13 +25,24 @@ function UserSubmissions({ activeTab, refreshTrigger }) {
           setSubmissions(result.data);
         }
       } catch (err) {
-        console.error(err);
       } finally {
         setLoading(false);
       }
     }
     fetchUserSubmissions();
-  }, [refreshTrigger, token]);
+  }, [refreshTrigger, localTrigger, token]);
+
+  const handleDecision = async (submissionId, decision) => {
+    try {
+      const result = await apiFetch('/used-products/user-response', {
+        method: 'PATCH',
+        body: { submissionId, decision }
+      });
+      if (result.result === 'success') {
+        setLocalTrigger(prev => prev + 1);
+      }
+    } catch (err) {}
+  };
 
   if (loading) return <p className="loadingMsg">Beküldéseid betöltése...</p>;
 
@@ -73,6 +85,22 @@ function UserSubmissions({ activeTab, refreshTrigger }) {
                 </span>
                 {(submission.status === 'accepted' || submission.status === 'offer_accepted' || submission.status === 'listed') && submission.adminOfferPrice && (
                   <p className="offerPrice">Ajánlott ár: <strong>{formatPrice(submission.adminOfferPrice)} Ft</strong></p>
+                )}
+                {submission.status === 'accepted' && (
+                    <div className="userDecisionRow">
+                        <button 
+                            onClick={() => handleDecision(submission.submissionId, 'accept')} 
+                            className="decisionBtn acceptOfferBtn"
+                        >
+                            Elfogadom
+                        </button>
+                        <button 
+                            onClick={() => handleDecision(submission.submissionId, 'reject')} 
+                            className="decisionBtn rejectOfferBtn"
+                        >
+                            Elutasítom
+                        </button>
+                    </div>
                 )}
               </div>
             </div>
@@ -160,7 +188,6 @@ function SubmissionForm({ onSubmissionSuccess }) {
          setModal({ isOpen: true, title: 'Hiba', message: result.message || 'Hiba történt a beküldés során.', type: 'alert' });
       }
     } catch (err) {
-      console.error(err);
       setModal({ isOpen: true, title: 'Hiba', message: 'Hálózati hiba történt.', type: 'alert' });
     } finally {
       setLoading(false);
@@ -252,9 +279,9 @@ export default function UsedProductPage() {
       </div>
 
       <div className="tabsNav">
-        <button className={`tabBtn ${activeTab === 'form' ? 'active' : ''}`} onClick={() => setActiveTab('form')}>Új beküldések</button>
-        <button className={`tabBtn ${activeTab === 'inProgress' ? 'active' : ''}`} onClick={() => setActiveTab('inProgress')}>Folyamatban lévők</button>
-        <button className={`tabBtn ${activeTab === 'closed' ? 'active' : ''}`} onClick={() => setActiveTab('closed')}>Lezárt ügyek</button>
+        <button className={`tabBtn ${activeTab === 'form' ? 'active' : ''}`} onClick={() => setActiveTab('form')}>Termék beküldése</button>
+        <button className={`tabBtn ${activeTab === 'inProgress' ? 'active' : ''}`} onClick={() => setActiveTab('inProgress')}>Korábbi beküldések</button>
+        <button className={`tabBtn ${activeTab === 'closed' ? 'active' : ''}`} onClick={() => setActiveTab('closed')}>Lezárt beküldések</button>
       </div>
 
       {activeTab === 'form' && (

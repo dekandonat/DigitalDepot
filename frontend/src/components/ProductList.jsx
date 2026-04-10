@@ -42,10 +42,19 @@ function ProductCard({ product, onOpenReviews, showToast }) {
     navigate(`/product/${product.prodId}`);
   };
 
+  const getImageUrl = (imgPath) => {
+    if (!imgPath) return '';
+    if (imgPath.startsWith('http')) return imgPath;
+    if (!imgPath.includes('uploads/')) {
+        return `/uploads/products/${imgPath}`;
+    }
+    return imgPath.startsWith('/') ? imgPath : `/${imgPath}`;
+  };
+
   return (
     <div className={`productCard ${product.quantity <= 0 ? 'outOfStock' : ''}`} onClick={navigateToProduct}>
       <div className="imageContainer">
-        <img src={product.productImg} alt={product.productName} />
+        <img src={getImageUrl(product.productImg)} alt={product.productName} />
         <span className={`conditionBadge ${product.conditionState}`}>
           {product.conditionState}
         </span>
@@ -82,13 +91,20 @@ export default function ProductList() {
   const [toast, setToast] = useState({ show: false, message: '', type: '', key: 0 });
   
   const sortType = searchParams.get('sort') || 'default';
+  const searchQuery = searchParams.get('q');
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const url = categoryId ? `/category/${categoryId}/products` : '/products';
+        let url = '/products';
+        if (categoryId) {
+          url = `/products/category/${categoryId}`;
+        } else if (searchQuery) {
+          url = `/products/search/${searchQuery}`;
+        }
+
         const data = await apiFetch(url);
         setProducts(data.data || []);
       } catch (error) {
@@ -98,7 +114,7 @@ export default function ProductList() {
       }
     };
     fetchProducts();
-  }, [categoryId]);
+  }, [categoryId, searchQuery]);
 
   useEffect(() => {
     let sorted = [...products];
@@ -146,7 +162,13 @@ export default function ProductList() {
         <div id="filterAndTitleArea">
           {categoryId && (
             <div id="activeFilterContainer">
-                Kategória: <span id="activeFilterName">{displayedProducts[0]?.categoryName || 'Betöltés...'}</span>
+                Kategória: <span id="activeFilterName">{displayedProducts.length > 0 ? displayedProducts[0]?.categoryName : 'Nincs találat'}</span>
+                <button id="clearFilterButton" onClick={() => navigate('/')}>×</button>
+            </div>
+          )}
+          {searchQuery && !categoryId && (
+            <div id="activeFilterContainer">
+                Keresés: <span id="activeFilterName">{searchQuery}</span>
                 <button id="clearFilterButton" onClick={() => navigate('/')}>×</button>
             </div>
           )}
@@ -166,7 +188,7 @@ export default function ProductList() {
       </div>
 
       {displayedProducts.length === 0 ? (
-        <p>Nincs találat ebben a kategóriában.</p>
+        <p>Nincs találat.</p>
       ) : (
         <div id="productGrid">
           {displayedProducts.map((product) => (

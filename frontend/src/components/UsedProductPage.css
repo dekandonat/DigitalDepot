@@ -9,7 +9,7 @@
 }
 
 .pageHeader {
-  margin-top: 20px;
+  margin-top: 15px;
   margin-bottom: 20px;
 }
 
@@ -17,40 +17,47 @@
   text-align: center;
   color: #333;
   margin-bottom: 10px;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
 }
 
 .pageHeader p {
   text-align: center;
   color: #666;
   margin-bottom: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .tabsNav {
   display: flex;
-  gap: 5px;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  gap: 10px;
   margin-bottom: 20px;
   border-bottom: 2px solid #eee;
-  padding-bottom: 0;
-  flex-wrap: wrap;
+  padding-bottom: 5px;
+}
+
+.tabsNav::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tabsNav::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 4px;
 }
 
 .tabBtn {
   background: none;
   border: none;
-  padding: 10px 5px;
-  font-size: 0.9rem;
+  padding: 10px 15px;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #666;
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
-  bottom: -2px; 
-  border-bottom: 3px solid transparent;
-  flex: 1;
-  text-align: center;
-  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .tabBtn:hover {
@@ -59,7 +66,17 @@
 
 .tabBtn.active {
   color: #007bff;
-  border-bottom: 3px solid #007bff;
+}
+
+.tabBtn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #007bff;
+  border-radius: 3px 3px 0 0;
 }
 
 #submissionFormSection {
@@ -69,9 +86,7 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   margin-bottom: 20px;
   box-sizing: border-box;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
   border: 1px solid #eee;
 }
 
@@ -83,11 +98,11 @@
 
 #submissionFormSection h2 {
   margin-top: 0;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   color: #333;
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 .formInputField,
@@ -101,6 +116,15 @@
   color: #333;
   box-sizing: border-box;
   transition: border-color 0.2s;
+  appearance: none;
+}
+
+#conditionSelectField {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 35px;
 }
 
 .formInputField:focus,
@@ -129,6 +153,7 @@
   cursor: pointer;
   text-align: center;
   transition: all 0.2s;
+  font-size: 0.95rem;
 }
 
 .fileInputLabel:hover {
@@ -156,11 +181,12 @@
   border: none;
   padding: 15px;
   border-radius: 8px;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
   box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+  width: 100%;
 }
 
 .formSubmitButton:hover {
@@ -177,19 +203,14 @@
   box-shadow: none;
 }
 
-.loadingMsg {
-  text-align: center;
-  color: #666;
-  padding: 20px;
-}
-
-.noDataMsg {
-  grid-column: 1 / -1;
+.loadingMsg, .noDataMsg {
   text-align: center;
   color: #666;
   padding: 20px;
   background-color: #f8f9fa;
   border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 #userSubmissionsSection {
@@ -198,7 +219,7 @@
 
 .submissionGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
   gap: 20px;
   width: 100%;
 }
@@ -211,6 +232,8 @@
   position: relative;
   transition: box-shadow 0.2s, border-color 0.2s;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
 }
 
 .submissionCard:hover {
@@ -242,21 +265,16 @@
   z-index: 5;
 }
 
-.conditionBadge.bontatlan {
-  background-color: rgba(16, 185, 129, 0.9);
-}
-.conditionBadge.felbontott {
-  background-color: rgba(245, 158, 11, 0.9);
-}
-.conditionBadge.használt {
-  background-color: rgba(239, 68, 68, 0.9);
-}
-.conditionBadge.hibás {
-  background-color: rgba(108, 117, 125, 0.9);
-}
+.conditionBadge.bontatlan { background-color: rgba(16, 185, 129, 0.9); }
+.conditionBadge.felbontott { background-color: rgba(245, 158, 11, 0.9); }
+.conditionBadge.használt { background-color: rgba(239, 68, 68, 0.9); }
+.conditionBadge.hibás { background-color: rgba(108, 117, 125, 0.9); }
 
 .submissionCardContent {
   padding: 15px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .submissionCardContent h3 {
@@ -294,43 +312,15 @@
   border-radius: 20px;
   margin-top: 8px;
   text-transform: capitalize;
+  width: fit-content;
 }
 
-.statusLabel.pending {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeeba;
-}
-
-.statusLabel.accepted {
-  background-color: #d1ecf1;
-  color: #0c5460;
-  border: 1px solid #bee5eb;
-}
-
-.statusLabel.rejected {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-.statusLabel.offer_accepted {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.statusLabel.offer_rejected {
-  background-color: #dc3545;
-  color: white;
-  border: 1px solid #bd2130;
-}
-
-.statusLabel.listed {
-  background-color: #c3e6cb;
-  color: #155724;
-  border: 1px solid #a3cfbb;
-}
+.statusLabel.pending { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+.statusLabel.accepted { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+.statusLabel.rejected { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.statusLabel.offer_accepted { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.statusLabel.offer_rejected { background-color: #dc3545; color: white; border: 1px solid #bd2130; }
+.statusLabel.listed { background-color: #c3e6cb; color: #155724; border: 1px solid #a3cfbb; }
 
 .offerPrice {
   margin-top: 12px !important;
@@ -341,6 +331,50 @@
   padding: 10px;
   border-radius: 6px;
   text-align: center;
+}
+
+.userDecisionRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.decisionBtn {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.acceptOfferBtn {
+  background-color: #e6f4ea;
+  color: #28a745;
+  border-color: #c3e6cb;
+}
+
+.acceptOfferBtn:hover {
+  background-color: #28a745;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+}
+
+.rejectOfferBtn {
+  background-color: #fdf5f5;
+  color: #dc3545;
+  border-color: #f5c6cb;
+}
+
+.rejectOfferBtn:hover {
+  background-color: #dc3545;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
 }
 
 @media (min-width: 768px) {
@@ -362,23 +396,39 @@
   }
 
   .tabsNav {
-    gap: 10px;
+    overflow-x: visible;
+    flex-wrap: wrap;
+    gap: 15px;
     margin-bottom: 25px;
-    flex-wrap: nowrap;
+    padding-bottom: 0;
   }
 
   .tabBtn {
-    padding: 10px 20px;
-    font-size: 1rem;
     flex: none;
+    font-size: 1rem;
+  }
+
+  .tabBtn.active::after {
+    bottom: -3px;
   }
 
   #submissionFormSection {
     padding: 30px;
     margin-bottom: 30px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   #submissionFormSection h2 {
     font-size: 1.4rem;
+  }
+
+  .submissionGrid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  .userDecisionRow {
+    flex-direction: row;
   }
 }
