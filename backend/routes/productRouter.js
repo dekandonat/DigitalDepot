@@ -3,6 +3,23 @@ const router = express.Router();
 
 const Products = require('../models/products');
 
+router.get('/category/:categoryId', async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    const idNum = Number(categoryId);
+
+    if (!Number.isInteger(idNum) || idNum <= 0) {
+      return res.status(400).json({ result: 'fail', message: 'Azonosítónak számnak kell lennie' });
+    }
+
+    const data = await Products.fetchByCategory(idNum);
+    res.status(200).json({ result: 'success', data: data });
+  } catch (err) {
+    console.error("Backend hiba a kategória lekérdezésekor:", err);
+    res.status(500).json({ result: 'fail', message: 'Szerver hiba' });
+  }
+});
+
 router.get('/search/:string', async (req, res) => {
   try {
     const string = req.params.string;
