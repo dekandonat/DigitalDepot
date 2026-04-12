@@ -54,7 +54,7 @@ function ProductCard({ product, onOpenReviews, showToast }) {
   return (
     <div className={`productCard ${product.quantity <= 0 ? 'outOfStock' : ''}`} onClick={navigateToProduct}>
       <div className="imageContainer">
-        <img src={getImageUrl(product.productImg)} alt={product.productName} />
+        <img src={getImageUrl(product.productImg)} alt={product.productName} loading="lazy" />
         <span className={`conditionBadge ${product.conditionState}`}>
           {product.conditionState}
         </span>
@@ -89,6 +89,7 @@ export default function ProductList() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedProductForReview, setSelectedProductForReview] = useState(null);
   const [toast, setToast] = useState({ show: false, message: '', type: '', key: 0 });
+  const [visibleCount, setVisibleCount] = useState(24);
   
   const sortType = searchParams.get('sort') || 'default';
   const searchQuery = searchParams.get('q');
@@ -126,7 +127,8 @@ export default function ProductList() {
     else if (sortType === 'rating_asc') sorted.sort((a, b) => a.avgRating - b.avgRating);
     
     setDisplayedProducts(sorted);
-  }, [products, sortType]);
+    setVisibleCount(24);
+  }, [products, sortType, categoryId, searchQuery]);
 
   const showToast = (message, type) => {
     setToast({ show: true, message, type, key: Date.now() });
@@ -148,7 +150,13 @@ export default function ProductList() {
     navigate({ search: currentParams.toString() });
   };
 
+  const handleLoadMore = () => {
+    setVisibleCount(prevCount => prevCount + 24);
+  };
+
   if (isLoading) return <div className="loadingContainer"><p>Termékek betöltése...</p></div>;
+
+  const currentVisibleProducts = displayedProducts.slice(0, visibleCount);
 
   return (
     <div id="productListContainer">
@@ -190,16 +198,26 @@ export default function ProductList() {
       {displayedProducts.length === 0 ? (
         <p>Nincs találat.</p>
       ) : (
-        <div id="productGrid">
-          {displayedProducts.map((product) => (
-            <ProductCard
-              key={product.prodId}
-              product={product}
-              onOpenReviews={setSelectedProductForReview}
-              showToast={showToast}
-            />
-          ))}
-        </div>
+        <>
+          <div id="productGrid">
+            {currentVisibleProducts.map((product) => (
+              <ProductCard
+                key={product.prodId}
+                product={product}
+                onOpenReviews={setSelectedProductForReview}
+                showToast={showToast}
+              />
+            ))}
+          </div>
+          
+          {visibleCount < displayedProducts.length && (
+            <div className="loadMoreContainer">
+              <button className="loadMoreBtn" onClick={handleLoadMore}>
+                Mutass többet
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {selectedProductForReview && (

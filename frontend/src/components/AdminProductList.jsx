@@ -5,6 +5,7 @@ import './AdminProductList.css';
 
 export default function AdminProductList() {
   const [products, setProducts] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(24);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -19,6 +20,12 @@ export default function AdminProductList() {
     fetchProducts();
   }, []);
 
+  const handleLoadMore = () => {
+    setVisibleCount(prevCount => prevCount + 24);
+  };
+
+  const currentVisibleProducts = products.slice(0, visibleCount);
+
   return (
     <div className="adminProductListWrapper">
       <div className="adminProductListHeader">
@@ -26,7 +33,7 @@ export default function AdminProductList() {
       </div>
       
       <div className="productListGrid">
-        {products.map((product) => {
+        {currentVisibleProducts.map((product) => {
           return (
             <AdminProductCard
               id={product.prodId}
@@ -41,6 +48,14 @@ export default function AdminProductList() {
           );
         })}
       </div>
+
+      {visibleCount < products.length && (
+        <div className="loadMoreContainer">
+            <button className="loadMoreBtn" onClick={handleLoadMore}>
+                Mutass többet
+            </button>
+        </div>
+      )}
     </div>
   );
 }
