@@ -70,7 +70,10 @@ describe('Cart Routes', () => {
 
   // TEST 4: POST /cart/add - add item to cart
   test('POST /cart/add/:id/:quantity should add item to cart', async () => {
-    db.execute.mockResolvedValue([{ affectedRows: 1 }]);
+    db.execute
+      .mockResolvedValueOnce([[{ quantity: 100 }]])
+      .mockResolvedValueOnce([[]])
+      .mockResolvedValueOnce([{ affectedRows: 1 }]);
 
     const response = await request(app).post('/cart/add/1/5').expect(201);
 
@@ -118,7 +121,10 @@ describe('Cart Routes', () => {
 
   // TEST 10: POST /cart/add - duplicate key (update quantity)
   test('POST /cart/add/:id/:quantity should update quantity on duplicate', async () => {
-    db.execute.mockResolvedValue([{ affectedRows: 1 }]);
+    db.execute
+      .mockResolvedValueOnce([[{ quantity: 100 }]])
+      .mockResolvedValueOnce([[{ quantity: 2 }]])
+      .mockResolvedValueOnce([{ affectedRows: 1 }]);
 
     const response = await request(app).post('/cart/add/1/3').expect(201);
 
@@ -132,7 +138,10 @@ describe('Cart Routes', () => {
 
   // TEST 11: PATCH /cart/:id - update cart quantity (increase)
   test('PATCH /cart/:id should increase quantity', async () => {
-    db.execute.mockResolvedValue([{ affectedRows: 1 }]);
+    db.execute
+      .mockResolvedValueOnce([[{ quantity: 100 }]])
+      .mockResolvedValueOnce([[{ quantity: 5 }]])
+      .mockResolvedValueOnce([{ affectedRows: 1 }]);
 
     const response = await request(app)
       .patch('/cart/1')
@@ -142,14 +151,15 @@ describe('Cart Routes', () => {
     expect(response.body.result).toBe('success');
     expect(db.execute).toHaveBeenCalledWith(
       expect.stringContaining('UPDATE carts SET quantity'),
-      [2, mockUserId, '1']
+      [2, mockUserId, 1]
     );
   });
 
   // TEST 12: PATCH /cart/:id - update cart quantity (decrease)
   test('PATCH /cart/:id should decrease quantity and delete if <= 0', async () => {
     db.execute
-      .mockResolvedValueOnce([{ affectedRows: 1 }])
+      .mockResolvedValueOnce([[{ quantity: 100 }]])
+      .mockResolvedValueOnce([[{ quantity: 2 }]])
       .mockResolvedValueOnce([{ affectedRows: 1 }]);
 
     const response = await request(app)
@@ -158,8 +168,12 @@ describe('Cart Routes', () => {
       .expect(200);
 
     expect(response.body.result).toBe('success');
-    // Should call DELETE for items with quantity <= 0
-    expect(db.execute).toHaveBeenCalledTimes(2);
+    expect(db.execute).toHaveBeenCalledTimes(3);
+    expect(db.execute).toHaveBeenNthCalledWith(
+      3,
+      expect.stringContaining('DELETE FROM carts'),
+      [mockUserId, 1]
+    );
   });
 
   // TEST 13: PATCH /cart/:id - invalid product ID
@@ -184,6 +198,11 @@ describe('Cart Routes', () => {
 
   // TEST 15: PATCH /cart/:id - amount is 0 (nothing changes)
   test('PATCH /cart/:id should handle amount 0', async () => {
+    db.execute
+      .mockResolvedValueOnce([[{ quantity: 100 }]])
+      .mockResolvedValueOnce([[{ quantity: 5 }]])
+      .mockResolvedValueOnce([{ affectedRows: 1 }]);
+
     const response = await request(app)
       .patch('/cart/1')
       .send({ amount: 0 })
@@ -201,6 +220,6 @@ describe('Cart Routes', () => {
       .send({ amount: 2 })
       .expect(500);
 
-    expect(response.body.result).toBe('szerver hiba');
+    expect(response.body.result).toBe('fail');
   });
 });

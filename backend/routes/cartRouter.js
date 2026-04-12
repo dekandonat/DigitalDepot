@@ -32,6 +32,16 @@ router.post('/add/:id/:quantity', async (req, res) => {
       .json({ result: 'fail', message: 'érvénytelen azonosító' });
   }
 
+  if (
+    isNaN(quantityNum) ||
+    !Number.isInteger(quantityNum) ||
+    quantityNum <= 0
+  ) {
+    return res
+      .status(400)
+      .json({ result: 'fail', message: 'érvénytelen mennyiség' });
+  }
+
   try {
     const userId = req.user.id;
 
@@ -85,6 +95,12 @@ router.patch('/:id', async (req, res) => {
       return res
         .status(400)
         .json({ result: 'fail', message: 'érvénytelen azonosító' });
+    }
+
+    if (!Number.isInteger(amountNum)) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'mennyiségnek számnak kell lennie' });
     }
 
     const [productRows] = await db.execute(
