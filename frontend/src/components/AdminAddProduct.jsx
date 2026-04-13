@@ -9,6 +9,8 @@ export default function AdminAddProduct() {
   const [price, setPrice] = useState(0);
   const [img, setImg] = useState(undefined);
   const [categories, setCategories] = useState([]);
+  const [mainCategories, setMainCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
   const [toast, setToast] = useState('');
   const selectRef = useRef(null);
@@ -19,6 +21,8 @@ export default function AdminAddProduct() {
         const data = await apiFetch('/category');
         if (data.data) {
           setCategories(data.data);
+          const mains = data.data.filter((c) => c.parentId === null);
+          setMainCategories(mains);
         }
       } catch (err) {
         console.error(err);
