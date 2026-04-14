@@ -10,6 +10,7 @@ const News = require('../models/news');
 const Coupon = require('../models/coupon');
 const upload = require('../util/upload');
 const validateImage = require('../util/validateImage');
+const processImage = require('../util/imageProcessor');
 
 const groupMessagesByUser = (messages) => {
   const groupMap = {};
@@ -476,6 +477,7 @@ router.post(
   '/addProduct',
   upload.uploadMiddleware,
   validateImage,
+  processImage(800, 600),
   async (req, res) => {
     try {
       if (!req.file) {
@@ -579,6 +581,7 @@ router.patch(
   '/product/:prodId',
   upload.uploadMiddleware,
   validateImage,
+  processImage(800, 600),
   async (req, res) => {
     try {
       const id = req.params.prodId;
@@ -614,6 +617,7 @@ router.post(
   '/news',
   upload.uploadNewsMiddleware,
   validateImage,
+  processImage(1200, 600),
   async (req, res) => {
     try {
       if (!req.file) {
