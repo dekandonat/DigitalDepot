@@ -54,12 +54,12 @@ module.exports = class Order {
       cartItems.forEach((item) => {
         totalAmount += item.productPrice * item.quantity;
       });
-
+      let discount;
       if (this.couponCode != '') {
         couponResult = await Coupon.check(this.couponCode);
         if (couponResult.result == 'success') {
           totalAmount = totalAmount - couponResult.data.value;
-
+          discount = couponResult.data.value;
           if (totalAmount < 0) {
             totalAmount = 0;
           }
@@ -120,7 +120,9 @@ module.exports = class Order {
         for (const row of ordered_products) {
           htmlbody += `<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;">${row.productName}</td><td style="padding: 8px; border-bottom: 1px solid #ddd; text-align:right;">${row.productPrice}</td><td style="padding: 8px; border-bottom: 1px solid #ddd; text-align:right;">${row.quantity}</td></tr>`;
         }
-
+        if (discount) {
+          htmlbody += `<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;">Kedvezmény</td><td style="padding: 8px; border-bottom: 1px solid #ddd; text-align:right;">${discount}</td></tr>`;
+        }
         htmlbody += `</table><br><h1>Fizetendő összeg: ${totalAmount} Ft</h1>`;
 
         await transporter.sendMail({
@@ -171,7 +173,17 @@ module.exports = class Order {
          WHERE order_items.orderId = ?`,
         [orderId]
       );
-      return rows;
+
+      const [discount] = await db.execute(
+        'SELECT coupons.value FROM coupons WHERE coupons.orderId = ?;',
+        [orderId]
+      );
+
+      if (discount.length > 0) {
+        return { products: rows, discount: discount[0] };
+      } else {
+        return { products: rows, discount: 0 };
+      }
     } catch (err) {
       throw err;
     }

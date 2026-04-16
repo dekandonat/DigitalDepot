@@ -17,8 +17,8 @@ router.get('/items/:orderId', async (req, res) => {
   }
 
   try {
-    const items = await Order.getOrderItems(orderId);
-    res.status(200).json({ result: 'success', data: items });
+    const result = await Order.getOrderItems(orderId);
+    res.status(200).json({ result: 'success', data: result });
   } catch (err) {
     res.status(500).json({ result: 'fail', message: 'szerver hiba' });
   }
