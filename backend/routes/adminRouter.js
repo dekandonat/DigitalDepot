@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../util/database');
-const fs = require('fs');
+const fs = require('fs/promises');
 
 const User = require('../models/user');
 const Order = require('../models/order');
@@ -51,7 +51,7 @@ const insertCategory = async (catName, parentId) => {
     );
     return rows.insertId;
   } catch (err) {
-    return 'error';
+    throw new Error('Hiba: kategória beszúrás sikertelen');
   }
 };
 
@@ -513,7 +513,7 @@ router.post(
 
       if (!Number.isInteger(priceNum)) {
         await fs.unlink(req.file.path).catch(() => {
-          console.log('failed to remove file: ' + req.file.filename);
+          console.log('failed to remove file: ' + req.file?.filename);
         });
         return res
           .status(400)
@@ -584,18 +584,21 @@ router.patch(
   processImage(800, 600),
   async (req, res) => {
     try {
+      if (!req.file) {
+        return res.status(400).json({ result: 'fail', message: 'hiányzó kép' });
+      }
+
       const id = req.params.prodId;
 
       const numId = Number(id);
 
       if (!Number.isInteger(numId) || numId <= 0) {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file.filename);
+        });
         return res
           .status(400)
           .json({ result: 'fail', message: 'nem megfelelő azonosító' });
-      }
-
-      if (!req.file) {
-        return res.status(400).json({ result: 'fail', message: 'hiányzó kép' });
       }
 
       const img = `uploads/products/${req.file.filename}`;
@@ -605,9 +608,15 @@ router.patch(
       if (result.result == 'success') {
         res.status(200).json(result);
       } else {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file.filename);
+        });
         res.status(500).json({ result: 'fail', message: 'szerver hiba' });
       }
     } catch (err) {
+      await fs.unlink(req.file.path).catch(() => {
+        console.log('failed to remove file: ' + req.file.filename);
+      });
       res.status(500).json({ result: 'fail', message: 'szerver hiba' });
     }
   }
@@ -625,6 +634,9 @@ router.post(
       }
 
       if (!req.body.alt) {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file.filename);
+        });
         return res
           .status(400)
           .json({ result: 'fail', message: 'hiányzó leírás' });
@@ -636,9 +648,15 @@ router.post(
       if (result.result == 'success') {
         res.status(200).json(result);
       } else {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file.filename);
+        });
         res.status(500).json(result);
       }
     } catch (err) {
+      await fs.unlink(req.file.path).catch(() => {
+        console.log('failed to remove file: ' + req.file.filename);
+      });
       res.status(500).json({ result: 'fail', message: 'szerver hiba' });
     }
   }
