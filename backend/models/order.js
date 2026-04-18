@@ -123,13 +123,14 @@ module.exports = class Order {
 
         htmlbody += `</table><br><h1>Fizetendő összeg: ${totalAmount} Ft</h1>`;
 
-        await transporter.sendMail({
+        transporter.sendMail({
           from: `"DigitalDepot" <${process.env.EMAIL_USER}>`,
           to: email[0][0].email,
           subject: 'Sikeres Rendelés',
           text: 'Rendszerünk sikeresen rögzítette rendelését!',
           html: htmlbody,
-        });
+        }).catch(err => console.log(err.message));
+        
       } catch (mailErr) {
         console.log(mailErr.message);
       }
