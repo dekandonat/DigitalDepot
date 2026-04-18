@@ -3,6 +3,7 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 15px;
+  padding-bottom: 70px;
   box-sizing: border-box;
 }
 
@@ -53,12 +54,6 @@
 
 .desktopSortContainer {
   display: none;
-}
-
-@media (min-width: 768px) {
-  .desktopSortContainer {
-    display: block;
-  }
 }
 
 .desktopSortSelect {
@@ -311,6 +306,31 @@
   background-color: #007bff;
 }
 
+.loadMoreContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  width: 100%;
+}
+
+.loadMoreBtn {
+  background-color: white;
+  color: #007bff;
+  border: 2px solid #007bff;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.loadMoreBtn:hover {
+  background-color: #007bff;
+  color: white;
+}
+
 @keyframes slideInRight {
   from {
     transform: translateX(100%);
@@ -333,12 +353,22 @@
 }
 
 @media (min-width: 768px) {
-  .imageContainer {
-    height: 200px;
+  #productListContainer {
+    padding-bottom: 15px;
+  }
+
+  .desktopSortContainer {
+    display: block;
   }
 
   .ratingDisplay:hover .ratingText {
     text-decoration: underline;
     color: #007bff;
+  }
+
+  .loadMoreBtn {
+    width: auto;
+    padding: 8px 16px;
+    min-width: 200px;
   }
 }

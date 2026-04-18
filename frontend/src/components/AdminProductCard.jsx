@@ -114,7 +114,12 @@ export default function AdminProductCard(props) {
       {toast && <div className="toastMessage">{toast}</div>}
 
       <div className="productCardImgWrapper">
-        <img src={currentImg} alt={name} className="productCardImg" />
+        <img
+          src={currentImg}
+          alt={name}
+          className="productCardImg"
+          loading="lazy"
+        />
 
         {isEditing && (
           <div className="imageEditOverlay" onClick={handleImageClick}>
