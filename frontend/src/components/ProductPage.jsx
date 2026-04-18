@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { apiFetch } from '../assets/util/fetch';
 import ReviewModal from './ReviewModal';
-import './productPage.css';
+import './ProductPage.css';
 
 export default function ProductPage() {
   const { productId } = useParams();
@@ -15,6 +15,7 @@ export default function ProductPage() {
   const [reviewCount, setReviewCount] = useState(0);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState(10);
 
   const fetchProductData = async () => {
     try {
@@ -99,6 +100,10 @@ export default function ProductPage() {
     return cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
   };
 
+  const handleLoadMoreReviews = () => {
+    setVisibleReviewsCount(prev => prev + 10);
+  };
+
   if (isLoading)
     return (
       <div className="loadingContainer">
@@ -107,6 +112,8 @@ export default function ProductPage() {
     );
   if (!product)
     return <div className="errorContainer">A termék nem található.</div>;
+
+  const currentVisibleReviews = reviews.slice(0, visibleReviewsCount);
 
   return (
     <div className="pageWrapper">
@@ -128,6 +135,7 @@ export default function ProductPage() {
                 src={getImageUrl(product.productImg)}
                 alt={product.productName}
                 className="mainProductImage"
+                loading="lazy"
               />
               {product.conditionState && (
                 <span
@@ -258,39 +266,48 @@ export default function ProductPage() {
               Ehhez a termékhez még nem érkezett vélemény.
             </p>
           ) : (
-            <div className="reviewsList">
-              {reviews.map((review, index) => (
-                <div key={index} className="reviewCard">
-                  <div className="reviewHeader">
-                    <div className="reviewUser">
-                      <div className="userAvatarPlaceholder">
-                        {review.userName
-                          ? review.userName.charAt(0).toUpperCase()
-                          : 'U'}
+            <>
+              <div className="reviewsList">
+                {currentVisibleReviews.map((review, index) => (
+                  <div key={index} className="reviewCard">
+                    <div className="reviewHeader">
+                      <div className="reviewUser">
+                        <div className="userAvatarPlaceholder">
+                          {review.userName
+                            ? review.userName.charAt(0).toUpperCase()
+                            : 'U'}
+                        </div>
+                        <span className="userName">
+                          {review.userName || 'Névtelen felhasználó'}
+                        </span>
                       </div>
-                      <span className="userName">
-                        {review.userName || 'Névtelen felhasználó'}
-                      </span>
+                      <div className="reviewStars">
+                        <span className="starFilled">
+                          {'★'.repeat(review.rating)}
+                        </span>
+                        <span className="starEmpty">
+                          {'★'.repeat(5 - review.rating)}
+                        </span>
+                      </div>
                     </div>
-                    <div className="reviewStars">
-                      <span className="starFilled">
-                        {'★'.repeat(review.rating)}
-                      </span>
-                      <span className="starEmpty">
-                        {'★'.repeat(5 - review.rating)}
-                      </span>
+                    <div className="reviewContent">
+                      <p>
+                        {review.review ||
+                          review.comment ||
+                          'Nincs szöveges értékelés.'}
+                      </p>
                     </div>
                   </div>
-                  <div className="reviewContent">
-                    <p>
-                      {review.review ||
-                        review.comment ||
-                        'Nincs szöveges értékelés.'}
-                    </p>
-                  </div>
+                ))}
+              </div>
+              {visibleReviewsCount < reviews.length && (
+                <div className="loadMoreContainer">
+                  <button className="loadMoreBtn" onClick={handleLoadMoreReviews}>
+                    További vélemények betöltése
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
 

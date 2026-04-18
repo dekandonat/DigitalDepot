@@ -79,7 +79,7 @@ export default function AdminProductCard(props) {
       />
       {toast && <div className="toastMessage">{toast}</div>}
 
-      <img src={props.img} alt={name} className="productCardImg" />
+      <img src={props.img} alt={name} className="productCardImg" loading="lazy" />
 
       <div className="productCardContent">
         {isEditing ? (
