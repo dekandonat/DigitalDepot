@@ -1,13 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const { promisify } = require('util');
 const UsedProduct = require('../models/usedProduct');
 const db = require('../util/database');
 const upload = require('../util/upload');
 const validateImage = require('../util/validateImage');
-
-const verifyAsync = promisify(jwt.verify);
+const verifyAdmin = require('../util/verifyAdmin');
 
 router.post(
   '/submit',
@@ -15,45 +12,40 @@ router.post(
   validateImage,
   async (req, res) => {
     if (!req.file) {
-      return res
-        .status(400)
-        .json({ result: 'fail', message: 'Kép feltöltése kötelező!' });
+      return res.status(400).json({ result: 'fail', message: 'Kép feltöltése kötelező!' });
     }
 
     try {
       const userId = req.user.id;
+      const { productName, productDescription, conditionState } = req.body;
+
+      if (!productName || typeof productName !== 'string' || productName.trim() === '' ||
+          !productDescription || typeof productDescription !== 'string' || productDescription.trim() === '' ||
+          !conditionState || typeof conditionState !== 'string') {
+        return res.status(400).json({ result: 'fail', message: 'Hiányzó vagy érvénytelen adatok' });
+      }
 
       const [userRows] = await db.execute(
         'SELECT bankAccountNumber FROM users WHERE userId = ?',
         [userId]
       );
+      
       if (userRows.length == 0 || !userRows[0].bankAccountNumber) {
-        return res
-          .status(400)
-          .json({ result: 'fail', message: 'Bank account number missing!' });
+        return res.status(400).json({ result: 'fail', message: 'Bank account number missing!' });
       }
 
       const img = `uploads/products/${req.file.filename}`;
 
       const usedProduct = new UsedProduct(
         userId,
-        req.body.productName,
-        req.body.productDescription,
-        req.body.conditionState,
+        productName.trim(),
+        productDescription.trim(),
+        conditionState,
         img
       );
 
-      if (
-        !req.body.productName ||
-        !req.body.productDescription ||
-        !req.body.conditionState
-      ) {
-        return res
-          .status(400)
-          .json({ result: 'fail', message: 'Hiányzó adatok' });
-      }
-
       const result = await usedProduct.save();
+      
       if (result.result == 'success') {
         res.status(201).json(result);
       } else {
@@ -74,17 +66,8 @@ router.get('/my-submissions', async (req, res) => {
   }
 });
 
-router.get('/admin/all', async (req, res) => {
-  const authorizationHeader = req.headers['authorization'];
-  const token = authorizationHeader && authorizationHeader.split(' ')[1];
-
-  if (!token) return res.status(401).json({ result: 'fail' });
-
+router.get('/admin/all', verifyAdmin, async (req, res) => {
   try {
-    const decodedToken = await verifyAsync(token, process.env.SECRET);
-    if (decodedToken.role != 'admin' && decodedToken.role != 'owner')
-      return res.status(403).json({ result: 'fail' });
-
     const rows = await UsedProduct.fetchAll();
     res.status(200).json({ result: 'success', data: rows });
   } catch (err) {
@@ -92,22 +75,31 @@ router.get('/admin/all', async (req, res) => {
   }
 });
 
-router.patch('/admin/status', async (req, res) => {
-  const authorizationHeader = req.headers['authorization'];
-  const token = authorizationHeader && authorizationHeader.split(' ')[1];
-
-  if (!token) return res.status(401).json({ result: 'fail' });
-
+router.patch('/admin/status', verifyAdmin, async (req, res) => {
   try {
-    const decodedToken = await verifyAsync(token, process.env.SECRET);
-    if (decodedToken.role != 'admin' && decodedToken.role != 'owner')
-      return res.status(403).json({ result: 'fail' });
-
     const { submissionId, status, offerPrice } = req.body;
+    
+    const subIdNum = Number(submissionId);
+    if (!Number.isInteger(subIdNum) || subIdNum <= 0) {
+      return res.status(400).json({ result: 'fail', message: 'Érvénytelen azonosító' });
+    }
+
+    if (!status || typeof status !== 'string') {
+      return res.status(400).json({ result: 'fail', message: 'Érvénytelen státusz' });
+    }
+
+    let parsedOfferPrice = null;
+    if (offerPrice !== undefined && offerPrice !== null && offerPrice !== '') {
+      parsedOfferPrice = Number(offerPrice);
+      if (isNaN(parsedOfferPrice) || parsedOfferPrice < 0) {
+        return res.status(400).json({ result: 'fail', message: 'Érvénytelen ár' });
+      }
+    }
+
     const result = await UsedProduct.updateStatus(
-      submissionId,
+      subIdNum,
       status,
-      offerPrice
+      parsedOfferPrice
     );
 
     if (result.result == 'success') {
@@ -123,12 +115,13 @@ router.patch('/admin/status', async (req, res) => {
 router.patch('/user-response', async (req, res) => {
   try {
     const { submissionId, decision } = req.body;
-
-    if (!decision || !submissionId) {
-      return res.status(400).json({ result: 'fail', message: 'Hiányzó adat' });
+    
+    const subIdNum = Number(submissionId);
+    if (!Number.isInteger(subIdNum) || subIdNum <= 0 || !decision || typeof decision !== 'string') {
+      return res.status(400).json({ result: 'fail', message: 'Érvénytelen vagy hiányzó adat' });
     }
 
-    const result = await UsedProduct.userRespondToOffer(submissionId, decision);
+    const result = await UsedProduct.userRespondToOffer(subIdNum, decision);
 
     if (result.result == 'success') {
       res.status(200).json(result);
@@ -142,19 +135,11 @@ router.patch('/user-response', async (req, res) => {
 
 router.post(
   '/admin/list-product',
+  verifyAdmin,
   upload.uploadMiddleware,
   validateImage,
   async (req, res) => {
-    const authorizationHeader = req.headers['authorization'];
-    const token = authorizationHeader && authorizationHeader.split(' ')[1];
-
-    if (!token) return res.status(401).json({ result: 'fail' });
-
     try {
-      const decodedToken = await verifyAsync(token, process.env.SECRET);
-      if (decodedToken.role != 'admin' && decodedToken.role != 'owner')
-        return res.status(403).json({ result: 'fail' });
-
       const {
         submissionId,
         productName,
@@ -165,55 +150,70 @@ router.post(
         existingImage,
         newMainCategory,
         newSubCategory,
-        selectedMainCat,
+        selectedMainCat
       } = req.body;
+
+      const subIdNum = Number(submissionId);
+      const priceNum = Number(productPrice);
+
+      if (!Number.isInteger(subIdNum) || subIdNum <= 0 || isNaN(priceNum) || priceNum < 0) {
+        return res.status(400).json({ result: 'fail', message: 'Érvénytelen szám adatok' });
+      }
+
+      if (!productName || !productDescription) {
+        return res.status(400).json({ result: 'fail', message: 'Hiányzó adatok' });
+      }
 
       let finalImage = existingImage;
       if (req.file) {
         finalImage = `uploads/products/${req.file.filename}`;
       }
 
-      if (!finalImage) {
+      if (!finalImage || typeof finalImage !== 'string') {
         return res.status(400).json({
           result: 'fail',
           message: 'Hiányzó termékkép! Kérlek tölts fel egyet.',
         });
       }
 
-      let finalCategoryId = categoryId;
+      let finalCategoryId = Number(categoryId);
 
-      if (newMainCategory) {
+      if (newMainCategory && typeof newMainCategory === 'string' && newMainCategory.trim() !== '') {
         const [mainResult] = await db.execute(
           'INSERT INTO categories (categoryName, parentId) VALUES (?, NULL)',
-          [newMainCategory]
+          [newMainCategory.trim()]
         );
         finalCategoryId = mainResult.insertId;
 
-        if (newSubCategory) {
+        if (newSubCategory && typeof newSubCategory === 'string' && newSubCategory.trim() !== '') {
           const [subResult] = await db.execute(
             'INSERT INTO categories (categoryName, parentId) VALUES (?, ?)',
-            [newSubCategory, finalCategoryId]
+            [newSubCategory.trim(), finalCategoryId]
           );
           finalCategoryId = subResult.insertId;
         }
-      } else if (newSubCategory) {
+      } else if (newSubCategory && typeof newSubCategory === 'string' && newSubCategory.trim() !== '') {
+        const selMainCatNum = Number(selectedMainCat);
+        if (!Number.isInteger(selMainCatNum) || selMainCatNum <= 0) {
+            return res.status(400).json({ result: 'fail', message: 'Érvénytelen főkategória azonosító' });
+        }
         const [subResult] = await db.execute(
           'INSERT INTO categories (categoryName, parentId) VALUES (?, ?)',
-          [newSubCategory, selectedMainCat]
+          [newSubCategory.trim(), selMainCatNum]
         );
         finalCategoryId = subResult.insertId;
       }
 
       const productData = {
-        productName,
-        productDescription,
-        productPrice,
+        productName: productName.trim(),
+        productDescription: productDescription.trim(),
+        productPrice: priceNum,
         productImg: finalImage,
         categoryId: finalCategoryId,
         conditionState,
       };
 
-      const result = await UsedProduct.publishToShop(submissionId, productData);
+      const result = await UsedProduct.publishToShop(subIdNum, productData);
 
       if (result.result == 'success') {
         res.status(200).json(result);

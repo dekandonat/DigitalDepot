@@ -14,6 +14,7 @@ export default function Checkout() {
   const [currentDiscount, setCurrentDiscount] = useState(null);
   const [currentPrice, setCurrentPrice] = useState(null);
   const [toast, setToast] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [modal, setModal] = useState({
     isOpen: false,
     title: '',
@@ -61,6 +62,7 @@ export default function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
     const form = e.target;
     const token = localStorage.getItem('token');
@@ -75,26 +77,28 @@ export default function Checkout() {
       return;
     }
 
-    const name = form.name.value.trim();
-    let shippingAddress = '';
-
-    if (selectedAddressId === 'new') {
-      const zip = form.zip.value.trim();
-      const city = form.city.value.trim();
-      const address = form.address.value.trim();
-      shippingAddress = `${zip} ${city}, ${address}`;
-    } else {
-      const selected = savedAddresses.find(
-        (a) => a.id.toString() === selectedAddressId
-      );
-      if (selected) {
-        shippingAddress = `${selected.zipCode} ${selected.city}, ${selected.streetAddress}`;
-      }
-    }
-
-    const couponCode = form.couponCode?.value.trim() || '';
+    setIsSubmitting(true);
 
     try {
+      const name = form.name.value.trim();
+      let shippingAddress = '';
+
+      if (selectedAddressId === 'new') {
+        const zip = form.zip.value.trim();
+        const city = form.city.value.trim();
+        const address = form.address.value.trim();
+        shippingAddress = `${zip} ${city}, ${address}`;
+      } else {
+        const selected = savedAddresses.find(
+          (a) => a.id.toString() === selectedAddressId
+        );
+        if (selected) {
+          shippingAddress = `${selected.zipCode} ${selected.city}, ${selected.streetAddress}`;
+        }
+      }
+
+      const couponCode = form.couponCode?.value.trim() || '';
+
       const data = await apiFetch('/order/place-order', {
         method: 'POST',
         body: { shippingAddress, paymentMethod, couponCode },
@@ -122,6 +126,8 @@ export default function Checkout() {
         message: error.message,
         redirect: null,
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -269,8 +275,8 @@ export default function Checkout() {
           Végösszeg:{' '}
           {Math.max(0, currentPrice ? currentPrice - currentDiscount : 0)} Ft
         </h3>
-        <button type="submit" className="payButton">
-          Rendelés leadása (Utánvét)
+        <button type="submit" className="payButton" disabled={isSubmitting}>
+          {isSubmitting ? 'Feldolgozás...' : 'Rendelés leadása (Utánvét)'}
         </button>
       </form>
     </div>
