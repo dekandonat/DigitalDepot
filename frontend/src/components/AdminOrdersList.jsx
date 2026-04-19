@@ -5,8 +5,18 @@ import { apiFetch } from '../assets/util/fetch';
 
 export default function AdminOrdersList() {
   const [orders, setOrders] = useState([]);
-  const [modal, setModal] = useState({ isOpen: false, orderId: null, type: 'confirm', title: '', message: '' });
-  const [details, setDetails] = useState({ data: null, isOpen: false, orderId: null });
+  const [modal, setModal] = useState({
+    isOpen: false,
+    orderId: null,
+    type: 'confirm',
+    title: '',
+    message: '',
+  });
+  const [details, setDetails] = useState({
+    data: null,
+    isOpen: false,
+    orderId: null,
+  });
 
   const fetchOrders = async () => {
     try {
@@ -55,7 +65,14 @@ export default function AdminOrdersList() {
     try {
       const data = await apiFetch(`/order/items/${id}`);
       if (data.result === 'success') {
-        setDetails({ data: data.data, isOpen: true, orderId: id });
+        setDetails({
+          data: {
+            products: data.data.products,
+            discount: data.data.discount.value,
+          },
+          isOpen: true,
+          orderId: id,
+        });
       }
     } catch (err) {
       console.error(err);
@@ -96,7 +113,9 @@ export default function AdminOrdersList() {
             <div key={order.orderId} className="adminOrderCard">
               <div className="orderCardHeader">
                 <span className="orderId">#{order.orderId}</span>
-                <span className="orderDate">{new Date(order.orderDate).toLocaleDateString()}</span>
+                <span className="orderDate">
+                  {new Date(order.orderDate).toLocaleDateString()}
+                </span>
               </div>
               <div className="orderCardBody">
                 <div className="orderDataRow">
@@ -104,7 +123,9 @@ export default function AdminOrdersList() {
                   <select
                     className="statusSelect"
                     value={order.status || 'Függőben'}
-                    onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
+                    onChange={(e) =>
+                      handleStatusChange(order.orderId, e.target.value)
+                    }
                   >
                     <option value="Függőben">Függőben</option>
                     <option value="Csomagolás alatt">Csomagolás alatt</option>
@@ -135,22 +156,33 @@ export default function AdminOrdersList() {
               {details.isOpen && details.orderId === order.orderId && (
                 <div className="adminOrderDetails">
                   {details.data ? (
-                    details.data.map((item, idx) => (
-                      <div key={idx} className="adminOrderDetailsList">
-                        <h3>{item.productName}</h3>
-                        <h3>{item.quantity} db</h3>
-                      </div>
-                    ))
+                    <>
+                      {details.data.products.map((item, idx) => (
+                        <div key={idx} className="adminOrderDetailsList">
+                          <h3>{item.productName}</h3>
+                          <h3>{item.quantity} db</h3>
+                        </div>
+                      ))}
+                      {details.data.discount > 0 ? (
+                        <h3>Kedvezmény: {details.data.discount} Ft</h3>
+                      ) : null}
+                    </>
                   ) : (
                     <p>Betöltés...</p>
                   )}
                 </div>
               )}
               <div className="orderCardActions">
-                <button className="orderDetailBtn" onClick={() => handleOrderDetails(order.orderId)}>
+                <button
+                  className="orderDetailBtn"
+                  onClick={() => handleOrderDetails(order.orderId)}
+                >
                   Részletek
                 </button>
-                <button className="deleteOrderBtn" onClick={() => confirmDelete(order.orderId)}>
+                <button
+                  className="deleteOrderBtn"
+                  onClick={() => confirmDelete(order.orderId)}
+                >
                   Törlés
                 </button>
               </div>

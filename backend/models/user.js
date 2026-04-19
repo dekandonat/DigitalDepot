@@ -37,6 +37,10 @@ module.exports = class User {
 
   static async deleteUser(userId) {
     try {
+      await db.execute(
+        'DELETE FROM messages WHERE messages.sender = ? OR messages.recipientId = ?;',
+        [userId, userId]
+      );
       await db.execute('DELETE FROM carts WHERE userId = ?', [userId]);
       await db.execute('DELETE FROM reviews WHERE userId = ?', [userId]);
       await db.execute(

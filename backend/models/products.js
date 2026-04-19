@@ -114,6 +114,18 @@ module.exports = class Products {
     }
   }
 
+  static async updateImg(id, img) {
+    try {
+      await db.execute(`UPDATE products SET productImg = ? WHERE prodId = ?`, [
+        img,
+        id,
+      ]);
+      return { result: 'success' };
+    } catch (err) {
+      return { result: 'fail', message: 'szerver hiba' };
+    }
+  }
+
   static async addInventory(id, quantity) {
     try {
       if (!Number.isInteger(quantity) || quantity <= 0) {

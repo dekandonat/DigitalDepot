@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import './AdminProductCard.css';
 import { apiFetch } from '../assets/util/fetch';
 import CustomModal from './CustomModal';
@@ -11,6 +11,8 @@ export default function AdminProductCard(props) {
   const [condition, setCondition] = useState(props.condition || '');
   const [toast, setToast] = useState('');
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+  const [currentImg, setCurrentImg] = useState(props.img);
+  const fileInputRef = useRef(null);
 
   const closeModal = () => {
     setModal({ ...modal, isOpen: false });
@@ -68,6 +70,38 @@ export default function AdminProductCard(props) {
     setIsEditing(false);
   };
 
+  const handleImageClick = (e) => {
+    e.stopPropagation();
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const result = await apiFetch(`/adminRoute/product/${props.id}`, {
+        method: 'PATCH',
+        body: formData,
+      });
+
+      if (result.result == 'success') {
+        setToast('Sikeres frissítés');
+        const imgResult = await apiFetch(`/products/${props.id}`);
+        if (imgResult.result == 'success') {
+          setCurrentImg(imgResult.data.productImg);
+        }
+      } else {
+        setModal({ isOpen: true, title: 'Hiba', message: result.message });
+      }
+    } catch (err) {
+      setModal({ isOpen: true, title: 'Hiba', message: err.message });
+    }
+  };
+
   return (
     <div className="adminProductCardDiv">
       <CustomModal
@@ -79,7 +113,28 @@ export default function AdminProductCard(props) {
       />
       {toast && <div className="toastMessage">{toast}</div>}
 
-      <img src={props.img} alt={name} className="productCardImg" loading="lazy" />
+      <div className="productCardImgWrapper">
+        <img
+          src={currentImg}
+          alt={name}
+          className="productCardImg"
+          loading="lazy"
+        />
+
+        {isEditing && (
+          <div className="imageEditOverlay" onClick={handleImageClick}>
+            <span className="pencilIcon">✏️</span>
+          </div>
+        )}
+      </div>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+        accept="image/*"
+      />
 
       <div className="productCardContent">
         {isEditing ? (
@@ -128,7 +183,9 @@ export default function AdminProductCard(props) {
               )}
             </div>
             <p className="productCardDesc">{description}</p>
-            <p className="productCardDesc">Eladott: {props.soldQuantity || 0} db</p>
+            <p className="productCardDesc">
+              Eladott: {props.soldQuantity || 0} db
+            </p>
           </>
         )}
       </div>

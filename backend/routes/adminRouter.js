@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../util/database');
+const fs = require('fs/promises');
 
 const User = require('../models/user');
 const Order = require('../models/order');
@@ -9,6 +10,7 @@ const News = require('../models/news');
 const Coupon = require('../models/coupon');
 const upload = require('../util/upload');
 const validateImage = require('../util/validateImage');
+const processImage = require('../util/imageProcessor');
 
 const groupMessagesByUser = (messages) => {
   const groupMap = {};
@@ -41,6 +43,18 @@ const groupMessagesByUser = (messages) => {
   return Object.values(groupMap);
 };
 
+const insertCategory = async (catName, parentId) => {
+  try {
+    const [rows] = await db.execute(
+      'INSERT INTO categories(categoryName, parentId) VALUES(?, ?);',
+      [catName, parentId]
+    );
+    return rows.insertId;
+  } catch (err) {
+    throw new Error('Hiba: kategória beszúrás sikertelen');
+  }
+};
+
 router.get('/statistics', async (req, res) => {
   try {
     if (req.user.role !== 'owner') {
@@ -56,20 +70,33 @@ router.get('/statistics', async (req, res) => {
 
     if (period === '7d') {
       orderDateCond = ' AND orderDate >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
-      submissionDateCond = ' AND submissionDate >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+      submissionDateCond =
+        ' AND submissionDate >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
     } else if (period === '1m') {
       orderDateCond = ' AND orderDate >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
-      submissionDateCond = ' AND submissionDate >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+      submissionDateCond =
+        ' AND submissionDate >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
     } else if (period === '1y') {
       orderDateCond = ' AND orderDate >= DATE_SUB(NOW(), INTERVAL 1 YEAR)';
-      submissionDateCond = ' AND submissionDate >= DATE_SUB(NOW(), INTERVAL 1 YEAR)';
+      submissionDateCond =
+        ' AND submissionDate >= DATE_SUB(NOW(), INTERVAL 1 YEAR)';
     }
 
-    const [users] = await db.execute('SELECT COUNT(userId) as count FROM users');
-    const [orders] = await db.execute(`SELECT COUNT(orderId) as count FROM orders WHERE 1=1${orderDateCond}`);
-    const [revenue] = await db.execute(`SELECT SUM(totalAmount) as total FROM orders WHERE status != "Törölve"${orderDateCond}`);
-    const [soldProducts] = await db.execute(`SELECT SUM(order_items.quantity) as total FROM order_items JOIN orders ON order_items.orderId = orders.orderId WHERE orders.status != "Törölve"${orderDateCond}`);
-    const [purchasedUsed] = await db.execute(`SELECT COUNT(submissionId) as count FROM used_product_submissions WHERE status IN ("offer_accepted", "listed")${submissionDateCond}`);
+    const [users] = await db.execute(
+      'SELECT COUNT(userId) as count FROM users'
+    );
+    const [orders] = await db.execute(
+      `SELECT COUNT(orderId) as count FROM orders WHERE 1=1${orderDateCond}`
+    );
+    const [revenue] = await db.execute(
+      `SELECT SUM(totalAmount) as total FROM orders WHERE status != "Törölve"${orderDateCond}`
+    );
+    const [soldProducts] = await db.execute(
+      `SELECT SUM(order_items.quantity) as total FROM order_items JOIN orders ON order_items.orderId = orders.orderId WHERE orders.status != "Törölve"${orderDateCond}`
+    );
+    const [purchasedUsed] = await db.execute(
+      `SELECT COUNT(submissionId) as count FROM used_product_submissions WHERE status IN ("offer_accepted", "listed")${submissionDateCond}`
+    );
 
     res.status(200).json({
       result: 'success',
@@ -78,8 +105,8 @@ router.get('/statistics', async (req, res) => {
         totalOrders: orders[0].count || 0,
         totalRevenue: revenue[0].total || 0,
         soldProducts: soldProducts[0].total || 0,
-        successfulBuybacks: purchasedUsed[0].count || 0
-      }
+        successfulBuybacks: purchasedUsed[0].count || 0,
+      },
     });
   } catch (err) {
     res.status(500).json({ result: 'fail', message: 'szerver hiba' });
@@ -450,55 +477,147 @@ router.post(
   '/addProduct',
   upload.uploadMiddleware,
   validateImage,
+  processImage(800, 600),
   async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ result: 'fail', message: 'hiányzó kép' });
       }
 
+      let {
+        prodPrice,
+        categoryId,
+        prodName,
+        prodDescription,
+        newCategory,
+        newSubcategory,
+      } = req.body;
+
       const img = `uploads/products/${req.file.filename}`;
 
-      const priceNum = Number(req.body.prodPrice);
-      const cateogryNum = Number(req.body.categoryId);
-
-      if (!Number.isInteger(priceNum)) {
-        return res
-          .status(400)
-          .json({ result: 'fail', message: 'az árnak számnak kell lennie' });
-      }
-
-      if (!Number.isInteger(cateogryNum)) {
-        return res
-          .status(400)
-          .json({ result: 'fail', message: 'érvénytelen kategória' });
-      }
+      const priceNum = Number(prodPrice);
 
       if (
-        req.body.prodName.trim() === '' ||
-        req.body.prodDescription.trim() === '' ||
+        prodName?.trim() === '' ||
+        prodDescription?.trim() === '' ||
         priceNum <= 0 ||
-        cateogryNum <= 0
+        (!categoryId && !newCategory)
       ) {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file.filename);
+        });
         return res
           .status(400)
           .json({ result: 'fail', message: 'hiányzó adatok' });
       }
 
+      if (!Number.isInteger(priceNum)) {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file?.filename);
+        });
+        return res
+          .status(400)
+          .json({ result: 'fail', message: 'az árnak számnak kell lennie' });
+      }
+
+      if (newCategory) {
+        const mainId = await insertCategory(newCategory.trim(), null);
+        const subId = await insertCategory(newSubcategory.trim(), mainId);
+        categoryId = subId;
+      }
+
+      if (!newCategory && newSubcategory && categoryId) {
+        const categoryNum = Number(categoryId);
+
+        if (!Number.isInteger(categoryNum)) {
+          await fs.unlink(req.file.path).catch(() => {
+            console.log('failed to remove file: ' + req.file.filename);
+          });
+          return res
+            .status(400)
+            .json({ result: 'fail', message: 'nem megfelelő kategória' });
+        }
+        const subId = await insertCategory(newSubcategory, categoryNum);
+        categoryId = subId;
+      }
+
+      const categoryNum = Number(categoryId);
+
+      if (!Number.isInteger(categoryNum) || categoryNum < 1) {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file.filename);
+        });
+        return res
+          .status(400)
+          .json({ result: 'fail', message: 'nem megfelelő kategória' });
+      }
+
       const product = new Products(
-        req.body.prodName,
-        req.body.prodDescription,
+        prodName,
+        prodDescription,
         priceNum,
         img,
-        cateogryNum
+        categoryNum
       );
       const result = await product.save();
       if (result.result === 'success') {
         res.status(201).json(result);
       } else {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file.filename);
+        });
         return res.status(500).json(result);
       }
     } catch (err) {
-      return res.status(400).json({ result: 'fail', message: 'szerver hiba' });
+      await fs.unlink(req.file.path).catch(() => {
+        console.log('failed to remove file: ' + req.file.filename);
+      });
+      return res.status(500).json({ result: 'fail', message: 'szerver hiba' });
+    }
+  }
+);
+
+router.patch(
+  '/product/:prodId',
+  upload.uploadMiddleware,
+  validateImage,
+  processImage(800, 600),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ result: 'fail', message: 'hiányzó kép' });
+      }
+
+      const id = req.params.prodId;
+
+      const numId = Number(id);
+
+      if (!Number.isInteger(numId) || numId <= 0) {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file.filename);
+        });
+        return res
+          .status(400)
+          .json({ result: 'fail', message: 'nem megfelelő azonosító' });
+      }
+
+      const img = `uploads/products/${req.file.filename}`;
+
+      const result = await Products.updateImg(numId, img);
+
+      if (result.result == 'success') {
+        res.status(200).json(result);
+      } else {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file.filename);
+        });
+        res.status(500).json({ result: 'fail', message: 'szerver hiba' });
+      }
+    } catch (err) {
+      await fs.unlink(req.file.path).catch(() => {
+        console.log('failed to remove file: ' + req.file.filename);
+      });
+      res.status(500).json({ result: 'fail', message: 'szerver hiba' });
     }
   }
 );
@@ -507,6 +626,7 @@ router.post(
   '/news',
   upload.uploadNewsMiddleware,
   validateImage,
+  processImage(1200, 600),
   async (req, res) => {
     try {
       if (!req.file) {
@@ -514,6 +634,9 @@ router.post(
       }
 
       if (!req.body.alt) {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file.filename);
+        });
         return res
           .status(400)
           .json({ result: 'fail', message: 'hiányzó leírás' });
@@ -525,9 +648,15 @@ router.post(
       if (result.result == 'success') {
         res.status(200).json(result);
       } else {
+        await fs.unlink(req.file.path).catch(() => {
+          console.log('failed to remove file: ' + req.file.filename);
+        });
         res.status(500).json(result);
       }
     } catch (err) {
+      await fs.unlink(req.file.path).catch(() => {
+        console.log('failed to remove file: ' + req.file.filename);
+      });
       res.status(500).json({ result: 'fail', message: 'szerver hiba' });
     }
   }

@@ -161,6 +161,19 @@ export default function AdminChatPanel() {
     return groups;
   };
 
+  const handleMessageDelete = async (id) => {
+    try {
+      const result = await apiFetch(`/adminRoute/messages/${id}`, {
+        method: 'DELETE',
+      });
+      if (result.result == 'success') {
+        fetchMessages();
+      }
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
   const groupedUsers = getGroupedUsers();
 
   return (
@@ -205,6 +218,14 @@ export default function AdminChatPanel() {
                         {user.messages[user.messages.length - 1]?.text ||
                           'Nincs üzenet'}
                       </p>
+                      <button
+                        className="deleteUserChatBtn"
+                        onClick={() => {
+                          handleMessageDelete(user.id);
+                        }}
+                      >
+                        X
+                      </button>
                     </div>
                   ))
                 ) : (

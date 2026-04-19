@@ -263,7 +263,7 @@ describe('Order Routes', () => {
         paymentMethod: 'Utánvét',
         couponCode: null,
       })
-      .expect(500);
+      .expect(400);
 
     expect(response.body.result).toBe('fail');
   });

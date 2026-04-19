@@ -236,7 +236,7 @@ describe('User Router', () => {
 
   // TEST 13: POST /user/reset-password - invalid code
   test('POST /user/reset-password should fail with invalid code', async () => {
-    const mockResult = { result: 'fail', message: 'code doesnt match' };
+    const mockResult = { result: 'fail', message: 'hibás email vagy kód' };
     User.resetPassword.mockResolvedValue(mockResult);
 
     const response = await request(app)

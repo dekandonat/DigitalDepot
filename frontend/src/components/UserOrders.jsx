@@ -43,7 +43,13 @@ export default function UserOrders() {
     if (!orderDetails[orderId]) {
       try {
         const data = await apiFetch(`/order/items/${orderId}`);
-        setOrderDetails((prev) => ({ ...prev, [orderId]: data.data }));
+        setOrderDetails((prev) => ({
+          ...prev,
+          [orderId]: {
+            products: data.data.products,
+            discount: data.data.discount.value,
+          },
+        }));
       } catch (error) {
         console.error(error);
       }
@@ -158,29 +164,37 @@ export default function UserOrders() {
                     <h3>Rendelt termékek</h3>
                     {orderDetails[order.orderId] ? (
                       <div className="itemsList">
-                        {orderDetails[order.orderId].map((item, index) => (
-                          <div key={index} className="orderItemRow">
-                            <img
-                              src={item.productImg}
-                              alt={item.productName}
-                              className="itemThumb"
-                            />
-                            <div className="itemInfo">
-                              <span className="itemName">
-                                {item.productName}
-                              </span>
-                              <span className="itemQty">
-                                {item.quantity} db
+                        {orderDetails[order.orderId].products.map(
+                          (item, index) => (
+                            <div key={index} className="orderItemRow">
+                              <img
+                                src={item.productImg}
+                                alt={item.productName}
+                                className="itemThumb"
+                              />
+                              <div className="itemInfo">
+                                <span className="itemName">
+                                  {item.productName}
+                                </span>
+                                <span className="itemQty">
+                                  {item.quantity} db
+                                </span>
+                              </div>
+                              <span className="itemPrice">
+                                {(item.price * item.quantity).toLocaleString(
+                                  'hu-HU'
+                                )}{' '}
+                                Ft
                               </span>
                             </div>
-                            <span className="itemPrice">
-                              {(item.price * item.quantity).toLocaleString(
-                                'hu-HU'
-                              )}{' '}
-                              Ft
-                            </span>
-                          </div>
-                        ))}
+                          )
+                        )}
+                        {orderDetails[order.orderId].discount > 0 ? (
+                          <h3>
+                            Kedvezmény: {orderDetails[order.orderId].discount}{' '}
+                            Ft
+                          </h3>
+                        ) : null}
                       </div>
                     ) : (
                       <p>Részletek betöltése...</p>

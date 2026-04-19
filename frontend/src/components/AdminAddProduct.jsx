@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { apiFetch } from '../assets/util/fetch';
 import CustomModal from './CustomModal';
 import './AdminAddProduct.css';
@@ -8,10 +8,15 @@ export default function AdminAddProduct() {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
   const [img, setImg] = useState(undefined);
+  const [currentMainCategory, setCurrentMainCategory] = useState('');
+  const [currentSubCategory, setCurrentSubCategory] = useState('');
   const [categories, setCategories] = useState([]);
+  const [mainCategories, setMainCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [newMainCategory, setNewMainCategory] = useState('');
+  const [newSubCategory, setNewSubCategory] = useState('');
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
   const [toast, setToast] = useState('');
-  const selectRef = useRef(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -19,6 +24,8 @@ export default function AdminAddProduct() {
         const data = await apiFetch('/category');
         if (data.data) {
           setCategories(data.data);
+          const mains = data.data.filter((c) => c.parentId === null);
+          setMainCategories(mains);
         }
       } catch (err) {
         console.error(err);
@@ -38,6 +45,15 @@ export default function AdminAddProduct() {
   const handleDescriptionChange = (e) => setDescription(e.target.value);
   const handlePriceChange = (e) => setPrice(e.target.value);
   const handleImgChange = (e) => setImg(e.target.files[0]);
+  const handleMainCatChange = (e) => {
+    setCurrentMainCategory(e.target.value);
+    const currentMainCat = e.target.value;
+    setCurrentSubCategory('');
+    setSubCategories(categories.filter((c) => c.parentId == currentMainCat));
+  };
+  const handleSubCategoryChange = (e) => setCurrentSubCategory(e.target.value);
+  const handleNewMainCategoryChange = (e) => setNewMainCategory(e.target.value);
+  const handleNewSubCategoryChange = (e) => setNewSubCategory(e.target.value);
 
   const handleAddProduct = () => {
     if (img == undefined) {
@@ -53,8 +69,15 @@ export default function AdminAddProduct() {
     formData.append('prodName', name);
     formData.append('prodDescription', description);
     formData.append('prodPrice', price);
-    if (selectRef.current)
-      formData.append('categoryId', selectRef.current.value);
+    if (currentMainCategory === 'new') {
+      formData.append('newCategory', newMainCategory);
+      formData.append('newSubcategory', newSubCategory);
+    } else if (currentSubCategory === 'new') {
+      formData.append('categoryId', currentMainCategory);
+      formData.append('newSubcategory', newSubCategory);
+    } else {
+      formData.append('categoryId', currentSubCategory || currentMainCategory);
+    }
     formData.append('file', img);
 
     apiFetch('/adminRoute/addProduct', {
@@ -137,15 +160,60 @@ export default function AdminAddProduct() {
           </div>
 
           <div className="formControl">
-            <label htmlFor="categoryId">Termék kategóriája</label>
-            <select id="categoryId" ref={selectRef}>
-              {categories.map((category) => (
+            <label htmlFor="categoryId">Főkategória</label>
+            <select
+              id="categoryId"
+              onChange={handleMainCatChange}
+              value={currentMainCategory}
+            >
+              <option value="" hidden disabled>
+                Válassz főkategóriát...
+              </option>
+              {mainCategories.map((category) => (
                 <option key={category.categoryId} value={category.categoryId}>
                   {category.categoryName}
                 </option>
               ))}
+              <option value="new"> + Új kategória</option>
             </select>
+            {currentMainCategory == 'new' ? (
+              <input
+                type="text"
+                value={newMainCategory}
+                onChange={handleNewMainCategoryChange}
+                placeholder="Adja meg az új főkategória nevét"
+              ></input>
+            ) : null}
           </div>
+
+          {currentMainCategory ? (
+            <div className="formControl">
+              <label htmlFor="subCategoryId">Alkategória</label>
+              <select
+                id="subCategoryId"
+                value={currentSubCategory}
+                onChange={handleSubCategoryChange}
+              >
+                <option value="" hidden disabled>
+                  Válassz főkategóriát...
+                </option>
+                {subCategories.map((category) => (
+                  <option key={category.categoryId} value={category.categoryId}>
+                    {category.categoryName}
+                  </option>
+                ))}
+                <option value="new"> + Új alkategória</option>
+              </select>
+              {currentSubCategory == 'new' ? (
+                <input
+                  type="text"
+                  value={newSubCategory}
+                  onChange={handleNewSubCategoryChange}
+                  placeholder="Adja meg az új alkategória nevét"
+                ></input>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="formControl">
             <label htmlFor="imgId">Termék képe</label>
