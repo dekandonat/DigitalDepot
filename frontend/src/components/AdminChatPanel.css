@@ -172,6 +172,10 @@
   font-size: 0.95rem;
   font-weight: 500;
   margin: 0;
+
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .sentMessageAdmin {
