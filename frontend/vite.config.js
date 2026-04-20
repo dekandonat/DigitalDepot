@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 const backendProxy = {
   target: 'http://localhost:3000',
   changeOrigin: true,
+  xfwd: true,
   bypass: (req) => {
     if (req.headers.accept?.includes('text/html')) {
       return '/index.html';

@@ -37,6 +37,7 @@ const couponRouter = require('./routes/couponRouter');
 const IP = process.env.IP;
 const PORT = process.env.PORT;
 
+app.set('trust proxy', 1);
 app.use(helmet());
 app.use(limiter);
 app.use(express.json());
