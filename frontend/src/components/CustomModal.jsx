@@ -1,16 +1,18 @@
 import './CustomModal.css';
 
-export default function CustomModal({ isOpen, title, message, onConfirm, onCancel, type = 'alert' }) {
+export default function CustomModal({ isOpen, title, message, onConfirm, onCancel, type = 'alert', confirmText, children }) {
   if (!isOpen) return null;
 
   return (
     <div className="modalOverlay" onMouseDown={onCancel || onConfirm}>
       <div className="modalContent" onMouseDown={(e) => e.stopPropagation()}>
         <h3 className="modalTitle">{title}</h3>
-        <p className="modalMessage">{message}</p>
+        {message && <p className="modalMessage">{message}</p>}
+        
+        {children}
         
         <div className="modalActions">
-          {type === 'confirm' && (
+          {(type === 'confirm' || type === 'custom') && (
             <button className="modalCancelBtn" onClick={onCancel}>
               Mégse
             </button>
@@ -19,7 +21,7 @@ export default function CustomModal({ isOpen, title, message, onConfirm, onCance
             className={`modalConfirmBtn ${type}`} 
             onClick={onConfirm}
           >
-            {type === 'confirm' ? 'Igen, törlöm' : 'Rendben'}
+            {confirmText || (type === 'confirm' ? 'Igen, törlöm' : 'Rendben')}
           </button>
         </div>
       </div>

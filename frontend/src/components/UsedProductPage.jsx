@@ -157,6 +157,10 @@ function SubmissionForm({ onSubmissionSuccess }) {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  const [bankModalOpen, setBankModalOpen] = useState(false);
+  const [bankInput, setBankInput] = useState('');
+
   const [modal, setModal] = useState({
     isOpen: false,
     title: '',
@@ -176,44 +180,8 @@ function SubmissionForm({ onSubmissionSuccess }) {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const submitProductData = async () => {
     setLoading(true);
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setModal({
-        isOpen: true,
-        title: 'Hiba',
-        message: 'Kérjük, jelentkezz be a termék leadásához!',
-        type: 'alert',
-      });
-      setLoading(false);
-      return;
-    }
-
-    if (!conditionState) {
-      setModal({
-        isOpen: true,
-        title: 'Hiba',
-        message: 'Válassz állapotot!',
-        type: 'alert',
-      });
-      setLoading(false);
-      return;
-    }
-
-    if (!imageFile) {
-      setModal({
-        isOpen: true,
-        title: 'Hiba',
-        message: 'Kérlek tölts fel egy képet a termékről!',
-        type: 'alert',
-      });
-      setLoading(false);
-      return;
-    }
-
     const formData = new FormData();
     formData.append('productName', productName);
     formData.append('productDescription', productDescription);
@@ -231,8 +199,7 @@ function SubmissionForm({ onSubmissionSuccess }) {
         setModal({
           isOpen: true,
           title: 'Siker',
-          message:
-            'Termék sikeresen beküldve! Az adminisztrátor hamarosan értékeli.',
+          message: 'Termék sikeresen beküldve! Az adminisztrátor hamarosan értékeli.',
           type: 'alert',
           onConfirm: () => {
             setModal({ ...modal, isOpen: false });
@@ -253,14 +220,75 @@ function SubmissionForm({ onSubmissionSuccess }) {
         });
       }
     } catch (err) {
+      if (err.message && err.message.toLowerCase().includes('bankszámla')) {
+        setBankModalOpen(true);
+      } else {
+        setModal({
+          isOpen: true,
+          title: 'Hiba',
+          message: err.message,
+          type: 'alert',
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setModal({
+        isOpen: true,
+        title: 'Hiba',
+        message: 'Kérjük, jelentkezz be a termék leadásához!',
+        type: 'alert',
+      });
+      return;
+    }
+
+    if (!conditionState) {
+      setModal({
+        isOpen: true,
+        title: 'Hiba',
+        message: 'Válassz állapotot!',
+        type: 'alert',
+      });
+      return;
+    }
+
+    if (!imageFile) {
+      setModal({
+        isOpen: true,
+        title: 'Hiba',
+        message: 'Kérlek tölts fel egy képet a termékről!',
+        type: 'alert',
+      });
+      return;
+    }
+
+    submitProductData();
+  };
+
+  const handleBankSaveAndSubmit = async () => {
+    try {
+      const patchResult = await apiFetch('/user/bank-account', {
+        method: 'PATCH',
+        body: { bankAccountNumber: bankInput },
+      });
+      if (patchResult.result === 'success') {
+        setBankModalOpen(false);
+        submitProductData();
+      }
+    } catch (err) {
       setModal({
         isOpen: true,
         title: 'Hiba',
         message: err.message,
         type: 'alert',
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -275,6 +303,28 @@ function SubmissionForm({ onSubmissionSuccess }) {
           modal.onConfirm || (() => setModal({ ...modal, isOpen: false }))
         }
       />
+
+      <CustomModal
+        isOpen={bankModalOpen}
+        title="Hiányzó bankszámlaszám"
+        message="A termék beküldéséhez kérlek, add meg a bankszámlaszámodat, ahova az összeget utalhatjuk!"
+        type="custom"
+        confirmText="Mentés és Beküldés"
+        onConfirm={handleBankSaveAndSubmit}
+        onCancel={() => setBankModalOpen(false)}
+      >
+        <input
+          type="text"
+          className={`formInputField bankModalInput ${
+            bankInput.length === 27 ? 'validBank' : 'invalidBank'
+          }`}
+          placeholder="HU 000000000000000000000000"
+          value={bankInput}
+          onChange={(e) => setBankInput(e.target.value)}
+          maxLength="27"
+        />
+      </CustomModal>
+
       <h2>Új termék beküldése felvásárlásra</h2>
       <form onSubmit={handleSubmit} id="usedProductSubmitForm">
         <input

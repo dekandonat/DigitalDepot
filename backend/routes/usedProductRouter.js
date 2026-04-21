@@ -4,9 +4,8 @@ const UsedProduct = require('../models/usedProduct');
 const db = require('../util/database');
 const upload = require('../util/upload');
 const validateImage = require('../util/validateImage');
-const pocessImage = require('../util/imageProcessor');
-const verifyAdmin = require('../util/verifyAdmin');
 const processImage = require('../util/imageProcessor');
+const verifyAdmin = require('../util/verifyAdmin');
 
 router.post(
   '/submit',
@@ -47,7 +46,7 @@ router.post(
       if (userRows.length == 0 || !userRows[0].bankAccountNumber) {
         return res
           .status(400)
-          .json({ result: 'fail', message: 'Bank account number missing!' });
+          .json({ result: 'fail', message: 'A beküldéshez hiányzik a bankszámlaszám!' });
       }
 
       const img = `uploads/products/${req.file.filename}`;
