@@ -159,27 +159,35 @@ router.patch('/bank-account', verifyToken, async (req, res) => {
   try {
     let { bankAccountNumber } = req.body;
 
-    if (!bankAccountNumber.includes('HU')) {
+    if (!bankAccountNumber || typeof bankAccountNumber !== 'string') {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'Érvénytelen adat' });
+    }
+
+    let cleaned = bankAccountNumber.toUpperCase().replace(/[\s-]/g, '');
+
+    if (!cleaned.startsWith('HU')) {
       return res
         .status(400)
         .json({ result: 'fail', message: 'nem megfelelő formátum' });
     }
 
-    bankAccountNumber = bankAccountNumber.split(' ')[1];
+    let numbersOnly = cleaned.substring(2);
 
-    if (!bankAccountNumber || bankAccountNumber.trim() == '') {
+    if (numbersOnly === '') {
       return res
         .status(400)
         .json({ result: 'fail', message: 'nem adott meg bankszámlaszámot' });
     }
 
-    if (!/^\d+$/.test(bankAccountNumber.trim())) {
+    if (!/^\d+$/.test(numbersOnly)) {
       return res
         .status(400)
         .json({ result: 'fail', message: 'nem megfelelő formátum' });
     }
 
-    if (bankAccountNumber.trim().length !== 24) {
+    if (numbersOnly.length < 16 || numbersOnly.length > 26) {
       return res
         .status(400)
         .json({ result: 'fail', message: 'nem megfelelő hossz' });
@@ -187,7 +195,19 @@ router.patch('/bank-account', verifyToken, async (req, res) => {
 
     await db.execute(
       'UPDATE users SET bankAccountNumber = ? WHERE userId = ?',
-      [bankAccountNumber, req.user.id]
+      [cleaned, req.user.id]
+    );
+    res.status(200).json({ result: 'success' });
+  } catch (err) {
+    res.status(500).json({ result: 'fail' });
+  }
+});
+
+router.delete('/bank-account', verifyToken, async (req, res) => {
+  try {
+    await db.execute(
+      'UPDATE users SET bankAccountNumber = NULL WHERE userId = ?',
+      [req.user.id]
     );
     res.status(200).json({ result: 'success' });
   } catch (err) {

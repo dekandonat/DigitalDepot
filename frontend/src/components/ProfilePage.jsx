@@ -13,6 +13,7 @@ export default function ProfilePage() {
   const [isEditingBank, setIsEditingBank] = useState(false);
   const [bankInput, setBankInput] = useState('');
   const [showAddressForm, setShowAddressForm] = useState(false);
+  const [toast, setToast] = useState('');
 
   const [newAddress, setNewAddress] = useState({
     zipCode: '',
@@ -31,6 +32,11 @@ export default function ProfilePage() {
     fetchProfileData();
     fetchAddresses();
   }, []);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  };
 
   const fetchProfileData = async () => {
     try {
@@ -72,10 +78,44 @@ export default function ProfilePage() {
         title: 'Siker',
         message: 'Bankszámlaszám sikeresen frissítve!',
         type: 'alert',
-        onConfirm: () => setModal({ isOpen: false }),
+        onConfirm: () => setModal((prev) => ({ ...prev, isOpen: false })),
       });
     } catch (err) {
-      setModal({ isOpen: true, title: 'Hiba', message: err.message });
+      setModal({ 
+        isOpen: true, 
+        title: 'Hiba', 
+        message: err.message,
+        type: 'alert',
+        onConfirm: () => setModal((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
+  };
+
+  const initiateDeleteBank = () => {
+    setModal({
+      isOpen: true,
+      title: 'Törlés megerősítése',
+      message: 'Biztosan törölni szeretnéd a mentett bankszámlaszámodat?',
+      type: 'confirm',
+      onConfirm: deleteBank,
+    });
+  };
+
+  const deleteBank = async () => {
+    try {
+      await apiFetch('/user/bank-account', { method: 'DELETE' });
+      setUserData((prev) => ({ ...prev, bankAccount: '' }));
+      setBankInput('');
+      setModal((prev) => ({ ...prev, isOpen: false }));
+      showToast('Bankszámlaszám sikeresen törölve!');
+    } catch (err) {
+      setModal({ 
+        isOpen: true, 
+        title: 'Hiba', 
+        message: err.message,
+        type: 'alert',
+        onConfirm: () => setModal((prev) => ({ ...prev, isOpen: false }))
+      });
     }
   };
 
@@ -94,7 +134,7 @@ export default function ProfilePage() {
         title: 'Siker',
         message: 'Új cím sikeresen mentve!',
         type: 'alert',
-        onConfirm: () => setModal({ isOpen: false }),
+        onConfirm: () => setModal((prev) => ({ ...prev, isOpen: false })),
       });
     } catch (err) {
       console.error(err);
@@ -129,13 +169,14 @@ export default function ProfilePage() {
 
   return (
     <div className="profilePageContainer">
+      {toast && <div className="toastMessage">{toast}</div>}
       <CustomModal
         isOpen={modal.isOpen}
         title={modal.title}
         message={modal.message}
         type={modal.type}
         onConfirm={modal.onConfirm}
-        onCancel={() => setModal({ ...modal, isOpen: false })}
+        onCancel={() => setModal((prev) => ({ ...prev, isOpen: false }))}
       />
 
       <h2 className="profilePageHeader">Profil Adatok</h2>
@@ -158,8 +199,9 @@ export default function ProfilePage() {
                 type="text"
                 value={bankInput}
                 onChange={(e) => setBankInput(e.target.value)}
-                placeholder="HU00 0000..."
-                className="bankInput"
+                placeholder="HU 000000000000000000000000"
+                className={`bankInput ${bankInput.length === 27 ? 'validBank' : 'invalidBank'}`}
+                maxLength="27"
               />
               <button className="saveBankBtn" onClick={handleBankSave}>
                 Mentés
@@ -182,6 +224,11 @@ export default function ProfilePage() {
               >
                 ✏️
               </button>
+              {userData.bankAccount && (
+                <button className="profileActionDeleteBtn" onClick={initiateDeleteBank}>
+                  Törlés
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -206,7 +253,7 @@ export default function ProfilePage() {
                   <p>{addr.streetAddress}</p>
                 </div>
                 <button
-                  className="deleteAddressBtn"
+                  className="profileActionDeleteBtn"
                   onClick={() => initiateDeleteAddress(addr.id)}
                 >
                   Törlés
