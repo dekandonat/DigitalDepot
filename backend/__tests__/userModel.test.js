@@ -259,6 +259,7 @@ describe('User Model', () => {
   // TEST 16: Delete user successfully
   test('should delete user and cascade delete related data', async () => {
     db.execute
+      .mockResolvedValueOnce([{affectedRows: 5}]) //messages
       .mockResolvedValueOnce([{ affectedRows: 3 }]) // carts
       .mockResolvedValueOnce([{ affectedRows: 5 }]) // reviews
       .mockResolvedValueOnce([{ affectedRows: 2 }]) // used_product_submissions
@@ -270,7 +271,7 @@ describe('User Model', () => {
     const result = await User.deleteUser(1);
 
     expect(result.result).toBe('success');
-    expect(db.execute).toHaveBeenCalledTimes(7);
+    expect(db.execute).toHaveBeenCalledTimes(8);
   });
 
   // TEST 17: Delete user - cascade order
@@ -284,9 +285,9 @@ describe('User Model', () => {
     await User.deleteUser(1);
 
     // Verify carts deleted before user
-    expect(callOrder[0]).toContain('carts');
+    expect(callOrder[0]).toContain('messages');
     // Verify users deleted last
-    expect(callOrder[6]).toContain('users WHERE');
+    expect(callOrder[7]).toContain('users WHERE');
   });
 
   // TEST 18: Delete user - database error

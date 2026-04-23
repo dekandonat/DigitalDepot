@@ -46,7 +46,7 @@ describe('Order Routes', () => {
     expect(response.body.result).toBe('success');
     expect(Array.isArray(response.body.data)).toBe(true);
     expect(response.body.data.length).toBe(2);
-    expect(Order.getOrderItems).toHaveBeenCalledWith('1');
+    expect(Order.getOrderItems).toHaveBeenCalledWith(1);
   });
 
   // TEST 2: GET order items - empty list

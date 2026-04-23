@@ -82,7 +82,7 @@ describe('ProductCard - Add to Cart Functional Test', () => {
       expect(screen.getByText('Laptop')).toBeInTheDocument();
     });
 
-    const addToCartButton = screen.getByRole('button', { name: /Kosárba/i });
+    const addToCartButton = screen.getByRole('button', { name: /Elfogyott/i });
     const user = userEvent.setup();
     await user.click(addToCartButton);
 
