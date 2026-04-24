@@ -16,16 +16,15 @@ export default function UserOrders() {
       const token = localStorage.getItem('token');
       if (!token) {
         navigate('/');
-        return;
-      }
-
-      try {
-        const data = await apiFetch('/order/my-orders');
-        setOrders(data.data || []);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
+      } else {
+        try {
+          const data = await apiFetch('/order/my-orders');
+          setOrders(data.data || []);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
       }
     };
 
@@ -35,10 +34,9 @@ export default function UserOrders() {
   const viewOrderDetails = async (orderId) => {
     if (expandedOrderId === orderId) {
       setExpandedOrderId(null);
-      return;
+    } else {
+      setExpandedOrderId(orderId);
     }
-
-    setExpandedOrderId(orderId);
 
     if (!orderDetails[orderId]) {
       try {

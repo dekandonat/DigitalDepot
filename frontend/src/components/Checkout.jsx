@@ -62,24 +62,19 @@ export default function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSubmitting) return;
+    if (isSubmitting) {
+      throw new Error('A rendelés feldolgozása már folyamatban van!');
+    }
 
     const form = e.target;
     const token = localStorage.getItem('token');
-
-    if (!token) {
-      setModal({
-        isOpen: true,
-        title: 'Figyelem',
-        message: 'Jelentkezz be a vásárláshoz!',
-        redirect: '/',
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
     try {
+      if (!token) {
+        throw new Error('Jelentkezz be a vásárláshoz!');
+      }
+
+      setIsSubmitting(true);
+
       const name = form.name.value.trim();
       let shippingAddress = '';
 
@@ -143,26 +138,24 @@ export default function Checkout() {
   };
 
   const handleCouponCheck = () => {
-    if (!currentCoupon) {
-      return;
-    }
-
-    apiFetch('/coupon/check', {
-      method: 'POST',
-      body: {
-        code: currentCoupon,
-      },
-    })
-      .then((data) => {
-        if (data.result == 'success') {
-          showToast('Sikeres kupon ellenőrzés');
-          setCurrentCouponState('success');
-          setCurrentDiscount(data.data.value);
-        }
+    if (currentCoupon) {
+      apiFetch('/coupon/check', {
+        method: 'POST',
+        body: {
+          code: currentCoupon,
+        },
       })
-      .catch((err) => {
-        setCurrentCouponState('fail');
-      });
+        .then((data) => {
+          if (data.result == 'success') {
+            showToast('Sikeres kupon ellenőrzés');
+            setCurrentCouponState('success');
+            setCurrentDiscount(data.data.value);
+          }
+        })
+        .catch((err) => {
+          setCurrentCouponState('fail');
+        });
+    }
   };
 
   const handleCouponCancel = () => {

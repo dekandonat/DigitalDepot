@@ -10,13 +10,8 @@ export default function Cart({ onClose, isClosing }) {
   const navigate = useNavigate();
 
   const fetchCartData = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     try {
-      const response = await apiFetch('/cart', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await apiFetch('/cart');
 
       if (response.result === 'success') {
         setCartItems(response.data.items);
@@ -27,19 +22,15 @@ export default function Cart({ onClose, isClosing }) {
         }
       }
     } catch (error) {
-      console.error('Hiba: ', error);
+      console.error('Hiba: ', error.message);
     }
   };
 
   const handleQuantityChange = async (productId, amount) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     try {
       const url = `/cart/${productId}`;
       await apiFetch(url, {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}` },
         body: { amount: amount },
       });
       fetchCartData();

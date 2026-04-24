@@ -30,30 +30,25 @@ export default function AdminInventory() {
   };
 
   useEffect(() => {
-    getMethodFetch('/products')
+    apiFetch('/products')
       .then((data) => {
         setProducts(data.data);
       })
       .catch((err) => {
-        setModal({ isOpen: true, title: 'Hiba', message: 'Nem sikerült betölteni a termékeket.' });
+        setModal({
+          isOpen: true,
+          title: 'Hiba',
+          message: 'Nem sikerült betölteni a termékeket.',
+        });
       });
   }, []);
 
-  const getMethodFetch = (url) => {
-    return fetch(url)
-      .then((res) => res.json())
-      .catch((err) => {
-        throw err;
-      });
-  };
-
   const handleAddInventory = async () => {
-    if (!id || !quantity) {
-      setModal({ isOpen: true, title: 'Hiba', message: 'Kérem adja meg a termék azonosítót és a mennyiséget!' });
-      return;
-    }
-
     try {
+      if (!id || !quantity) {
+        throw new Error('Adja meg a termék azonosítót és mennyiséget!');
+      }
+
       const data = await apiFetch('/adminRoute/products/addInventory', {
         method: 'PATCH',
         body: { id: parseInt(id), quantity: parseInt(quantity) },
@@ -61,8 +56,8 @@ export default function AdminInventory() {
 
       if (data.result === 'success') {
         showToast('Készlet sikeresen frissítve!');
-        setProducts(prevProducts =>
-          prevProducts.map(product =>
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
             product.prodId === parseInt(id)
               ? { ...product, quantity: product.quantity + parseInt(quantity) }
               : product
@@ -71,10 +66,18 @@ export default function AdminInventory() {
         setId('');
         setQuantity('');
       } else {
-        setModal({ isOpen: true, title: 'Hiba', message: data.message || 'Hiba történt a frissítés során.' });
+        setModal({
+          isOpen: true,
+          title: 'Hiba',
+          message: data.message || 'Hiba történt a frissítés során.',
+        });
       }
     } catch (err) {
-      setModal({ isOpen: true, title: 'Hiba', message: 'Szerver hiba történt.' });
+      setModal({
+        isOpen: true,
+        title: 'Hiba',
+        message: err.message,
+      });
     }
   };
 

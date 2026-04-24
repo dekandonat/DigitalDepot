@@ -17,16 +17,17 @@ function UserSubmissions({ activeTab, refreshTrigger }) {
     async function fetchUserSubmissions() {
       if (!token) {
         setLoading(false);
-        return;
-      }
-      try {
-        const result = await apiFetch('/used-products/my-submissions');
-        if (result.result === 'success') {
-          setSubmissions(result.data);
+      } else {
+        try {
+          const result = await apiFetch('/used-products/my-submissions');
+          if (result.result === 'success') {
+            setSubmissions(result.data);
+          }
+        } catch (err) {
+          console.error(err.message);
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-      } finally {
-        setLoading(false);
       }
     }
     fetchUserSubmissions();
@@ -41,7 +42,9 @@ function UserSubmissions({ activeTab, refreshTrigger }) {
       if (result.result === 'success') {
         setLocalTrigger((prev) => prev + 1);
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error(err.message);
+    }
   };
 
   if (loading) return <p className="loadingMsg">Beküldéseid betöltése...</p>;
@@ -157,7 +160,7 @@ function SubmissionForm({ onSubmissionSuccess }) {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   const [bankModalOpen, setBankModalOpen] = useState(false);
   const [bankInput, setBankInput] = useState('');
 
@@ -199,7 +202,8 @@ function SubmissionForm({ onSubmissionSuccess }) {
         setModal({
           isOpen: true,
           title: 'Siker',
-          message: 'Termék sikeresen beküldve! Az adminisztrátor hamarosan értékeli.',
+          message:
+            'Termék sikeresen beküldve! Az adminisztrátor hamarosan értékeli.',
           type: 'alert',
           onConfirm: () => {
             setModal({ ...modal, isOpen: false });
@@ -246,30 +250,23 @@ function SubmissionForm({ onSubmissionSuccess }) {
         message: 'Kérjük, jelentkezz be a termék leadásához!',
         type: 'alert',
       });
-      return;
-    }
-
-    if (!conditionState) {
+    } else if (!conditionState) {
       setModal({
         isOpen: true,
         title: 'Hiba',
         message: 'Válassz állapotot!',
         type: 'alert',
       });
-      return;
-    }
-
-    if (!imageFile) {
+    } else if (!imageFile) {
       setModal({
         isOpen: true,
         title: 'Hiba',
         message: 'Kérlek tölts fel egy képet a termékről!',
         type: 'alert',
       });
-      return;
+    } else {
+      submitProductData();
     }
-
-    submitProductData();
   };
 
   const handleBankSaveAndSubmit = async () => {

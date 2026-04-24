@@ -60,22 +60,22 @@ export default function AdminOrdersList() {
   const handleOrderDetails = async (id) => {
     if (details.isOpen && details.orderId === id) {
       setDetails({ data: null, isOpen: false, orderId: null });
-      return;
-    }
-    try {
-      const data = await apiFetch(`/order/items/${id}`);
-      if (data.result === 'success') {
-        setDetails({
-          data: {
-            products: data.data.products,
-            discount: data.data.discount.value,
-          },
-          isOpen: true,
-          orderId: id,
-        });
+    } else {
+      try {
+        const data = await apiFetch(`/order/items/${id}`);
+        if (data.result === 'success') {
+          setDetails({
+            data: {
+              products: data.data.products,
+              discount: data.data.discount.value,
+            },
+            isOpen: true,
+            orderId: id,
+          });
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
     }
   };
 

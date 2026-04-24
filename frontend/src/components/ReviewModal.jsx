@@ -12,30 +12,30 @@ export default function ReviewModal({ product, onClose, refreshParentData }) {
 
   useEffect(() => {
     const fetchReviews = async () => {
-        try {
-            const data = await apiFetch(`/reviews/${product.prodId}`);
-            if (data.result === 'success') {
-                setReviews(data.data);
-            }
-        } catch (err) {
-            console.error(err);
+      try {
+        const data = await apiFetch(`/reviews/${product.prodId}`);
+        if (data.result === 'success') {
+          setReviews(data.data);
         }
+      } catch (err) {
+        console.error(err);
+      }
     };
 
     const fetchMyReview = async () => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const data = await apiFetch(`/reviews/my-review/${product.prodId}`);
-                if (data.result === 'success' && data.data) {
-                    setRating(data.data.rating);
-                    setComment(data.data.comment || '');
-                    setExistingReviewId(data.data.reviewId);
-                }
-            } catch (err) {
-                console.error(err);
-            }
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const data = await apiFetch(`/reviews/my-review/${product.prodId}`);
+          if (data.result === 'success' && data.data) {
+            setRating(data.data.rating);
+            setComment(data.data.comment || '');
+            setExistingReviewId(data.data.reviewId);
+          }
+        } catch (err) {
+          console.error(err);
         }
+      }
     };
 
     fetchReviews();
@@ -49,60 +49,60 @@ export default function ReviewModal({ product, onClose, refreshParentData }) {
     if (!token) {
       setErrorMessage('Értékeléshez jelentkezz be!');
       return;
-    }
-
-    try {
-      if (existingReviewId) {
-        const result = await apiFetch(`/reviews/${existingReviewId}`, {
-          method: 'PATCH',
-          body: {
-            rating: rating,
-            comment: comment,
-          },
-        });
-        if (result.result === 'success') {
-          if (refreshParentData) refreshParentData();
-          onClose();
+    } else {
+      try {
+        if (existingReviewId) {
+          const result = await apiFetch(`/reviews/${existingReviewId}`, {
+            method: 'PATCH',
+            body: {
+              rating: rating,
+              comment: comment,
+            },
+          });
+          if (result.result === 'success') {
+            if (refreshParentData) refreshParentData();
+            onClose();
+          } else {
+            setErrorMessage(result.message || 'Hiba történt');
+          }
         } else {
-          setErrorMessage(result.message || 'Hiba történt');
+          const result = await apiFetch('/reviews/', {
+            method: 'POST',
+            body: {
+              productId: product.prodId,
+              rating: rating,
+              comment: comment,
+            },
+          });
+          if (result.result === 'success') {
+            if (refreshParentData) refreshParentData();
+            onClose();
+          } else {
+            setErrorMessage(result.message || 'Hiba történt');
+          }
         }
-      } else {
-        const result = await apiFetch('/reviews/', {
-          method: 'POST',
-          body: {
-            productId: product.prodId,
-            rating: rating,
-            comment: comment,
-          },
-        });
-        if (result.result === 'success') {
-          if (refreshParentData) refreshParentData();
-          onClose();
-        } else {
-          setErrorMessage(result.message || 'Hiba történt');
-        }
+      } catch (err) {
+        setErrorMessage('Hálózati hiba történt');
       }
-    } catch (err) {
-      setErrorMessage('Hálózati hiba történt');
     }
   };
 
   const handleDelete = async () => {
     const token = localStorage.getItem('token');
-    if (!token || !existingReviewId) return;
-
-    try {
-      const result = await apiFetch(`/reviews/${existingReviewId}`, {
-        method: 'DELETE',
-      });
-      if (result.result === 'success') {
-        if (refreshParentData) refreshParentData();
-        onClose();
-      } else {
-        setErrorMessage(result.message || 'Hiba történt a törlés során');
+    if (token && existingReviewId) {
+      try {
+        const result = await apiFetch(`/reviews/${existingReviewId}`, {
+          method: 'DELETE',
+        });
+        if (result.result === 'success') {
+          if (refreshParentData) refreshParentData();
+          onClose();
+        } else {
+          setErrorMessage(result.message || 'Hiba történt a törlés során');
+        }
+      } catch (err) {
+        setErrorMessage('Hálózati hiba történt');
       }
-    } catch (err) {
-      setErrorMessage('Hálózati hiba történt');
     }
   };
 
@@ -115,7 +115,9 @@ export default function ReviewModal({ product, onClose, refreshParentData }) {
         <h2>Értékelések - {product.productName}</h2>
 
         <div className="addReviewSection">
-          <h3>{existingReviewId ? 'Értékelés módosítása' : 'Írd meg a véleményed'}</h3>
+          <h3>
+            {existingReviewId ? 'Értékelés módosítása' : 'Írd meg a véleményed'}
+          </h3>
           <div className="ratingSelector">
             {[1, 2, 3, 4, 5].map((star) => (
               <span

@@ -62,54 +62,56 @@ export default function AdminAddProduct() {
         title: 'Hiba',
         message: 'Nem adott meg képet a termékhez!',
       });
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('prodName', name);
-    formData.append('prodDescription', description);
-    formData.append('prodPrice', price);
-    if (currentMainCategory === 'new') {
-      formData.append('newCategory', newMainCategory);
-      formData.append('newSubcategory', newSubCategory);
-    } else if (currentSubCategory === 'new') {
-      formData.append('categoryId', currentMainCategory);
-      formData.append('newSubcategory', newSubCategory);
     } else {
-      formData.append('categoryId', currentSubCategory || currentMainCategory);
-    }
-    formData.append('file', img);
+      const formData = new FormData();
+      formData.append('prodName', name);
+      formData.append('prodDescription', description);
+      formData.append('prodPrice', price);
+      if (currentMainCategory === 'new') {
+        formData.append('newCategory', newMainCategory);
+        formData.append('newSubcategory', newSubCategory);
+      } else if (currentSubCategory === 'new') {
+        formData.append('categoryId', currentMainCategory);
+        formData.append('newSubcategory', newSubCategory);
+      } else {
+        formData.append(
+          'categoryId',
+          currentSubCategory || currentMainCategory
+        );
+      }
+      formData.append('file', img);
 
-    apiFetch('/adminRoute/addProduct', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: formData,
-    })
-      .then((data) => {
-        if (data.result === 'success') {
-          showToast('Sikeres feltöltés!');
-          setName('');
-          setDescription('');
-          setPrice(0);
-          setImg(undefined);
-          document.getElementById('imgId').value = '';
-        } else {
+      apiFetch('/adminRoute/addProduct', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: formData,
+      })
+        .then((data) => {
+          if (data.result === 'success') {
+            showToast('Sikeres feltöltés!');
+            setName('');
+            setDescription('');
+            setPrice(0);
+            setImg(undefined);
+            document.getElementById('imgId').value = '';
+          } else {
+            setModal({
+              isOpen: true,
+              title: 'Hiba történt',
+              message: data.message,
+            });
+          }
+        })
+        .catch((err) => {
           setModal({
             isOpen: true,
-            title: 'Hiba történt',
-            message: data.message,
+            title: 'Hiba',
+            message: err.message,
           });
-        }
-      })
-      .catch((err) => {
-        setModal({
-          isOpen: true,
-          title: 'Hiba',
-          message: err.message,
         });
-      });
+    }
   };
 
   return (

@@ -10,7 +10,12 @@ export default function ProductPage() {
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [toast, setToast] = useState({ show: false, message: '', type: '', key: 0 });
+  const [toast, setToast] = useState({
+    show: false,
+    message: '',
+    type: '',
+    key: 0,
+  });
   const [averageRating, setAverageRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -71,21 +76,17 @@ export default function ProductPage() {
     const userToken = localStorage.getItem('token');
     if (!userToken) {
       showToast('A vásárláshoz jelentkezzen be!', 'error');
-      return;
-    }
-
-    if (product.quantity <= 0) {
+    } else if (product.quantity <= 0) {
       showToast('Sajnáljuk, a termék jelenleg nincs készleten!', 'error');
-      return;
-    }
-
-    try {
-      await apiFetch(`/cart/add/${product.prodId}/1`, {
-        method: 'POST',
-      });
-      showToast('Termék a kosárba került! ✅', 'success');
-    } catch (error) {
-      showToast('Hiba történt a kosárba helyezéskor.', 'error');
+    } else {
+      try {
+        await apiFetch(`/cart/add/${product.prodId}/1`, {
+          method: 'POST',
+        });
+        showToast('Termék a kosárba került! ✅', 'success');
+      } catch (error) {
+        showToast('Hiba történt a kosárba helyezéskor.', 'error');
+      }
     }
   };
 
@@ -101,7 +102,7 @@ export default function ProductPage() {
   };
 
   const handleLoadMoreReviews = () => {
-    setVisibleReviewsCount(prev => prev + 10);
+    setVisibleReviewsCount((prev) => prev + 10);
   };
 
   if (isLoading)
@@ -122,7 +123,7 @@ export default function ProductPage() {
           {toast.message}
         </div>
       )}
-      
+
       <div className="productPageContainer">
         <button className="backButton" onClick={() => navigate(-1)}>
           &larr; Vissza
@@ -302,7 +303,10 @@ export default function ProductPage() {
               </div>
               {visibleReviewsCount < reviews.length && (
                 <div className="loadMoreContainer">
-                  <button className="loadMoreBtn" onClick={handleLoadMoreReviews}>
+                  <button
+                    className="loadMoreBtn"
+                    onClick={handleLoadMoreReviews}
+                  >
                     További vélemények betöltése
                   </button>
                 </div>

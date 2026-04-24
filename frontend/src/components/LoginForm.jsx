@@ -45,26 +45,24 @@ export default function LoginForm({ onClose, setIsLoggedIn }) {
   const submit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
-
-    if (!isLogin && password !== password2) {
-      setErrorMsg('A két jelszó nem egyezik!');
-      return;
-    }
-
-    let url;
-    if (isLogin === true) {
-      url = '/user/login';
-    } else {
-      url = '/user/register';
-    }
-
-    let dataValues = {
-      email: email,
-      password: password,
-      userName: userName,
-    };
-
     try {
+      if (!isLogin && password !== password2) {
+        throw new Error('A két jelszó nem egyezik!');
+      }
+
+      let url;
+      if (isLogin === true) {
+        url = '/user/login';
+      } else {
+        url = '/user/register';
+      }
+
+      let dataValues = {
+        email: email,
+        password: password,
+        userName: userName,
+      };
+
       const response = await apiFetch(url, {
         method: 'POST',
         credentials: 'include',

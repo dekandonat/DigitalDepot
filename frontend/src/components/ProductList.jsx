@@ -21,20 +21,18 @@ function ProductCard({ product, onOpenReviews, showToast }) {
     if (!userToken) {
       showToast('Jelentkezzen be a vásárláshoz!', 'error');
       return;
-    }
-
-    if (product.quantity <= 0) {
+    } else if (product.quantity <= 0) {
       showToast('Sajnáljuk, a termék jelenleg nincs készleten!', 'error');
       return;
-    }
-
-    try {
-      const response = await apiFetch(`/cart/add/${product.prodId}/1`, {
-        method: 'POST',
-      });
-      showToast('Sikeresen a kosárba helyezve!', 'success');
-    } catch (error) {
-      showToast(error.message || 'Hiba történt a művelet során!', 'error');
+    } else {
+      try {
+        const response = await apiFetch(`/cart/add/${product.prodId}/1`, {
+          method: 'POST',
+        });
+        showToast('Sikeresen a kosárba helyezve!', 'success');
+      } catch (error) {
+        showToast(error.message || 'Hiba történt a művelet során!', 'error');
+      }
     }
   };
 

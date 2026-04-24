@@ -1,26 +1,7 @@
 import { useState } from 'react';
 import './passwordReset.css';
 import CustomModal from './CustomModal';
-
-const postMethodFetch = (url, body) => {
-  return fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(response);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      return data;
-    })
-    .catch((err) => {
-      throw new Error(err);
-    });
-};
+import { apiFetch } from '../assets/util/fetch';
 
 export default function PasswordReset(props) {
   const [isCode, setIsCode] = useState(true);
@@ -60,35 +41,51 @@ export default function PasswordReset(props) {
 
   function getCode() {
     if (email != '') {
-      postMethodFetch('/user/reset-code', { email: email })
+      apiFetch('/user/reset-code', { method: 'POST', body: { email: email } })
         .then((data) => {
           if (data.result == 'success') {
             setIsCode(false);
           } else {
-            setModal({ isOpen: true, title: 'Hiba', message: 'Hiba történt! Ellenőrizze a megadott email címet' });
+            setModal({
+              isOpen: true,
+              title: 'Hiba',
+              message: 'Hiba történt! Ellenőrizze a megadott email címet',
+            });
           }
         })
         .catch((err) => {
           console.log(err.message);
         });
     } else {
-      setModal({ isOpen: true, title: 'Figyelem', message: 'Adja meg email címét!' });
+      setModal({
+        isOpen: true,
+        title: 'Figyelem',
+        message: 'Adja meg email címét!',
+      });
     }
   }
 
   function changePassword() {
     if (password == '' || code == '') {
-      setModal({ isOpen: true, title: 'Figyelem', message: 'Minden mezőt ki kell tölteni' });
-      return;
-    }
-
-    if (password !== password2) {
-      setModal({ isOpen: true, title: 'Figyelem', message: 'A jelszavak nem egyeznek' });
+      setModal({
+        isOpen: true,
+        title: 'Figyelem',
+        message: 'Minden mezőt ki kell tölteni',
+      });
+    } else if (password !== password2) {
+      setModal({
+        isOpen: true,
+        title: 'Figyelem',
+        message: 'A jelszavak nem egyeznek',
+      });
     } else {
-      postMethodFetch('/user/reset-password', {
-        email: email,
-        code: code,
-        password: password.trim(),
+      apiFetch('/user/reset-password', {
+        method: 'POST',
+        body: {
+          email: email,
+          code: code,
+          password: password.trim(),
+        },
       })
         .then((data) => {
           console.log(data);
@@ -107,7 +104,7 @@ export default function PasswordReset(props) {
 
   return (
     <>
-      <CustomModal 
+      <CustomModal
         isOpen={modal.isOpen}
         title={modal.title}
         message={modal.message}

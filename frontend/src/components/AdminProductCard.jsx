@@ -77,28 +77,28 @@ export default function AdminProductCard(props) {
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
 
-    const formData = new FormData();
-    formData.append('file', file);
+      try {
+        const result = await apiFetch(`/adminRoute/product/${props.id}`, {
+          method: 'PATCH',
+          body: formData,
+        });
 
-    try {
-      const result = await apiFetch(`/adminRoute/product/${props.id}`, {
-        method: 'PATCH',
-        body: formData,
-      });
-
-      if (result.result == 'success') {
-        setToast('Sikeres frissítés');
-        const imgResult = await apiFetch(`/products/${props.id}`);
-        if (imgResult.result == 'success') {
-          setCurrentImg(imgResult.data.productImg);
+        if (result.result == 'success') {
+          setToast('Sikeres frissítés');
+          const imgResult = await apiFetch(`/products/${props.id}`);
+          if (imgResult.result == 'success') {
+            setCurrentImg(imgResult.data.productImg);
+          }
+        } else {
+          setModal({ isOpen: true, title: 'Hiba', message: result.message });
         }
-      } else {
-        setModal({ isOpen: true, title: 'Hiba', message: result.message });
+      } catch (err) {
+        setModal({ isOpen: true, title: 'Hiba', message: err.message });
       }
-    } catch (err) {
-      setModal({ isOpen: true, title: 'Hiba', message: err.message });
     }
   };
 
