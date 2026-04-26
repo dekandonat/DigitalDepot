@@ -1,10 +1,10 @@
 #mainCategoriesNav {
   width: 100%;
-  background-color: #fcfcfc;
+  background-color: #334155;
   position: relative;
   z-index: 90;
-  border-bottom: 1px solid #e0e0e0;
-  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: none;
   display: none;
 }
 
@@ -23,20 +23,20 @@
   text-align: center;
   font-weight: 500;
   font-size: 0.95rem;
-  color: #666;
+  color: white;
   transition: all 0.2s;
   text-transform: capitalize;
-  border-right: 1px solid #f0f0f0; 
+  border-right: 1px solid rgba(255, 255, 255, 0.05); 
 }
 
 #mainCategoriesList > li:first-child {
-  border-left: 1px solid #f0f0f0;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 #mainCategoriesList > li:hover, 
 #mainCategoriesList > li.active {
-  color: #007bff;
-  background-color: #f9f9f9;
+  color: white;
+  background-color: #1e293b;
 }
 
 .subCategories {
@@ -49,9 +49,9 @@
   list-style: none;
   padding: 5px 0;
   margin-top: 0;
-  border: 1px solid #eee;
+  border: 1px solid #e2e8f0;
   border-radius: 6px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   opacity: 0;
   animation: expandDown 0.2s ease forwards;
@@ -69,15 +69,15 @@
 
 .subCategories li {
   padding: 10px 20px;
-  color: #555;
+  color: #334155;
   text-align: left;
   font-size: 0.9rem;
   cursor: pointer;
 }
 
 .subCategories li:hover {
-  background-color: #f8f9fa;
-  color: #007bff;
+  background-color: #f8fafc;
+  color: #1e293b;
 }
 
 @keyframes expandDown {
@@ -88,7 +88,7 @@
 @media(min-width: 768px) {
   #mainCategoriesNav {
       display: block;
-      background-color: white;
+      background-color: #334155;
       border-top: none;
   }
 }

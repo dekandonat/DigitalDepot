@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  background-color: #f4f5f7;
 }
 
 .chatIcon {
@@ -48,6 +49,12 @@ body {
   border: 2px solid white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 1001;
+}
+
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 @media (max-width: 768px) {

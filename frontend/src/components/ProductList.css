@@ -42,7 +42,7 @@
 #clearFilterButton {
   background: none;
   border: none;
-  color: #dc3545;
+  color: #991b1b;
   font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
@@ -70,7 +70,7 @@
 
 .desktopSortSelect:hover,
 .desktopSortSelect:focus {
-  border-color: #007bff;
+  border-color: #334155;
 }
 
 #productGrid {
@@ -143,13 +143,13 @@
 }
 
 .conditionBadge.bontatlan {
-  background-color: rgba(16, 185, 129, 0.9);
+  background-color: rgba(22, 101, 52, 0.9);
 }
 .conditionBadge.felbontott {
-  background-color: rgba(245, 158, 11, 0.9);
+  background-color: rgba(180, 83, 9, 0.9);
 }
 .conditionBadge.használt {
-  background-color: rgba(239, 68, 68, 0.9);
+  background-color: rgba(153, 27, 27, 0.9);
 }
 
 .cardContent {
@@ -176,7 +176,7 @@
 }
 
 .productCard h3:hover {
-  color: #007bff;
+  color: #334155;
 }
 
 .productDescription {
@@ -204,7 +204,7 @@
 .productPrice {
   font-size: 1.2rem;
   font-weight: 800;
-  color: #007bff;
+  color: #334155;
   letter-spacing: -0.3px;
 }
 
@@ -216,7 +216,7 @@
 }
 
 #intoCartButton {
-  background-color: #007bff;
+  background-color: #334155;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -229,7 +229,7 @@
 }
 
 #intoCartButton:hover {
-  background-color: #0056b3;
+  background-color: #475569;
 }
 
 #intoCartButton:active {
@@ -282,15 +282,15 @@
 }
 
 .toast-success {
-  background-color: rgba(223, 246, 233, 0.95);
-  border: 1px solid rgba(46, 204, 113, 0.4);
-  color: #1e8449;
+  background-color: rgba(240, 253, 244, 0.95);
+  border: 1px solid rgba(22, 101, 52, 0.4);
+  color: #166534;
 }
 
 .toast-error {
-  background-color: rgba(250, 227, 225, 0.95);
-  border: 1px solid rgba(231, 76, 60, 0.4);
-  color: #c0392b;
+  background-color: rgba(254, 242, 242, 0.95);
+  border: 1px solid rgba(153, 27, 27, 0.4);
+  color: #991b1b;
 }
 
 .productCard.outOfStock {
@@ -303,7 +303,7 @@
 }
 
 .productCard.outOfStock #intoCartButton:hover {
-  background-color: #007bff;
+  background-color: #334155;
 }
 
 .loadMoreContainer {
@@ -315,8 +315,8 @@
 
 .loadMoreBtn {
   background-color: white;
-  color: #007bff;
-  border: 2px solid #007bff;
+  color: #334155;
+  border: 2px solid #334155;
   padding: 12px 30px;
   border-radius: 8px;
   font-weight: 600;
@@ -327,7 +327,7 @@
 }
 
 .loadMoreBtn:hover {
-  background-color: #007bff;
+  background-color: #334155;
   color: white;
 }
 
@@ -363,7 +363,7 @@
 
   .ratingDisplay:hover .ratingText {
     text-decoration: underline;
-    color: #007bff;
+    color: #334155;
   }
 
   .loadMoreBtn {

@@ -3,16 +3,15 @@
   height: 60px;
   justify-content: space-between; 
   align-items: center; 
-  border-bottom: 1px solid #eee; 
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
   padding: 0 15px; 
   position: sticky;
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(5px);
+  background-color: #1e293b;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 #navbarLogo {
@@ -20,6 +19,10 @@
   width: auto;
   object-fit: contain;
   cursor: pointer;
+  filter: brightness(0) invert(1);
+  transform: scale(1.35);
+  transform-origin: left center;
+  opacity: 0.95;
 }
 
 #navbarActions {
@@ -35,13 +38,15 @@
   width: 36px;
   padding: 8px;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: none;
   border-radius: 50%;
-  background-color: #f8f9fa;
-  background-size: 20px;
+  background-color: transparent;
+  background-size: 22px;
   background-repeat: no-repeat;
   background-position: center;
-  transition: background-color 0.2s, border-color 0.2s;
+  filter: brightness(0) invert(1);
+  opacity: 0.75;
+  transition: all 0.2s ease;
 }
 
 #navbarCartBtn { background-image: url(../assets/NavImages/shopping-cart-icon.png); }
@@ -51,67 +56,86 @@
 #navbarCartBtn:hover,
 #navbarLoginBtn:hover,
 #navbarProfileBtn:hover {
-  background-color: #e2e6ea;
-  border-color: #dae0e5;
+  opacity: 1;
+  transform: scale(1.15);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .searchBar {
-    display: flex;
-    align-items: center;
-    border-radius: 20px;
-    background-color: #f1f3f5;
-    transition: all 0.3s ease;
-    border: 1px solid transparent;
-    position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 25px;
+  background-color: rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+}
+
+.searchBar:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .searchBar:focus-within {
-    background-color: white;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0,123,255,0.1);
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
 }
 
 #navSearchText {
-    display: none;
-    border: none;
-    background: transparent;
-    outline: none;
-    padding: 8px;
-    width: 100%;
-    font-size: 16px;
+  display: none;
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 8px;
+  width: 100%;
+  font-size: 16px;
+  color: white;
+}
+
+#navSearchText::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
 }
 
 .searchBar.active #navSearchText {
-    display: block;
-    width: 150px;
-    padding-left: 15px;
+  display: block;
+  width: 150px;
+  padding-left: 15px;
 }
 
 .searchBar.active {
-    background-color: white;
-    border-color: #ddd;
-    position: absolute;
-    right: 50px; 
-    z-index: 10;
+  background-color: #1e293b;
+  position: absolute;
+  right: 50px; 
+  z-index: 10;
 }
 
 #navSearchButton {
-    display: flex;
-    padding: 8px;
-    cursor: pointer;    
-    border: none;
-    height: 36px;
-    width: 36px;
-    background: none;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
+  display: flex;
+  padding: 8px;
+  cursor: pointer;    
+  border: none;
+  height: 36px;
+  width: 36px;
+  background: transparent;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
 }
 
 #searchIconId {
-    height: 18px;
-    width: auto;
-    opacity: 0.6;
+  height: 18px;
+  width: auto;
+  opacity: 0.7;
+  filter: brightness(0) invert(1);
+  transition: opacity 0.2s;
+}
+
+.searchBar:hover #searchIconId,
+.searchBar:focus-within #searchIconId {
+  opacity: 1;
 }
 
 @media(max-width: 768px) {
@@ -121,50 +145,37 @@
 }
 
 @media(min-width: 768px) {
-    #navbar {
-        height: 70px;
-        padding: 0 30px;
-    }
+  #navbar {
+    height: 70px;
+    padding: 0 30px;
+  }
 
-    #navbarLogo {
-        height: 50px;
-    }
+  #navbarLogo {
+    height: 50px;
+  }
 
-    #navbarActions {
-        gap: 25px;
-    }
+  #navbarActions {
+    gap: 25px;
+  }
 
-    .searchBar {
-        width: 300px;
-        background-color: white;
-        border: 1px solid #ced4da;
-        overflow: hidden;
-    }
+  .searchBar {
+    width: 300px;
+  }
 
-    .searchBar.active {
-        position: static;
-        width: 300px;
-    }
+  .searchBar.active {
+    position: static;
+    width: 300px;
+  }
 
-    #navSearchText {
-        display: block;
-        flex: 1;
-        padding: 8px 15px;
-        border: none;
-        outline: none;
-        background: transparent;
-        font-size: 0.95rem;
-        color: #495057;
-    }
+  #navSearchText {
+    display: block;
+    flex: 1;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+  }
 
-    #navSearchButton {
-        width: 50px;
-        border-radius: 0 20px 20px 0;
-        border-left: 1px solid #ced4da;
-        background-color: #f8f9fa;
-    }
-
-    #navSearchButton:hover {
-        background-color: #e9ecef;
-    }
+  #navSearchButton {
+    width: 45px;
+    border-radius: 0 25px 25px 0;
+  }
 }

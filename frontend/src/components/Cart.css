@@ -62,7 +62,7 @@
 
 #cartHeader h2{
     margin: 0;
-    color: #333;
+    color: #1e293b;
 }
 
 #cartCloseBtn{
@@ -70,15 +70,16 @@
     border: none;
     font-size: 2rem;
     cursor: pointer;
-    color: #666;
+    color: #64748b;
     padding: 0 10px;
     line-height: 1;
     display: flex;
     align-items: center;
+    transition: color 0.2s;
 }
 
 #cartCloseBtn:hover{
-    color: black;
+    color: #1e293b;
 }
 
 #cartItemsList{
@@ -92,17 +93,20 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 0;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .cartItemInfo h4{
     margin: 0 0 5px 0;
     font-size: 1rem;
+    color: #334155;
 }
 
 .cartItemInfo p{
     margin: 0;
-    color: #666;
+    color: #64748b;
     font-size: 0.9rem;
+    font-weight: 600;
 }
 
 .cartControls{
@@ -114,22 +118,24 @@
 .quantityBtn{
     width: 30px;
     height: 30px;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 6px;
     font-weight: bold;
-    transition: background-color 0.2s;
+    color: #334155;
+    transition: all 0.2s;
 }
 
 .quantityBtn:hover{
-    background-color: #eee;
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
 }
 
 #cartFooter{
     margin-top: 20px;
     padding-top: 20px;
-    border-top: 1px solid #eee;
+    border-top: 2px solid #f1f5f9;
 }
 
 #totalRow{
@@ -138,23 +144,31 @@
     font-size: 1.2rem;
     font-weight: bold;
     margin-bottom: 20px;
+    color: #1e293b;
 }
 
 #checkoutBtn{
     width: 100%;
     padding: 15px;
-    background-color: #007bff;
+    background-color: #334155;
     color: white;
     border: none;
-    border-radius: 5px;
-    font-size: 1rem;
+    border-radius: 8px;
+    font-size: 1.05rem;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
+    box-shadow: 0 4px 10px rgba(51, 65, 85, 0.2);
 }
 
 #checkoutBtn:hover{
-    background-color: #0056b3;
+    background-color: #475569;
+}
+
+#checkoutBtn:disabled{
+    background-color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 @media(min-width: 768px) {

@@ -19,7 +19,7 @@
 .adminChatList {
   width: 320px;
   min-width: 320px;
-  background-color: #f8fbff;
+  background-color: #f8fafc;
   border-right: 1px solid #ddd;
   overflow-y: auto;
   z-index: 5;
@@ -28,13 +28,13 @@
 
 .topicAccordion {
   margin-bottom: 10px;
-  border: 1px solid #cce5ff;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   overflow: hidden;
 }
 
 .topicAccordionHeader {
-  background: #0275d8;
+  background: #334155;
   color: white;
   padding: 12px 15px;
   font-weight: bold;
@@ -46,11 +46,11 @@
 }
 
 .topicAccordionHeader:hover {
-  background: #025aa5;
+  background: #475569;
 }
 
 .topicAccordionBody {
-  background: #f8fbff;
+  background: #f8fafc;
   padding: 10px;
   display: none;
 }
@@ -71,8 +71,8 @@
 }
 
 .adminChatUser.active {
-  background-color: #e3f2ff;
-  border-color: #7bbdfa;
+  background-color: #f1f5f9;
+  border-color: #334155;
 }
 
 .adminChatUser h3 {
@@ -118,14 +118,14 @@
 }
 
 .deleteUserChatBtn:hover {
-  background-color: #ff4d4d;
+  background-color: #991b1b;
   color: white;
   transform: scale(1.1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .unreadBadge {
-  background: #dc3545;
+  background: #991b1b;
   color: white;
   padding: 2px 8px;
   border-radius: 10px;
@@ -179,7 +179,7 @@
 }
 
 .sentMessageAdmin {
-  background-color: #0275d8;
+  background-color: #334155;
   color: white;
   border-bottom-right-radius: 0;
 }
@@ -215,7 +215,7 @@
 
 .adminChatInput button {
   padding: 0 25px;
-  background-color: #0275d8;
+  background-color: #334155;
   color: white;
   border: none;
   border-radius: 10px;
@@ -225,7 +225,7 @@
 }
 
 .adminChatInput button:hover {
-  background-color: #025aa5;
+  background-color: #475569;
 }
 
 .mobileMenuToggle {
@@ -253,7 +253,7 @@
     width: calc(100% - 20px);
     margin: 10px auto;
     padding: 14px;
-    background-color: #0275d8;
+    background-color: #334155;
     color: white;
     border: none;
     border-radius: 10px;
