@@ -51,6 +51,12 @@ body {
   z-index: 1001;
 }
 
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 @media (max-width: 768px) {
   .chatIcon {
     bottom: 70px !important;

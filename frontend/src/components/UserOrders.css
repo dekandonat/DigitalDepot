@@ -24,7 +24,7 @@
     cursor: pointer;
     border: none;
     border-radius: 5px;
-    background-color: #6c757d;
+    background-color: #334155;
     color: white;
     font-weight: 500;
     font-size: 1rem;
@@ -32,7 +32,7 @@
 }
 
 .backButton:hover {
-    background-color: #5a6268;
+    background-color: #475569;
 }
 
 .loadingText, .noOrdersText {
@@ -52,11 +52,11 @@
 }
 
 .orderCard {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    border: none;
+    border-radius: 12px;
     padding: 15px;
     background-color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     transition: all 0.2s;
 }
 
@@ -78,7 +78,7 @@
 .orderId {
     font-weight: bold;
     font-size: 1.1rem;
-    color: #007bff;
+    color: #334155;
 }
 
 .orderDate {
@@ -89,7 +89,7 @@
 .expandButton {
     background: none;
     border: none;
-    color: #007bff;
+    color: #334155;
     padding: 0;
     cursor: pointer;
     font-size: 0.9rem;
@@ -98,7 +98,7 @@
 }
 
 .expandButton:hover {
-    color: #0056b3;
+    color: #475569;
     text-decoration: none;
 }
 
@@ -133,7 +133,7 @@
     top: 15px;
     left: 0;
     height: 3px;
-    background-color: #007bff;
+    background-color: #334155;
     z-index: 2;
     transition: width 0.4s ease;
 }
@@ -142,7 +142,7 @@
 .statusStepper[data-progress="1"]::after { width: 33%; }
 .statusStepper[data-progress="2"]::after { width: 66%; }
 .statusStepper[data-progress="3"]::after { width: 100%; }
-.statusStepper[data-progress="4"]::after { width: 100%; background-color: #dc3545; }
+.statusStepper[data-progress="4"]::after { width: 100%; background-color: #991b1b; }
 
 .statusStep {
     position: relative;
@@ -170,11 +170,11 @@
 }
 
 .statusStep.completed .stepCircle {
-    background-color: #007bff;
+    background-color: #334155;
 }
 
 .statusStep.cancelled .stepCircle {
-    background-color: #dc3545;
+    background-color: #991b1b;
 }
 
 .stepLabel {
@@ -185,12 +185,12 @@
 }
 
 .statusStep.completed .stepLabel {
-    color: #007bff;
+    color: #334155;
     font-weight: 600;
 }
 
 .statusStep.cancelled .stepLabel {
-    color: #dc3545;
+    color: #991b1b;
     font-weight: 600;
 }
 
@@ -257,7 +257,7 @@
 
 @media (min-width: 600px) {
     .userOrdersContainer {
-        padding: 40px 20px;
+        padding: 0 20px;
     }
 
     .userOrdersTitle {

@@ -1,4 +1,5 @@
 .pageWrapper {
+  background-color: #f4f5f7;
   min-height: 100vh;
   padding: 15px 0 70px 0;
   display: flex;
@@ -29,7 +30,7 @@
 }
 
 .backButton:hover {
-  color: #007bff;
+  color: #334155;
   text-decoration: none;
   background: transparent;
   transform: translateX(-3px);
@@ -85,14 +86,14 @@
 }
 
 .conditionBadgeLarge.bontatlan {
-  background-color: #2ecc71;
+  background-color: #166534;
 }
 .conditionBadgeLarge.felbontott {
-  background-color: #f1c40f;
-  color: #333;
+  background-color: #b45309;
+  color: white;
 }
 .conditionBadgeLarge.használt {
-  background-color: #e74c3c;
+  background-color: #991b1b;
 }
 
 .rightColumn {
@@ -127,7 +128,7 @@
 }
 
 .ratingLink {
-  color: #007bff;
+  color: #334155;
   font-size: 0.85rem;
   font-weight: 500;
 }
@@ -174,27 +175,27 @@
 }
 
 .availabilityItem.inStock {
-  color: #27ae60;
+  color: #166534;
 }
 
 .availabilityItem.lowStock {
-  color: #f39c12;
+  color: #b45309;
 }
 
 .availabilityItem.outOfStock {
-  color: #e74c3c;
+  color: #991b1b;
 }
 
 .availabilityItem.inStock .checkIcon {
-  color: #27ae60;
+  color: #166534;
 }
 
 .availabilityItem.lowStock .checkIcon {
-  color: #f39c12;
+  color: #b45309;
 }
 
 .availabilityItem.outOfStock .checkIcon {
-  color: #e74c3c;
+  color: #991b1b;
 }
 
 .checkIcon {
@@ -208,7 +209,7 @@
 
 .addToCartBtnBig {
   width: 100%;
-  background-color: #007bff;
+  background-color: #334155;
   color: white;
   font-size: 1.1rem;
   font-weight: 600;
@@ -222,11 +223,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(51, 65, 85, 0.25);
 }
 
 .addToCartBtnBig:hover {
-  background-color: #0056b3;
+  background-color: #475569;
 }
 
 .addToCartBtnBig:active {
@@ -286,7 +287,7 @@
 
 .infoBox li::before {
   content: '•';
-  color: #007bff;
+  color: #334155;
   font-weight: bold;
   display: inline-block;
   width: 1em;
@@ -347,7 +348,7 @@
 .userAvatarPlaceholder {
   width: 32px;
   height: 32px;
-  background-color: #007bff;
+  background-color: #334155;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -390,15 +391,15 @@
 }
 
 .toast-success {
-  background-color: rgba(223, 246, 233, 0.95);
-  border: 1px solid rgba(46, 204, 113, 0.4);
-  color: #1e8449;
+  background-color: rgba(240, 253, 244, 0.95);
+  border: 1px solid rgba(22, 101, 52, 0.4);
+  color: #166534;
 }
 
 .toast-error {
-  background-color: rgba(250, 227, 225, 0.95);
-  border: 1px solid rgba(231, 76, 60, 0.4);
-  color: #c0392b;
+  background-color: rgba(254, 242, 242, 0.95);
+  border: 1px solid rgba(153, 27, 27, 0.4);
+  color: #991b1b;
 }
 
 .loadingContainer,
@@ -414,7 +415,7 @@
 
 .loader {
   border: 3px solid #e0e0e0;
-  border-top: 3px solid #007bff;
+  border-top: 3px solid #334155;
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -460,8 +461,8 @@
 
 .loadMoreBtn {
   background-color: white;
-  color: #007bff;
-  border: 2px solid #007bff;
+  color: #334155;
+  border: 2px solid #334155;
   padding: 10px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -472,7 +473,7 @@
 }
 
 .loadMoreBtn:hover {
-  background-color: #007bff;
+  background-color: #334155;
   color: white;
 }
 

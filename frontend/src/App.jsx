@@ -17,6 +17,10 @@ import AdminChatPanel from './components/AdminChatPanel';
 import MobileBottomNav from './components/MobileBottomNav';
 import MobileCategoryMenu from './components/MobileCategoryMenu';
 import ProfilePage from './components/ProfilePage';
+import Footer from './components/Footer';
+import PrivacyPolicy from './components/Info/PrivacyPolicy';
+import TermsOfService from './components/Info/TermsOfService';
+import AboutUs from './components/Info/AboutUs';
 import { slides } from './data/MainPageGalleryData.json';
 import './main.css';
 import { jwtDecode } from 'jwt-decode';
@@ -239,6 +243,9 @@ export default function App() {
         location.pathname !== '/my-orders' &&
         location.pathname !== '/used-products' &&
         location.pathname !== '/profile' &&
+        location.pathname !== '/privacy-policy' &&
+        location.pathname !== '/terms-of-service' &&
+        location.pathname !== '/about-us' &&
         !location.pathname.startsWith('/product/') && (
           <MainCategoriesMenu onCategorySelect={handleCategorySelect} />
         )}
@@ -249,6 +256,9 @@ export default function App() {
         <Route path="/search" element={<ProductList />} />
         <Route path="/product/:productId" element={<ProductPage />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/about-us" element={<AboutUs />} />
 
         <Route
           path="/profile"
@@ -298,6 +308,8 @@ export default function App() {
           }
         />
       </Routes>
+
+      {!isAdminRoute && <Footer />}
 
       {!isAdminRoute && (
         <MobileBottomNav

@@ -90,7 +90,7 @@
 }
 
 .mobileCategoryTitle:active {
-    color: #007bff;
+    color: #334155;
 }
 
 .mobileCategoryToggle {
@@ -134,7 +134,7 @@
 }
 
 .mobileSubCategories li:active {
-    color: #007bff;
+    color: #334155;
     background-color: #f0f0f0;
 }
 
@@ -169,5 +169,5 @@
 }
 
 .mobileSortSelect:focus {
-    border-color: #007bff;
+    border-color: #334155;
 }
