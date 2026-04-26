@@ -34,12 +34,12 @@
 
 .adminAddCouponDiv input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #334155;
+  box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.1);
 }
 
 .adminAddCouponDiv button {
-  background-color: #3b82f6;
+  background-color: #334155;
   color: white;
   padding: 12px 24px;
   border: none;
@@ -52,7 +52,7 @@
 }
 
 .adminAddCouponDiv button:hover {
-  background-color: #2563eb;
+  background-color: #475569;
 }
 
 .adminAddCouponDiv button:active {
@@ -63,11 +63,11 @@
   position: fixed;
   top: 80px;
   right: 25px;
-  background-color: rgba(16, 185, 129, 0.9);
+  background-color: rgba(22, 101, 52, 0.95);
   color: white;
   padding: 12px 24px;
   border-radius: 30px;
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 6px 16px rgba(22, 101, 52, 0.25);
   z-index: 3000;
   font-weight: 600;
   font-size: 0.95rem;

@@ -83,14 +83,14 @@
 }
 
 .roleSelect:focus {
-  border-color: #3b82f6;
+  border-color: #334155;
   background-color: white;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(51, 65, 85, 0.1);
 }
 
 .deleteUserBtn {
   background-color: #fef2f2;
-  color: #ef4444;
+  color: #991b1b;
   border: 1px solid #fecaca;
   padding: 8px 16px;
   border-radius: 6px;
@@ -103,7 +103,7 @@
 
 .deleteUserBtn:hover {
   background-color: #fee2e2;
-  color: #dc2626;
+  color: #7f1d1d;
   border-color: #fca5a5;
 }
 
@@ -153,7 +153,7 @@
 
 .confirmYesBtn {
   flex: 1;
-  background-color: #10b981;
+  background-color: #166534;
   color: white;
   border: none;
   padding: 12px 20px;
@@ -165,7 +165,7 @@
 }
 
 .confirmYesBtn:hover {
-  background-color: #059669;
+  background-color: #14532d;
   transform: translateY(-1px);
 }
 

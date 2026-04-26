@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './PrivacyPolicy.css';
 
 export default function PrivacyPolicy() {
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -10,6 +13,13 @@ export default function PrivacyPolicy() {
     <div className="pageWrapper">
       <div className="policyContainer">
         <div className="policyCard">
+          <button className="backBtn" onClick={() => navigate(-1)}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </button>
+          
           <h1>Adatvédelmi Tájékoztató</h1>
           <p className="lastUpdated">Utoljára frissítve: {new Date().toLocaleDateString('hu-HU')}</p>
 

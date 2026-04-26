@@ -76,11 +76,11 @@
 
 .adminAddNews input[type='text']:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: #334155;
 }
 
 .adminAddNews button {
-  background-color: #3b82f6;
+  background-color: #334155;
   color: white;
   border: none;
   padding: 12px;
@@ -92,12 +92,12 @@
 }
 
 .adminAddNews button:hover {
-  background-color: #2563eb;
+  background-color: #475569;
 }
 
 .adminNewsList button {
-  background-color: #fee2e2;
-  color: #dc2626;
+  background-color: #fef2f2;
+  color: #991b1b;
   border: 1px solid #fecaca;
   padding: 8px 16px;
   border-radius: 8px;
@@ -108,9 +108,9 @@
 }
 
 .adminNewsList button:hover {
-  background-color: #dc2626;
-  color: white;
-  border-color: #dc2626;
+  background-color: #fee2e2;
+  color: #7f1d1d;
+  border-color: #fca5a5;
 }
 
 @media (max-width: 600px) {

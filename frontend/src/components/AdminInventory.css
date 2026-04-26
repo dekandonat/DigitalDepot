@@ -68,11 +68,11 @@
 }
 
 .formGroup input:focus {
-  border-color: #3b82f6;
+  border-color: #334155;
 }
 
 .submitStockBtn {
-  background-color: #10b981;
+  background-color: #166534;
   color: white;
   border: none;
   border-radius: 8px;
@@ -86,7 +86,7 @@
 }
 
 .submitStockBtn:hover {
-  background-color: #059669;
+  background-color: #14532d;
 }
 
 .submitStockBtn:active {

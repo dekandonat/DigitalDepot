@@ -58,7 +58,7 @@
 }
 
 .star.filled {
-    color: #ffc107;
+    color: #f59e0b;
 }
 
 .addReviewSection textarea {
@@ -81,7 +81,7 @@
 }
 
 .submitReviewBtn {
-    background-color: #007bff;
+    background-color: #334155;
     color: white;
     border: none;
     padding: 12px 20px; 
@@ -93,11 +93,11 @@
 }
 
 .submitReviewBtn:hover {
-    background-color: #0056b3;
+    background-color: #475569;
 }
 
 .deleteReviewBtn {
-    background-color: #dc3545;
+    background-color: #991b1b;
     color: white;
     border: none;
     padding: 12px 20px;
@@ -110,7 +110,7 @@
 }
 
 .deleteReviewBtn:hover {
-    background-color: #c82333;
+    background-color: #7f1d1d;
 }
 
 .reviewsList {
@@ -136,7 +136,7 @@
 }
 
 .reviewStars {
-    color: #ffc107;
+    color: #f59e0b;
     letter-spacing: 2px;
 }
 
@@ -153,7 +153,7 @@
 }
 
 .errorMsg {
-    color: #dc3545;
+    color: #991b1b;
     margin-top: 10px;
     font-size: 0.9rem;
     font-weight: bold;
