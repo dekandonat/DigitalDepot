@@ -350,6 +350,28 @@ router.patch('/products/:prodId', async (req, res) => {
   }
 });
 
+router.delete('/products/:prodId', async (req, res) => {
+  try {
+    const numId = Number(req.params.prodId);
+
+    if (!Number.isInteger(numId) || numId <= 0) {
+      return res
+        .status(400)
+        .json({ result: 'fail', message: 'érvénytelen azonosító' });
+    }
+
+    const result = await Products.delete(numId);
+    
+    if (result.result === 'success') {
+      res.status(200).json({ result: 'success', message: 'Termék törölve' });
+    } else {
+      res.status(500).json({ result: 'fail', message: result.message });
+    }
+  } catch (err) {
+    res.status(500).json({ result: 'fail', message: 'szerver hiba' });
+  }
+});
+
 router.get('/messages/:id', async (req, res) => {
   try {
     const numId = Number(req.params.id);

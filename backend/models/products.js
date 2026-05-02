@@ -149,4 +149,17 @@ module.exports = class Products {
       return { result: 'fail', message: 'szerver hiba' };
     }
   }
+
+  static async delete(id) {
+    try {
+      await db.execute('DELETE FROM carts WHERE productId = ?', [id]);
+      await db.execute('DELETE FROM reviews WHERE productId = ?', [id]);
+      await db.execute('DELETE FROM order_items WHERE productId = ?', [id]);
+      
+      await db.execute('DELETE FROM products WHERE prodId = ?', [id]);
+      return { result: 'success' };
+    } catch (err) {
+      return { result: 'fail', message: 'Szerver hiba a törlés során' };
+    }
+  }
 };

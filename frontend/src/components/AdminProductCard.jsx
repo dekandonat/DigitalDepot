@@ -10,7 +10,7 @@ export default function AdminProductCard(props) {
   const [description, setDescription] = useState(props.description);
   const [condition, setCondition] = useState(props.condition || '');
   const [toast, setToast] = useState('');
-  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'alert', action: '' });
   const [currentImg, setCurrentImg] = useState(props.img);
   const fileInputRef = useRef(null);
 
@@ -51,6 +51,8 @@ export default function AdminProductCard(props) {
           isOpen: true,
           title: 'Hiba',
           message: response.message || 'Ismeretlen hiba történt.',
+          type: 'alert',
+          action: ''
         });
       }
     } catch (error) {
@@ -58,7 +60,59 @@ export default function AdminProductCard(props) {
         isOpen: true,
         title: 'Szerver hiba',
         message: error.message,
+        type: 'alert',
+        action: ''
       });
+    }
+  };
+
+  const handleDeleteClick = () => {
+    setModal({
+      isOpen: true,
+      title: 'Termék törlése',
+      message: `Biztosan törölni szeretnéd a(z) ${name} terméket? Ez a művelet nem vonható vissza.`,
+      type: 'confirm',
+      action: 'delete'
+    });
+  };
+
+  const handleConfirm = async () => {
+    if (modal.action === 'delete') {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await apiFetch(`/adminRoute/products/${props.id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.result == 'success') {
+          closeModal();
+          showToast('Sikeresen törölve!');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          setModal({
+            isOpen: true,
+            title: 'Hiba',
+            message: response.message || 'Ismeretlen hiba történt.',
+            type: 'alert',
+            action: ''
+          });
+        }
+      } catch (error) {
+        setModal({
+          isOpen: true,
+          title: 'Szerver hiba',
+          message: error.message,
+          type: 'alert',
+          action: ''
+        });
+      }
+    } else {
+      closeModal();
     }
   };
 
@@ -94,10 +148,10 @@ export default function AdminProductCard(props) {
             setCurrentImg(imgResult.data.productImg);
           }
         } else {
-          setModal({ isOpen: true, title: 'Hiba', message: result.message });
+          setModal({ isOpen: true, title: 'Hiba', message: result.message, type: 'alert', action: '' });
         }
       } catch (err) {
-        setModal({ isOpen: true, title: 'Hiba', message: err.message });
+        setModal({ isOpen: true, title: 'Hiba', message: err.message, type: 'alert', action: '' });
       }
     }
   };
@@ -108,8 +162,9 @@ export default function AdminProductCard(props) {
         isOpen={modal.isOpen}
         title={modal.title}
         message={modal.message}
-        onConfirm={closeModal}
-        type="alert"
+        onConfirm={handleConfirm}
+        onCancel={closeModal}
+        type={modal.type || 'alert'}
       />
       {toast && <div className="toastMessage">{toast}</div>}
 
@@ -201,9 +256,14 @@ export default function AdminProductCard(props) {
             </button>
           </>
         ) : (
-          <button onClick={() => setIsEditing(true)} className="editBtn">
-            Szerkesztés
-          </button>
+          <>
+            <button onClick={() => setIsEditing(true)} className="editBtn">
+              Szerkesztés
+            </button>
+            <button onClick={handleDeleteClick} className="deleteBtn">
+              Törlés
+            </button>
+          </>
         )}
       </div>
     </div>
