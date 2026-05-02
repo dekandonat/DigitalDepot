@@ -229,11 +229,12 @@ export default function ProductPage() {
               </button>
             </div>
 
-            <div className="descriptionContainer">
-              <h3>Termékleírás</h3>
-              <p>{product.productDescription}</p>
             </div>
-          </div>
+        </div>
+
+        <div className="descriptionContainer infoBox" style={{ marginBottom: '20px' }}>
+          <h3>Termékleírás</h3>
+          <p>{product.productDescription}</p>
         </div>
 
         <div className="additionalInfoSection">

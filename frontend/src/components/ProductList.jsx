@@ -121,7 +121,7 @@ export default function ProductList() {
     type: '',
     key: 0,
   });
-  const [visibleCount, setVisibleCount] = useState(24);
+  const [visibleCount, setVisibleCount] = useState(20);
 
   const sortType = searchParams.get('sort') || 'default';
   const searchQuery = searchParams.get('q');
@@ -165,7 +165,7 @@ export default function ProductList() {
       sorted.sort((a, b) => a.avgRating - b.avgRating);
 
     setDisplayedProducts(sorted);
-    setVisibleCount(24);
+    setVisibleCount(20);
   }, [products, sortType, categoryId, searchQuery]);
 
   const showToast = (message, type) => {
@@ -189,7 +189,7 @@ export default function ProductList() {
   };
 
   const handleLoadMore = () => {
-    setVisibleCount((prevCount) => prevCount + 24);
+    setVisibleCount((prevCount) => prevCount + 20);
   };
 
   if (isLoading)
