@@ -39,7 +39,6 @@ const PORT = process.env.PORT;
 
 app.set('trust proxy', 1);
 app.use(helmet());
-app.use(limiter);
 app.use(express.json());
 app.use(cookieparser());
 app.use(
@@ -55,6 +54,7 @@ app.use(
     maxAge: '1d',
   })
 );
+app.use(limiter);
 app.use('/products', productRouter);
 app.use('/user', userRouter);
 app.use('/category', categoryRouter);
