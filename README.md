@@ -27,16 +27,15 @@ A **DigitalDepot** egy webshop alkalmazás, amely új és használt műszaki cik
 ### Backend beállítása
 
 1. Hozz létre a `backend` mappában egy `.env` nevű fájlt, majd add meg a következő változókat:
-
-   - `IP` = szerver IP-címe  
-   - `PORT` = szerver portja  
-   - `HOST` = adatbázis elérése (host)  
-   - `USER` = adatbázis felhasználó  
-   - `PASSWORD` = adatbázis jelszó (hagyd üresen, ha nincs)  
-   - `DATABASE` = `digitaldepot`  
-   - `SECRET` = egy random karakterlánc a tokenekhez  
-   - `EMAIL_PASSWORD` = email cím app jelszó  
-   - `EMAIL_USER` = email cím  
+   - `IP` = szerver IP-címe
+   - `PORT` = szerver portja
+   - `HOST` = adatbázis elérése (host)
+   - `USER` = adatbázis felhasználó
+   - `PASSWORD` = adatbázis jelszó (hagyd üresen, ha nincs)
+   - `DATABASE` = `digitaldepot`
+   - `SECRET` = egy random karakterlánc a tokenekhez
+   - `EMAIL_PASSWORD` = email cím app jelszó
+   - `EMAIL_USER` = email cím
 
 2. Lépj be a backend mappába:
 
@@ -85,3 +84,13 @@ A **DigitalDepot** egy webshop alkalmazás, amely új és használt műszaki cik
 
 - Kattints a terminálban megjelenő linkre, vagy nyisd meg a böngésződben:
   - `http://localhost:5173`
+
+## Admin
+
+admin@gmail.com
+admin1234
+
+## Owner
+
+owner@gmail.com
+owner
