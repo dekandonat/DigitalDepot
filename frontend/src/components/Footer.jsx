@@ -17,7 +17,7 @@ export default function Footer() {
         <div className="footerSection">
           <h4>Elérhetőségek</h4>
           <ul>
-            <li>Email: info@digitaldepot.hu</li>
+            <li>Email: support.digitaldepot@gmail.com</li>
             <li>Telefon: +36 30 123 4567</li>
             <li>Cím: 1234 Budapest, Példa utca 1.</li>
           </ul>
