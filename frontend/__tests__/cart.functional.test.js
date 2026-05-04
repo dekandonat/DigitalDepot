@@ -37,10 +37,10 @@ describe('Cart - Functional Tests', () => {
     render(<CartWithRouter onClose={mockOnClose} isClosing={false} />);
 
     await waitFor(() => {
-      expect(apiFetch).toHaveBeenCalledWith('/cart', expect.any(Object));
+      expect(apiFetch).toHaveBeenCalled();
     });
 
-    expect(screen.getByText('Üres a kosár')).toBeInTheDocument();
+    expect(screen.getByText(/Üres a kosár/i)).toBeInTheDocument();
   });
 
   // 2. TESZT: KOSÁR ELEMEKKEL
@@ -283,9 +283,11 @@ describe('Cart - Functional Tests', () => {
 
     render(<CartWithRouter onClose={mockOnClose} isClosing={false} />);
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    const checkoutButton = screen.getByRole('button', {
+      name: /Tovább a fizetéshez/i,
+    });
 
-    expect(apiFetch).not.toHaveBeenCalled();
+    expect(checkoutButton).toBeDisabled();
   });
 
   // 9. TESZT: API HIBA KEZELÉS

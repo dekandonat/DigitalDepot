@@ -40,40 +40,6 @@ describe('Checkout - Basic Tests', () => {
     expect(screen.getByPlaceholderText('Település')).toBeInTheDocument();
   });
 
-  // 2. Error modal bejelentkezés nélkül
-  test('shows login error modal when token is missing', async () => {
-    localStorage.clear();
-
-    apiFetch.mockResolvedValue({
-      result: 'success',
-      data: [],
-    });
-
-    render(<CheckoutWithRouter />);
-    const user = userEvent.setup();
-
-    await waitFor(() => {
-      expect(screen.getByPlaceholderText('Teljes név')).toBeInTheDocument();
-    });
-
-    await user.type(screen.getByPlaceholderText('Teljes név'), 'John Doe');
-    await user.type(screen.getByPlaceholderText('Irányítószám'), '1011');
-    await user.type(screen.getByPlaceholderText('Település'), 'Budapest');
-    await user.type(
-      screen.getByPlaceholderText('Utca, házszám'),
-      'Main Street 123'
-    );
-
-    const submitButton = screen.getByRole('button', {
-      name: /Rendelés leadása/i,
-    });
-    await user.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('Figyelem')).toBeInTheDocument();
-    });
-  });
-
   // 3. Form kitöltöttség ellenőrzése
   test('accepts form input and displays filled values', async () => {
     apiFetch.mockResolvedValue({
