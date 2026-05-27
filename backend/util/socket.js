@@ -3,13 +3,15 @@ const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const verifyAsync = promisify(jwt.verify);
 const db = require('./database');
+const dotenv = require('dotenv');
+dotenv.config();
 let io;
 
 module.exports = {
   init: (server) => {
     io = new Server(server, {
       cors: {
-        origin: 'http://localhost:5173',
+        origin: process.env.FRONTEND_URL,
         methods: ['GET', 'POST'],
         credentials: true,
       },
@@ -39,7 +41,7 @@ module.exports = {
     io.on('connection', (socket) => {
       socket.on('send_message', async (data) => {
         const { id, role } = socket.user;
-        
+
         let messageText = '';
         if (typeof data === 'string') {
           messageText = data;
