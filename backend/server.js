@@ -34,8 +34,8 @@ const reviewRouter = require('./routes/reviewRouter');
 const newsRouter = require('./routes/newsRouter');
 const couponRouter = require('./routes/couponRouter');
 
-const IP = process.env.IP;
-const PORT = process.env.PORT;
+const IP = process.env.DB_HOST ? '0.0.0.0' : process.env.IP || 'localhost';
+const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
 app.use(helmet());
@@ -43,7 +43,7 @@ app.use(express.json());
 app.use(cookieparser());
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
