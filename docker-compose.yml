@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    restart: always
+    env_file:
+      - ./backend/.env
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=${DATABASE}
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  node-backend:
+    build: ./backend
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - DB_HOST=mysql-db
+    depends_on:
+      - mysql-db
+
+  # 3. FRONTEND (Vite)
+  vite-frontend:
+    build: ./frontend
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  mysql_data:
